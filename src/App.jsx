@@ -1,37 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import MainPage from './pages/MainPage';
-import QuestPage from './pages/QuestPage';
-import TodoPage from './pages/TodoPage';
-import StatPage from './pages/StatPage';
-import FriendPage from './pages/FriendPage';
-import ShopPage from './pages/ShopPage';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
-function App() {
-  return (
-    <Router>
-      <div className="app-container">
-        {/* 임시 네비게이션 바 (추후 하단 메뉴로 이동) */}
-        <nav className="temp-nav">
-          <Link to="/">메인</Link> | 
-          <Link to="/quest">퀘스트</Link> | 
-          <Link to="/todo">투두리스트</Link> | 
-          <Link to="/stat">스탯</Link> | 
-          <Link to="/friend">친구</Link> | 
-          <Link to="/shop">상점</Link>
-        </nav>
+// TODO: 추후 index.html에 있는 vanilla JS 코드를 각 페이지 컴포넌트로 마이그레이션 할 예정입니다.
+// 현재는 index.html의 정적 화면을 그대로 보여주기 위해 React는 아무것도 렌더링하지 않습니다.
 
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/quest" element={<QuestPage />} />
-          <Route path="/todo" element={<TodoPage />} />
-          <Route path="/stat" element={<StatPage />} />
-          <Route path="/friend" element={<FriendPage />} />
-          <Route path="/shop" element={<ShopPage />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+function App() {
+  return null;
 }
 
 export default App;
