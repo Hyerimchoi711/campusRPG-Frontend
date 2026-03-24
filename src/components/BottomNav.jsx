@@ -9,17 +9,20 @@ const BottomNav = () => {
 
   return (
     <div className="bottom-nav">
-      <div className={`nav-item ${isActive('/home')}`} onClick={() => navigate('/home')}>
-        <span>🏠</span><span>홈</span>
-      </div>
       <div className={`nav-item ${isActive('/stats')}`} onClick={() => navigate('/stats')}>
         <span>📊</span><span>스탯</span>
       </div>
       <div className={`nav-item ${isActive('/avatar')}`} onClick={() => navigate('/avatar')}>
-        <span>🧙</span><span>아바타</span>
+        <span>🧑‍🎓</span><span>캐릭터</span>
       </div>
-      <div className={`nav-item ${isActive('/achieve')}`} onClick={() => navigate('/achieve')}>
-        <span>🏆</span><span>업적</span>
+      <div className={`nav-item ${isActive('/home')}`} onClick={() => navigate('/home')}>
+        <span>🏠</span><span>홈</span>
+      </div>
+      <div className={`nav-item ${isActive('/quests')}`} onClick={() => navigate('/quests')}>
+        <span>📋</span><span>퀘스트</span>
+      </div>
+      <div className={`nav-item ${isActive('/friends')}`} onClick={() => navigate('/friends')}>
+        <span>👥</span><span>친구</span>
       </div>
     </div>
   );

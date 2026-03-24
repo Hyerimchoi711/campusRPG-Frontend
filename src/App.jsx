@@ -4,7 +4,9 @@ import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import StatsPage from './pages/StatsPage';
 import AvatarPage from './pages/AvatarPage';
-import AchievePage from './pages/AchievePage';
+import QuestsPage from './pages/QuestsPage';
+import FriendsPage from './pages/FriendsPage';
+/*import AchievePage from './pages/AchievePage';*/
 import './App.css';
 
 function App() {
@@ -17,7 +19,8 @@ function App() {
           <Route path="home" element={<HomePage />} />
           <Route path="stats" element={<StatsPage />} />
           <Route path="avatar" element={<AvatarPage />} />
-          <Route path="achieve" element={<AchievePage />} />
+          <Route path="quests" element={<QuestsPage />} />
+          <Route path="friends" element={<FriendsPage />} />
         </Route>
       </Routes>
     </Router>
