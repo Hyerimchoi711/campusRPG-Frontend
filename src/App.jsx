@@ -3,7 +3,7 @@ import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
 import StatsPage from './pages/StatsPage';
-import AvatarPage from './pages/AvatarPage';
+import TodoPage from './pages/TodoPage';
 import QuestsPage from './pages/QuestsPage';
 import FriendsPage from './pages/FriendsPage';
 /*import AchievePage from './pages/AchievePage';*/
@@ -18,7 +18,7 @@ function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="home" element={<HomePage />} />
           <Route path="stats" element={<StatsPage />} />
-          <Route path="avatar" element={<AvatarPage />} />
+          <Route path="todo" element={<TodoPage />} />
           <Route path="quests" element={<QuestsPage />} />
           <Route path="friends" element={<FriendsPage />} />
         </Route>

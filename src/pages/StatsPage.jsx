@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 
 const StatsPage = () => {
@@ -13,6 +14,7 @@ const StatsPage = () => {
 
   return (
     <div className="screen active" id="screenStats">
+      <TopBar />
       <div className="screen-header">
         <button className="back-btn" onClick={() => navigate('/home')}>←</button>
         <span>캐릭터 스탯</span>

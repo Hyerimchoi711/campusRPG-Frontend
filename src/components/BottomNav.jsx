@@ -12,8 +12,8 @@ const BottomNav = () => {
       <div className={`nav-item ${isActive('/stats')}`} onClick={() => navigate('/stats')}>
         <span>📊</span><span>스탯</span>
       </div>
-      <div className={`nav-item ${isActive('/avatar')}`} onClick={() => navigate('/avatar')}>
-        <span>🧑‍🎓</span><span>캐릭터</span>
+      <div className={`nav-item ${isActive('/todo')}`} onClick={() => navigate('/todo')}>
+        <span>📅</span><span>일정</span>
       </div>
       <div className={`nav-item ${isActive('/home')}`} onClick={() => navigate('/home')}>
         <span>🏠</span><span>홈</span>
