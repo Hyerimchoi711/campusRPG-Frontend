@@ -13,6 +13,19 @@ const HomePage = () => {
           Lv. 0
         </div>
         
+        {/* XP 바 */}
+        <div className="xp-section" style={{ width: '100%', padding: '0 20px' }}>
+          <div className="xp-label">
+            <span>EXP</span>
+            <span>1,240 / 2,000</span>
+          </div>
+          <div className="xp-bar">
+            <div className="xp-fill" style={{width: '62%'}}>
+              <div className="xp-shine"></div>
+            </div>
+          </div>
+        </div>
+
         <img 
           src="/images/animals/egg.png" 
           alt="알" 

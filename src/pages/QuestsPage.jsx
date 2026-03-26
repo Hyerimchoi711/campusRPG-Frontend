@@ -11,19 +11,6 @@ const QuestsPage = () => {
     <div className="screen active" id="screenQuests">
       <TopBar />
 
-      {/* XP 바 */}
-      <div className="xp-section">
-        <div className="xp-label">
-          <span>EXP</span>
-          <span>1,240 / 2,000</span>
-        </div>
-        <div className="xp-bar">
-          <div className="xp-fill" style={{width: '62%'}}>
-            <div className="xp-shine"></div>
-          </div>
-        </div>
-      </div>
-
       {/* 오늘의 퀘스트 */}
       <div className="section-header">
         <span className="section-icon">📋</span>

@@ -218,9 +218,9 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
   position: fixed;
   inset: 0;
   z-index: 0;
-  background-image: url('/images/background.png');
+  background-image: url('/images/background1.jpg');
   background-size: cover;
-  background-position: center;
+  background-position: top center;
   background-repeat: no-repeat;
   pointer-events: none;
 }
