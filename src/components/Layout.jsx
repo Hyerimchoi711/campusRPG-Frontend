@@ -27,12 +27,12 @@ const Layout = () => {
           </div>
           <div className="panel-quote">"오늘의 퀘스트가<br/>내일의 전설이 된다"</div>
         </div>
-        <div className="floating-icons">
+        {/* <div className="floating-icons">
           <div className="fi fi1">🌻</div>
           <div className="fi fi2">📚</div>
           <div className="fi fi3">⭐</div>
           <div className="fi fi4">🍃</div>
-        </div>
+        </div> */}
       </aside>
 
       {/* 우측 장식 패널 */}
@@ -93,12 +93,12 @@ const Layout = () => {
             <div className="event-sub">오늘 퀘스트 완료 시<br/>경험치 2배 획득</div>
           </div>
         </div>
-        <div className="floating-icons right">
+        {/* <div className="floating-icons right">
           <div className="fi fi5">🎯</div>
           <div className="fi fi6">🌸</div>
           <div className="fi fi7">🎮</div>
           <div className="fi fi8">💎</div>
-        </div>
+        </div> */}
       </aside>
 
       {/* 중앙 스마트폰 영역 */}

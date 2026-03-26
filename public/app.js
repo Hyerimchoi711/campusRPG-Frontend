@@ -107,12 +107,13 @@ function closeLevelup() {
 
 // ── 배경 파티클 캔버스 (Fireflies / Leaves) ─────────────────
 const canvas = document.getElementById('bgCanvas');
-const ctx    = canvas.getContext('2d');
+const ctx    = canvas ? canvas.getContext('2d') : null;
 
 let W, H;
 let particles = [];
 
 function resize() {
+  if (!canvas) return;
   W = canvas.width  = window.innerWidth;
   H = canvas.height = window.innerHeight;
 }
@@ -210,6 +211,7 @@ class Particle {
 for (let i = 0; i < 40; i++) particles.push(new Particle());
 
 function burstParticles() {
+  if (!canvas) return;
   const cx = W / 2, cy = H / 2;
   for (let i = 0; i < 50; i++) {
     particles.push(new Particle(true, cx, cy));
@@ -217,6 +219,7 @@ function burstParticles() {
 }
 
 function animateParticles() {
+  if (!ctx) return;
   ctx.clearRect(0, 0, W, H);
 
   particles = particles.filter(p => !p.isDead());
@@ -224,7 +227,7 @@ function animateParticles() {
 
   requestAnimationFrame(animateParticles);
 }
-animateParticles();
+if (ctx) animateParticles();
 
 // ── 좌측 패널 스탯 바 애니메이션 ──────────────────────────
 window.addEventListener('load', () => {

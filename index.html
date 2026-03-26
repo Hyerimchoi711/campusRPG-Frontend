@@ -12,11 +12,14 @@
 <body>
 
   <!-- 배경 파티클 캔버스 -->
-  <canvas id="bgCanvas"></canvas>
+  <!-- <canvas id="bgCanvas"></canvas> -->
+
+  <!-- 정적 배경 이미지 -->
+  <div class="static-bg"></div>
 
   <!-- 계절 배경 SVG 레이어 -->
+  <!-- 
   <div class="season-bg" id="seasonBg">
-    <!-- 하늘 그라디언트 레이어 -->
     <svg class="sky-layer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
       <defs>
         <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
@@ -25,7 +28,6 @@
         </linearGradient>
       </defs>
       <rect width="1200" height="400" fill="url(#skyGrad)"/>
-      <!-- 구름들 -->
       <g class="cloud-group" opacity="0.75">
         <ellipse cx="180" cy="80" rx="60" ry="28" fill="white"/>
         <ellipse cx="230" cy="68" rx="44" ry="22" fill="white"/>
@@ -39,53 +41,41 @@
       </g>
     </svg>
 
-    <!-- 나무 + 지형 레이어 -->
     <svg class="tree-layer" id="treeSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMax slice">
-      <!-- 지면 -->
       <rect id="groundRect" x="0" y="300" width="1200" height="100" fill="#6aaa40"/>
       <rect id="groundRect2" x="0" y="320" width="1200" height="80" fill="#4d8c30"/>
-      <!-- 언덕 -->
       <ellipse id="hill1" cx="200" cy="310" rx="280" ry="60" fill="#6aaa40"/>
       <ellipse id="hill2" cx="1000" cy="310" rx="300" ry="65" fill="#6aaa40"/>
       <ellipse id="hill3" cx="600" cy="320" rx="400" ry="50" fill="#5da035"/>
 
-      <!-- 왼쪽 나무 그룹 -->
-      <!-- 나무 1 (큰 것) -->
       <rect id="trunk1" x="68" y="245" width="14" height="60" rx="4" fill="#6b4226"/>
       <polygon id="leaf1c" points="75,155 115,248 35,248" fill="#3e8b2f"/>
       <polygon id="leaf1b" points="75,180 108,255 42,255" fill="#4da03c"/>
       <polygon id="leaf1a" points="75,200 105,262 45,262" fill="#5cb84a"/>
 
-      <!-- 나무 2 (중간) -->
       <rect id="trunk2" x="128" y="258" width="10" height="50" rx="3" fill="#6b4226"/>
       <polygon id="leaf2c" points="133,188 162,260 104,260" fill="#3e8b2f"/>
       <polygon id="leaf2b" points="133,208 158,266 108,266" fill="#4da03c"/>
       <polygon id="leaf2a" points="133,225 156,272 110,272" fill="#5cb84a"/>
 
-      <!-- 나무 3 (작은 것) -->
       <rect id="trunk3" x="32" y="268" width="8" height="40" rx="2" fill="#6b4226"/>
       <polygon id="leaf3c" points="36,210 58,270 14,270" fill="#3e8b2f"/>
       <polygon id="leaf3b" points="36,228 56,275 16,275" fill="#4da03c"/>
 
-      <!-- 오른쪽 나무 그룹 -->
-      <!-- 나무 4 (큰 것) -->
       <rect id="trunk4" x="1118" y="240" width="14" height="65" rx="4" fill="#6b4226"/>
       <polygon id="leaf4c" points="1125,148 1165,243 1085,243" fill="#3e8b2f"/>
       <polygon id="leaf4b" points="1125,175 1158,250 1092,250" fill="#4da03c"/>
       <polygon id="leaf4a" points="1125,198 1155,258 1095,258" fill="#5cb84a"/>
 
-      <!-- 나무 5 (중간) -->
       <rect id="trunk5" x="1058" y="256" width="10" height="50" rx="3" fill="#6b4226"/>
       <polygon id="leaf5c" points="1063,186 1092,258 1034,258" fill="#3e8b2f"/>
       <polygon id="leaf5b" points="1063,206 1088,264 1038,264" fill="#4da03c"/>
       <polygon id="leaf5a" points="1063,223 1086,270 1040,270" fill="#5cb84a"/>
 
-      <!-- 나무 6 (작은) -->
       <rect id="trunk6" x="1156" y="268" width="8" height="38" rx="2" fill="#6b4226"/>
       <polygon id="leaf6c" points="1160,212 1182,270 1138,270" fill="#3e8b2f"/>
       <polygon id="leaf6b" points="1160,230 1180,275 1140,275" fill="#4da03c"/>
 
-      <!-- 봄 꽃잎 파티클 (기본 숨김) -->
       <g id="petalGroup" opacity="0" class="petal-group">
         <circle cx="120" cy="220" r="5" fill="#ffb7c5" opacity="0.8"/>
         <circle cx="200" cy="180" r="4" fill="#ff9eb5" opacity="0.7"/>
@@ -97,7 +87,6 @@
         <circle cx="900"  cy="290" r="5" fill="#ffb7c5" opacity="0.7"/>
       </g>
 
-      <!-- 가을 낙엽 (기본 숨김) -->
       <g id="autumnLeaves" opacity="0">
         <ellipse cx="90"  cy="245" rx="8" ry="5" fill="#e8640a" transform="rotate(-20,90,245)"/>
         <ellipse cx="55"  cy="270" rx="7" ry="4" fill="#d4500a" transform="rotate(15,55,270)"/>
@@ -107,7 +96,6 @@
         <ellipse cx="850" cy="295" rx="7" ry="4" fill="#d46800" transform="rotate(-10,850,295)"/>
       </g>
 
-      <!-- 겨울 눈 (기본 숨김) -->
       <g id="snowCaps" opacity="0">
         <ellipse cx="75"  cy="158" rx="42" ry="10" fill="white" opacity="0.9"/>
         <ellipse cx="133" cy="190" rx="32" ry="8"  fill="white" opacity="0.85"/>
@@ -115,10 +103,10 @@
         <ellipse cx="1063" cy="188" rx="32" ry="8"  fill="white" opacity="0.85"/>
       </g>
 
-      <!-- 겨울 땅 (기본 숨김) -->
       <rect id="snowGround" x="0" y="298" width="1200" height="102" fill="white" opacity="0"/>
     </svg>
   </div>
+  -->
 
   <!-- 계절 선택 버튼 -->
   <!-- <div class="season-switcher" id="seasonSwitcher">

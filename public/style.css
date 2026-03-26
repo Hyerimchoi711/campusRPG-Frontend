@@ -352,6 +352,7 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
 }
 
 /* Floating icons - softer animation */
+/*
 .floating-icons {
   position: absolute;
   inset: 0;
@@ -380,6 +381,7 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
   50%      { transform: translateY(-12px) rotate(-2deg); }
   75%      { transform: translateY(-6px) rotate(2deg); }
 }
+*/
 
 /* Ranking list */
 .rank-list {
@@ -1710,13 +1712,9 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
 }
 
 .home-character-img {
-  width: 200px;
-  height: 300px;
-  border: 4px solid var(--bg-wood);
-  border-radius: 12px;
-  background: #fff;
+  width: 130px;
+  height: auto;
   object-fit: cover;
-  box-shadow: 4px 4px 0 var(--bg-wood-dark);
 }
 
 .home-info-box {
@@ -1742,4 +1740,18 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
   font-size: 12px;
   color: var(--text-sub);
   font-family: var(--body-font);
+}
+
+/* ============================================================
+   STATIC BACKGROUND IMAGE
+   ============================================================ */
+.static-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/images/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
 }

@@ -13,7 +13,7 @@ const HomePage = () => {
         </div>
         
         <img 
-          src="/images/characters/character1_male.jpg" 
+          src="/images/characters/character1_male.png" 
           alt="캐릭터" 
           className="home-character-img"
         />
