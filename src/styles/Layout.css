@@ -1,0 +1,548 @@
+/* ============================================================
+   SEASON SWITCHER BUTTON GROUP
+   ============================================================ */
+.season-switcher {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-card);
+  border: 3px solid var(--bg-wood);
+  border-radius: 14px;
+  padding: 6px 12px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-wood-light),
+    3px 3px 0 var(--bg-wood-dark),
+    0 8px 24px rgba(0,0,0,0.18);
+}
+
+.season-label {
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  padding-right: 4px;
+  border-right: 2px solid var(--border2);
+  margin-right: 2px;
+}
+
+.season-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.season-btn:hover {
+  background: rgba(139,105,20,0.08);
+  border-color: var(--border2);
+  transform: translateY(-2px);
+}
+
+.season-btn.active {
+  border-color: var(--bg-wood);
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.4),
+    2px 2px 0 var(--bg-wood-dark);
+}
+
+.season-btn[data-season="spring"].active { background: linear-gradient(135deg, #ffe0ea, #fff0f5); }
+.season-btn[data-season="summer"].active { background: linear-gradient(135deg, #d4f0b0, #e8ffd8); }
+.season-btn[data-season="autumn"].active { background: linear-gradient(135deg, #ffe0b0, #fff4d8); }
+.season-btn[data-season="winter"].active { background: linear-gradient(135deg, #d8eeff, #eef6ff); }
+
+.season-icon {
+  font-size: 18px;
+  display: block;
+  transition: transform 0.3s ease;
+  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.15));
+}
+.season-btn:hover .season-icon,
+.season-btn.active .season-icon {
+  transform: scale(1.15) translateY(-1px);
+}
+
+.season-name {
+  font-family: var(--pixel-font);
+  font-size: 7px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+.season-btn.active .season-name { color: var(--text-main); font-weight: 700; }
+
+/* ============================================================
+   SIDE PANELS - Wood frame style
+   ============================================================ */
+.side-panel {
+  position: fixed;
+  top: 0; bottom: 0;
+  width: calc((100vw - var(--phone-w) - 80px) / 2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 40px 20px;
+  z-index: 15;
+  overflow: hidden;
+}
+
+.left-panel  { left: 0; }
+.right-panel { right: 0; }
+
+/* Wood frame effect for panels */
+.panel-frame {
+  background: var(--bg-card);
+  border: 4px solid var(--bg-wood);
+  border-radius: 8px;
+  padding: 20px 16px;
+  box-shadow: 
+    inset 0 0 0 2px var(--bg-wood-light),
+    4px 4px 0 var(--bg-wood-dark),
+    8px 8px 20px rgba(0,0,0,0.2);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Corner decorations */
+.panel-frame::before,
+.panel-frame::after {
+  content: '✦';
+  position: absolute;
+  color: var(--gold);
+  font-size: 12px;
+}
+.panel-frame::before { top: 4px; left: 6px; }
+.panel-frame::after { top: 4px; right: 6px; }
+
+.panel-title {
+  font-family: var(--pixel-font);
+  font-size: 12px;
+  color: var(--text-main);
+  text-align: center;
+  line-height: 1.8;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 0 var(--gold);
+  position: relative;
+  z-index: 1;
+}
+
+.deco-line {
+  width: 80%;
+  height: 3px;
+  background: linear-gradient(to right, transparent, var(--bg-wood), var(--gold), var(--bg-wood), transparent);
+  border-radius: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.deco-stat-preview {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-sub);
+  font-family: var(--pixel-font);
+}
+
+.stat-bar-mini {
+  height: 8px;
+  background: var(--bg-card2);
+  border: 2px solid var(--bg-wood);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.stat-bar-mini .fill {
+  height: 100%;
+  background: linear-gradient(to bottom, var(--accent2), var(--accent));
+  border-radius: 2px;
+  animation: barPulse 3s ease-in-out infinite;
+}
+.stat-bar-mini .fill.lazy    { background: linear-gradient(to bottom, var(--coral), #e55555); }
+.stat-bar-mini .fill.social  { background: linear-gradient(to bottom, var(--rose), #e090a0); }
+.stat-bar-mini .fill.focus   { background: linear-gradient(to bottom, var(--sky-blue), #88c0d0); }
+
+@keyframes barPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.85; }
+}
+
+.panel-quote {
+  font-size: 10px;
+  color: var(--text-sub);
+  text-align: center;
+  line-height: 1.8;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+  padding: 8px;
+  background: rgba(255,248,240,0.5);
+  border-radius: 4px;
+  border: 1px dashed var(--border2);
+}
+
+/* Floating icons - softer animation */
+/*
+.floating-icons {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.fi {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0.4;
+  animation: floatSoft 8s ease-in-out infinite;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+}
+.fi1 { top: 15%; left: 20%; animation-delay: 0s; }
+.fi2 { top: 35%; left: 70%; animation-delay: 2s; }
+.fi3 { top: 60%; left: 30%; animation-delay: 4s; }
+.fi4 { top: 80%; left: 65%; animation-delay: 6s; }
+.fi5 { top: 10%; right: 20%; animation-delay: 1s; }
+.fi6 { top: 40%; right: 60%; animation-delay: 3s; }
+.fi7 { top: 65%; right: 25%; animation-delay: 5s; }
+.fi8 { top: 85%; right: 55%; animation-delay: 7s; }
+
+@keyframes floatSoft {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%      { transform: translateY(-8px) rotate(3deg); }
+  50%      { transform: translateY(-12px) rotate(-2deg); }
+  75%      { transform: translateY(-6px) rotate(2deg); }
+}
+*/
+
+/* Ranking list */
+.rank-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.rank-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card2);
+  border: 2px solid var(--border2);
+  border-radius: 6px;
+  padding: 6px 8px;
+  transition: all 0.3s;
+}
+.rank-item:hover {
+  background: #fff;
+  transform: translateX(2px);
+  box-shadow: 2px 2px 0 var(--bg-wood-dark);
+}
+.rank-item.gold   { border-color: var(--gold); background: linear-gradient(135deg, #fff8e7, #fff); }
+.rank-item.silver { border-color: #c0c0c0; background: linear-gradient(135deg, #f8f8f8, #fff); }
+.rank-item.bronze { border-color: var(--copper); background: linear-gradient(135deg, #fff5e8, #fff); }
+
+.rank-num {
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--text-dim);
+  min-width: 18px;
+}
+.rank-item.gold   .rank-num { color: var(--gold2); }
+.rank-item.silver .rank-num { color: #a0a0a0; }
+.rank-item.bronze .rank-num { color: var(--copper); }
+
+.rank-avatar {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  border: 2px solid var(--bg-wood);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.rank-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.rank-name  { font-size: 10px; font-weight: 700; color: var(--text-main); }
+.rank-class { font-size: 8px; color: var(--text-sub); }
+.rank-xp    { font-size: 8px; color: var(--accent3); font-family: var(--pixel-font); white-space: nowrap; }
+
+.today-event {
+  width: 100%;
+  background: linear-gradient(135deg, #fff8e7, #fff5f5);
+  border: 2px solid var(--gold);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.event-badge {
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--gold2);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+  text-shadow: 1px 1px 0 var(--bg-wood);
+}
+.event-text {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: var(--text-main);
+}
+.event-sub {
+  font-size: 9px;
+  color: var(--text-sub);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   PHONE STAGE (CENTER) - Cozy wooden device
+   ============================================================ */
+.phone-stage {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Soft glow effect */
+.phone-glow {
+  position: absolute;
+  width: calc(var(--phone-w) + 60px);
+  height: calc(var(--phone-h) + 60px);
+  border-radius: calc(var(--phone-r) + 30px);
+  background: radial-gradient(ellipse, rgba(245,192,110,0.3) 0%, rgba(139,195,74,0.15) 50%, transparent 70%);
+  animation: softGlow 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes softGlow {
+  0%, 100% { transform: scale(1);   opacity: 0.6; }
+  50%       { transform: scale(1.03); opacity: 0.8; }
+}
+
+/* Phone frame - Wood border style */
+.phone-frame {
+  width: var(--phone-w);
+  height: var(--phone-h);
+  border-radius: var(--phone-r);
+  background: linear-gradient(160deg, var(--bg-wood-light) 0%, var(--bg-wood) 50%, var(--bg-wood-dark) 100%);
+  border: none;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,0.3),
+    inset 0 -2px 4px rgba(0,0,0,0.2),
+    4px 4px 0 var(--bg-wood-dark),
+    8px 8px 20px rgba(0,0,0,0.3);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  padding: 8px;
+  animation: deviceFloat 5s ease-in-out infinite;
+}
+
+@keyframes deviceFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* Wood texture decorations */
+.phone-frame::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: calc(var(--phone-r) - 4px);
+  pointer-events: none;
+}
+
+/* Notch - Cozy style */
+.phone-notch {
+  width: 100px;
+  height: 22px;
+  background: var(--bg-wood-dark);
+  border-radius: 0 0 12px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 0;
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3);
+}
+.notch-camera {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #2a2a3a;
+  border: 1px solid var(--bg-wood);
+  box-shadow: inset 0 0 2px rgba(255,255,255,0.2);
+}
+.notch-speaker {
+  width: 30px; height: 3px;
+  border-radius: 2px;
+  background: #1a1a2a;
+  border: 1px solid rgba(0,0,0,0.3);
+}
+
+/* Phone screen - Parchment style */
+.phone-screen {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-card);
+  border-radius: calc(var(--phone-r) - 8px);
+  border: 3px solid var(--bg-wood-dark);
+}
+
+/* Home button */
+.phone-home-btn {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  border: 3px solid var(--bg-wood-dark);
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+  margin: 6px 0 4px;
+  flex-shrink: 0;
+  box-shadow: 
+    inset 0 2px 4px rgba(255,255,255,0.5),
+    2px 2px 0 var(--bg-wood-dark);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.phone-home-btn:hover {
+  transform: translateY(1px);
+  box-shadow: 
+    inset 0 2px 4px rgba(255,255,255,0.5),
+    1px 1px 0 var(--bg-wood-dark);
+}
+
+/* ============================================================
+   LEVEL UP OVERLAY - Celebration!
+   ============================================================ */
+.levelup-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(74,103,65,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  backdrop-filter: blur(4px);
+}
+.levelup-overlay.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.levelup-box {
+  background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+  border: 4px solid var(--gold);
+  border-radius: 16px;
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: 
+    inset 0 0 0 2px var(--bg-wood-light),
+    4px 4px 0 var(--bg-wood-dark),
+    0 0 40px rgba(245,192,110,0.5);
+  animation: levelupBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes levelupBounce {
+  0%   { transform: scale(0.5) rotate(-5deg); opacity: 0; }
+  50%  { transform: scale(1.1) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+.levelup-title {
+  font-family: var(--pixel-font);
+  font-size: 14px;
+  color: var(--gold2);
+  text-shadow: 2px 2px 0 var(--bg-wood);
+  margin-bottom: 6px;
+  animation: titlePulse 1s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.05); }
+}
+.levelup-num {
+  font-family: var(--pixel-font);
+  font-size: 28px;
+  color: var(--text-main);
+  margin-bottom: 8px;
+  text-shadow: 2px 2px 0 var(--gold);
+}
+.levelup-char {
+  font-size: 40px;
+  margin-bottom: 12px;
+  animation: charHop 0.8s ease-in-out infinite;
+  display: block;
+  filter: drop-shadow(3px 3px 0 var(--bg-wood));
+}
+.levelup-rewards {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.lv-reward {
+  background: linear-gradient(135deg, var(--mint), #a5d6a7);
+  border: 2px solid var(--accent3);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 9px;
+  color: var(--text-main);
+  font-family: var(--pixel-font);
+  box-shadow: 1px 1px 0 var(--accent3);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .side-panel { display: none; }
+  .phone-stage {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+

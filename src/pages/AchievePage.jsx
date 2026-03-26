@@ -3,6 +3,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
+import '../styles/AchievePage.css';
 
 const AchievePage = () => {
   const navigate = useNavigate();

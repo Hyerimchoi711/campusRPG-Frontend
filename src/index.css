@@ -1,1 +1,226 @@
-/* Base styles handled by public/style.css */
+/* ============================================================
+   CAMPUSQUEST — STARDEW VALLEY / PIXEL ARK STYLE
+   Soft, cozy pixel art aesthetic with warm pastel colors
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Warm, cozy color palette inspired by Stardew Valley */
+  --bg-deep:    #4a6741;    /* Forest green */
+  --bg-mid:     #5c7a50;    /* Meadow green */
+  --bg-card:    #f5ebe0;    /* Warm cream */
+  --bg-card2:   #fff8f0;    /* Soft white */
+  --bg-wood:    #8b6914;    /* Wood frame */
+  --bg-wood-light: #c4a35a; /* Light wood */
+  --bg-wood-dark:  #5a4510; /* Dark wood */
+  
+  --accent:     #6b9b4b;    /* Spring green */
+  --accent2:    #8bc34a;    /* Bright green */
+  --accent3:    #4a7c31;    /* Deep green */
+  
+  --gold:       #f5c06e;    /* Warm gold */
+  --gold2:      #ffd700;    /* Bright gold */
+  --copper:     #cd7f32;    /* Copper */
+  
+  --sky-blue:   #a8d8ea;    /* Sky blue */
+  --sunset:     #ffb347;    /* Sunset orange */
+  --rose:       #f8b4c4;    /* Soft rose */
+  --mint:       #b5e8c3;    /* Fresh mint */
+  --lavender:   #d4b8e0;    /* Soft lavender */
+  --coral:      #ff7f7f;    /* Coral red */
+  
+  --text-main:  #3d2914;    /* Dark brown */
+  --text-sub:   #6b5344;    /* Medium brown */
+  --text-dim:   #9a8478;    /* Light brown */
+  --text-light: #fff8f0;    /* Cream white */
+  
+  --border:     rgba(139,105,20,0.5);
+  --border2:    rgba(139,105,20,0.25);
+  
+  --phone-w:    340px;
+  --phone-h:    680px;
+  --phone-r:    20px;
+  
+  --pixel-font: 'DotGothic16', monospace;
+  --body-font:  'Gowun Dodum', sans-serif;
+  
+  /* Pixel border effect */
+  --pixel-border: 3px solid var(--bg-wood);
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #87CEEB;
+  font-family: var(--body-font);
+  color: var(--text-main);
+  image-rendering: pixelated;
+}
+
+/* ============================================================
+   SEASON BACKGROUND LAYERS
+   ============================================================ */
+.season-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sky-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 55%;
+  display: block;
+}
+
+.tree-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 55%;
+  display: block;
+}
+
+/* Cloud drift animation */
+.cloud-group {
+  animation: cloudDrift 60s linear infinite;
+}
+@keyframes cloudDrift {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(30px); }
+  100% { transform: translateX(0); }
+}
+
+/* Petal float animation */
+.petal-group circle {
+  animation: petalFloat 6s ease-in-out infinite;
+}
+.petal-group circle:nth-child(2) { animation-delay: 1s; }
+.petal-group circle:nth-child(3) { animation-delay: 2s; }
+.petal-group circle:nth-child(4) { animation-delay: 0.5s; }
+.petal-group circle:nth-child(5) { animation-delay: 1.5s; }
+.petal-group circle:nth-child(6) { animation-delay: 2.5s; }
+.petal-group circle:nth-child(7) { animation-delay: 3s; }
+.petal-group circle:nth-child(8) { animation-delay: 3.5s; }
+
+@keyframes petalFloat {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25%       { transform: translate(8px, 12px) rotate(15deg); }
+  50%       { transform: translate(-4px, 20px) rotate(-10deg); }
+  75%       { transform: translate(6px, 10px) rotate(8deg); }
+}
+
+/* Season transition on body */
+body { transition: background 1.5s ease; }
+
+/* ── SPRING ── */
+body.season-spring { background: #b8e0f7; }
+body.season-spring #skyTop { stop-color: #a0d8f1; }
+body.season-spring #skyBot { stop-color: #d4f0c8; }
+
+/* ── SUMMER ── */
+body.season-summer { background: #6ab8e8; }
+body.season-summer #skyTop { stop-color: #4fb3e8; }
+body.season-summer #skyBot { stop-color: #a8d870; }
+
+/* ── AUTUMN ── */
+body.season-autumn { background: #e8c490; }
+body.season-autumn #skyTop { stop-color: #e8b868; }
+body.season-autumn #skyBot { stop-color: #c8a850; }
+
+/* ── WINTER ── */
+body.season-winter { background: #c8ddf0; }
+body.season-winter #skyTop { stop-color: #b0cce8; }
+body.season-winter #skyBot { stop-color: #d8eaf8; }
+
+/* ============================================================
+   BACKGROUND CANVAS - Floating particles like fireflies
+   ============================================================ */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ============================================================
+   SCREENS
+   ============================================================ */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--bg-card2) 0%, var(--bg-card) 100%);
+  overflow-y: auto;
+  overflow-x: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(20px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  scrollbar-width: none;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+
+/* ============================================================
+   SCREEN HEADER (Common)
+   ============================================================ */
+.screen-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(to bottom, rgba(139,195,74,0.2), transparent);
+  border-bottom: 3px solid var(--border2);
+  font-family: var(--pixel-font);
+  font-size: 10px;
+  flex-shrink: 0;
+  color: var(--text-main);
+}
+.back-btn {
+  background: var(--bg-card2);
+  border: 2px solid var(--border);
+  color: var(--text-main);
+  width: 28px; height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0 var(--border2);
+}
+.back-btn:hover { 
+  background: #fff; 
+  border-color: var(--accent);
+  transform: translateY(1px);
+  box-shadow: 1px 1px 0 var(--border2);
+}
+.header-lv {
+  margin-left: auto;
+  color: var(--gold2);
+  font-size: 9px;
+  text-shadow: 1px 1px 0 var(--bg-wood);
+}
+
+/* ============================================================
+   STATIC BACKGROUND IMAGE
+   ============================================================ */
+.static-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/images/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}

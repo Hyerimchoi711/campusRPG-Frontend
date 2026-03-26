@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import '../styles/FriendsPage.css';
 
 const FriendsPage = () => {
   const [friends, setFriends] = useState([

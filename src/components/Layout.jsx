@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import '../styles/Layout.css';
 
 const Layout = () => {
   const navigate = useNavigate();

@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
@@ -6,8 +7,7 @@ import StatsPage from './pages/StatsPage';
 import TodoPage from './pages/TodoPage';
 import QuestsPage from './pages/QuestsPage';
 import FriendsPage from './pages/FriendsPage';
-/*import AchievePage from './pages/AchievePage';*/
-import './App.css';
+import './index.css';
 
 function App() {
   return (

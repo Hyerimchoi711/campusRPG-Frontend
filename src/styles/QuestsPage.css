@@ -1,0 +1,244 @@
+/* ============================================================
+   SCREEN: HOME - Cozy dashboard
+   ============================================================ */
+.hud-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: linear-gradient(to bottom, rgba(139,195,74,0.2), transparent);
+  border-bottom: 3px solid var(--border2);
+  flex-shrink: 0;
+}
+
+.hud-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-frame {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--mint), var(--sky-blue));
+  border: 3px solid var(--bg-wood);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--bg-wood-dark);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.avatar-frame:hover { 
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0 var(--bg-wood-dark);
+}
+.avatar-img { font-size: 22px; }
+.avatar-level {
+  position: absolute;
+  bottom: -4px; right: -4px;
+  background: var(--gold);
+  color: var(--text-main);
+  font-size: 7px;
+  font-family: var(--pixel-font);
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 2px solid var(--bg-wood);
+  box-shadow: 1px 1px 0 var(--bg-wood-dark);
+}
+
+.hud-info { display: flex; flex-direction: column; gap: 2px; }
+.hud-name  { font-size: 13px; font-weight: 700; color: var(--text-main); }
+.hud-class { font-size: 10px; color: var(--accent3); }
+
+.hud-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.hud-currency {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  background: var(--bg-card2);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 2px solid var(--border2);
+}
+.currency-val { font-family: var(--pixel-font); font-size: 9px; color: var(--gold2); text-shadow: 1px 1px 0 var(--bg-wood); }
+.streak-val { color: var(--sunset); }
+
+/* XP bar - Pixel style */
+.xp-section {
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+.xp-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--text-sub);
+  font-family: var(--pixel-font);
+  margin-bottom: 4px;
+}
+.xp-bar {
+  height: 12px;
+  background: var(--bg-card2);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 3px solid var(--bg-wood);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+.xp-fill {
+  height: 100%;
+  background: linear-gradient(180deg, var(--gold), var(--sunset));
+  border-radius: 3px;
+  position: relative;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.xp-shine {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  background: rgba(255,255,255,0.4);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Section header */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+.section-icon { font-size: 14px; }
+.section-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: white;
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: var(--pixel-font);
+  border: 2px solid var(--accent3);
+  box-shadow: 1px 1px 0 var(--accent3);
+}
+
+/* Quest list - Card style */
+.quest-list {
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.quest-list::-webkit-scrollbar { display: none; }
+
+.quest-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card2);
+  border: 3px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  box-shadow: 2px 2px 0 var(--border2);
+}
+.quest-item:hover:not(.done) {
+  border-color: var(--accent);
+  background: #fff;
+  transform: translateX(2px);
+}
+.quest-item.done {
+  opacity: 0.6;
+  cursor: default;
+  background: linear-gradient(135deg, #e8f5e9, var(--bg-card2));
+}
+.quest-item.active {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #fff8e7, #fff);
+  animation: questGlow 2s ease-in-out infinite;
+}
+@keyframes questGlow {
+  0%, 100% { box-shadow: 2px 2px 0 var(--border2); }
+  50%       { box-shadow: 2px 2px 8px rgba(245,192,110,0.4); }
+}
+
+.quest-check {
+  width: 24px; height: 24px;
+  border-radius: 6px;
+  background: var(--mint);
+  border: 2px solid var(--accent3);
+  color: var(--text-main);
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+.quest-check.empty {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  color: var(--text-dim);
+}
+
+.quest-info { flex: 1; }
+.quest-name   { font-size: 11px; font-weight: 600; margin-bottom: 2px; color: var(--text-main); }
+.quest-reward { font-size: 9px; color: var(--accent3); }
+
+.quest-xp {
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  color: var(--gold2);
+  white-space: nowrap;
+  text-shadow: 1px 1px 0 var(--bg-wood);
+}
+.done-badge {
+  background: linear-gradient(135deg, var(--mint), #a5d6a7);
+  color: var(--accent3);
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 2px solid var(--accent3);
+  text-shadow: none;
+}
+
+/* ============================================================
+   QUEST COMPLETE TOAST
+   ============================================================ */
+.quest-toast {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: linear-gradient(135deg, var(--mint), #a5d6a7);
+  border: 3px solid var(--accent3);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 10px;
+  font-family: var(--pixel-font);
+  color: var(--text-main);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+  z-index: 50;
+  box-shadow: 
+    2px 2px 0 var(--accent3),
+    0 4px 12px rgba(107,155,75,0.3);
+}
+.quest-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+

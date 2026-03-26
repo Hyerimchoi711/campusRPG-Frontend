@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import '../styles/StatsPage.css';
 
 const StatsPage = () => {
   const navigate = useNavigate();

@@ -1,0 +1,169 @@
+/* ============================================================
+   SCREEN: LOGIN - Cozy welcome
+   ============================================================ */
+.login-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(168,216,234,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(181,232,195,0.3) 0%, transparent 50%),
+    linear-gradient(180deg, var(--bg-card2) 0%, var(--bg-card) 100%);
+  pointer-events: none;
+}
+
+.login-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.game-logo {
+  text-align: center;
+}
+.logo-pixel {
+  font-family: var(--pixel-font);
+  font-size: 32px;
+  color: var(--accent3);
+  text-shadow: 
+    2px 2px 0 var(--gold),
+    4px 4px 0 var(--bg-wood);
+  animation: logoWobble 3s ease-in-out infinite;
+  margin-bottom: 8px;
+}
+@keyframes logoWobble {
+  0%, 100% { transform: rotate(-1deg); }
+  50%       { transform: rotate(1deg); }
+}
+.logo-title {
+  font-family: var(--pixel-font);
+  font-size: 10px;
+  color: var(--text-main);
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card2);
+  border: 3px solid var(--bg-wood);
+  border-radius: 8px;
+  padding: 0 12px;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0 var(--bg-wood-dark);
+}
+.input-group:focus-within {
+  border-color: var(--accent);
+  box-shadow: 2px 2px 0 var(--accent3);
+}
+.input-icon { font-size: 14px; }
+.game-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  font-size: 12px;
+  padding: 10px 0;
+  font-family: var(--body-font);
+}
+.game-input::placeholder { color: var(--text-dim); }
+
+.btn-primary {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(180deg, var(--accent2), var(--accent));
+  border: 3px solid var(--accent3);
+  border-radius: 8px;
+  color: white;
+  font-family: var(--pixel-font);
+  font-size: 10px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+  letter-spacing: 1px;
+  box-shadow: 
+    inset 0 2px 4px rgba(255,255,255,0.3),
+    3px 3px 0 var(--accent3);
+  text-shadow: 1px 1px 0 var(--accent3);
+}
+.btn-primary:hover {
+  transform: translateY(2px);
+  box-shadow: 
+    inset 0 2px 4px rgba(255,255,255,0.3),
+    1px 1px 0 var(--accent3);
+}
+.btn-primary:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+.btn-primary.small { padding: 8px 20px; width: auto; font-size: 9px; }
+.btn-shine {
+  position: absolute;
+  top: 0; left: -100%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+  animation: softShine 4s ease-in-out infinite;
+}
+@keyframes softShine {
+  0%   { left: -100%; }
+  30%  { left: 150%; }
+  100% { left: 150%; }
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-card2);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-sub);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--body-font);
+  box-shadow: 2px 2px 0 var(--border2);
+}
+.btn-secondary:hover {
+  border-color: var(--accent);
+  color: var(--accent3);
+  background: #fff;
+}
+
+.login-deco {
+  text-align: center;
+}
+.pixel-char {
+  font-size: 48px;
+  animation: charHop 1.2s ease-in-out infinite;
+  display: inline-block;
+  filter: drop-shadow(3px 3px 0 var(--bg-wood));
+}
+@keyframes charHop {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  30%       { transform: translateY(-12px) scaleY(1.05); }
+  50%       { transform: translateY(-10px) scaleY(1); }
+  70%       { transform: translateY(0) scaleY(0.95); }
+  85%       { transform: translateY(0) scaleY(1); }
+}
+

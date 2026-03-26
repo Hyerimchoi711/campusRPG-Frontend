@@ -1,6 +1,7 @@
 import React from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import '../styles/HomePage.css';
 
 const HomePage = () => {
   return (
