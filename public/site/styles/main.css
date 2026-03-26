@@ -352,7 +352,6 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
 }
 
 /* Floating icons - softer animation */
-/*
 .floating-icons {
   position: absolute;
   inset: 0;
@@ -381,7 +380,6 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
   50%      { transform: translateY(-12px) rotate(-2deg); }
   75%      { transform: translateY(-6px) rotate(2deg); }
 }
-*/
 
 /* Ranking list */
 .rank-list {
@@ -1018,9 +1016,6 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
   background: linear-gradient(180deg, var(--bg-wood-light), var(--bg-wood));
   border-top: 3px solid var(--bg-wood-dark);
   flex-shrink: 0;
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
 }
 
 .nav-item {
@@ -1597,161 +1592,4 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
     top: 50%;
     transform: translate(-50%, -50%);
   }
-}
-
-/* ============================================================
-   TOP BAR
-   ============================================================ */
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.4));
-  border-bottom: 2px solid var(--border2);
-  flex-shrink: 0;
-  z-index: 10;
-  position: sticky;
-  top: 0;
-  backdrop-filter: blur(4px);
-}
-
-.top-bar-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg-card2);
-  border: 2px solid var(--border);
-  border-radius: 20px;
-  padding: 4px 12px 4px 4px;
-  box-shadow: 1px 1px 0 var(--border2);
-}
-
-.top-profile-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--mint);
-  border: 2px solid var(--bg-wood);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-}
-
-.top-nickname {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-main);
-  font-family: var(--body-font);
-}
-
-.top-bar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.top-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--bg-card2);
-  border: 2px solid var(--border);
-  cursor: pointer;
-  box-shadow: 1px 1px 0 var(--border2);
-  transition: all 0.2s;
-  padding: 0;
-}
-
-.top-btn:hover {
-  transform: translateY(-2px);
-  background: #fff;
-  border-color: var(--accent);
-}
-
-.top-btn span:first-child {
-  font-size: 14px;
-}
-
-.top-btn-text {
-  font-size: 7px;
-  font-family: var(--pixel-font);
-  color: var(--text-sub);
-  margin-top: 1px;
-}
-
-/* ============================================================
-   NEW HOME PAGE (Character View)
-   ============================================================ */
-.home-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  gap: 16px;
-}
-
-.home-level-box {
-  background: var(--bg-card2);
-  border: 3px solid var(--bg-wood);
-  border-radius: 8px;
-  padding: 6px 20px;
-  font-family: var(--pixel-font);
-  font-size: 16px;
-  color: var(--text-main);
-  box-shadow: 2px 2px 0 var(--bg-wood-dark);
-  text-align: center;
-  min-width: 120px;
-}
-
-.home-character-img {
-  width: 130px;
-  height: auto;
-  object-fit: cover;
-}
-
-.home-info-box {
-  background: var(--bg-card2);
-  border: 3px solid var(--bg-wood);
-  border-radius: 8px;
-  padding: 10px 20px;
-  text-align: center;
-  box-shadow: 2px 2px 0 var(--bg-wood-dark);
-  min-width: 180px;
-}
-
-.home-info-nickname {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-main);
-  margin-bottom: 4px;
-  border-bottom: 2px dashed var(--border2);
-  padding-bottom: 4px;
-}
-
-.home-info-title {
-  font-size: 12px;
-  color: var(--text-sub);
-  font-family: var(--body-font);
-}
-
-/* ============================================================
-   STATIC BACKGROUND IMAGE
-   ============================================================ */
-.static-bg {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background-image: url('/images/background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  pointer-events: none;
 }

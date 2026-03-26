@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CampusQuest — 나의 대학생활 RPG</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Gowun+Dodum&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="site/styles/main.css" />
+</head>
+<body>
+
+  <!-- 배경 파티클 캔버스 -->
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- 계절 배경 SVG 레이어 -->
+  <div class="season-bg" id="seasonBg">
+    <!-- 하늘 그라디언트 레이어 -->
+    <svg class="sky-layer" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop id="skyTop" offset="0%" stop-color="#87CEEB"/>
+          <stop id="skyBot" offset="100%" stop-color="#c8e8c0"/>
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="400" fill="url(#skyGrad)"/>
+      <!-- 구름들 -->
+      <g class="cloud-group" opacity="0.75">
+        <ellipse cx="180" cy="80" rx="60" ry="28" fill="white"/>
+        <ellipse cx="230" cy="68" rx="44" ry="22" fill="white"/>
+        <ellipse cx="140" cy="82" rx="38" ry="18" fill="white"/>
+        <ellipse cx="600" cy="60" rx="70" ry="30" fill="white"/>
+        <ellipse cx="658" cy="48" rx="50" ry="24" fill="white"/>
+        <ellipse cx="555" cy="65" rx="42" ry="20" fill="white"/>
+        <ellipse cx="980" cy="90" rx="55" ry="25" fill="white"/>
+        <ellipse cx="1030" cy="78" rx="40" ry="20" fill="white"/>
+        <ellipse cx="940" cy="95" rx="36" ry="16" fill="white"/>
+      </g>
+    </svg>
+
+    <!-- 나무 + 지형 레이어 -->
+    <svg class="tree-layer" id="treeSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" preserveAspectRatio="xMidYMax slice">
+      <!-- 지면 -->
+      <rect id="groundRect" x="0" y="300" width="1200" height="100" fill="#6aaa40"/>
+      <rect id="groundRect2" x="0" y="320" width="1200" height="80" fill="#4d8c30"/>
+      <!-- 언덕 -->
+      <ellipse id="hill1" cx="200" cy="310" rx="280" ry="60" fill="#6aaa40"/>
+      <ellipse id="hill2" cx="1000" cy="310" rx="300" ry="65" fill="#6aaa40"/>
+      <ellipse id="hill3" cx="600" cy="320" rx="400" ry="50" fill="#5da035"/>
+
+      <!-- 왼쪽 나무 그룹 -->
+      <!-- 나무 1 (큰 것) -->
+      <rect id="trunk1" x="68" y="245" width="14" height="60" rx="4" fill="#6b4226"/>
+      <polygon id="leaf1c" points="75,155 115,248 35,248" fill="#3e8b2f"/>
+      <polygon id="leaf1b" points="75,180 108,255 42,255" fill="#4da03c"/>
+      <polygon id="leaf1a" points="75,200 105,262 45,262" fill="#5cb84a"/>
+
+      <!-- 나무 2 (중간) -->
+      <rect id="trunk2" x="128" y="258" width="10" height="50" rx="3" fill="#6b4226"/>
+      <polygon id="leaf2c" points="133,188 162,260 104,260" fill="#3e8b2f"/>
+      <polygon id="leaf2b" points="133,208 158,266 108,266" fill="#4da03c"/>
+      <polygon id="leaf2a" points="133,225 156,272 110,272" fill="#5cb84a"/>
+
+      <!-- 나무 3 (작은 것) -->
+      <rect id="trunk3" x="32" y="268" width="8" height="40" rx="2" fill="#6b4226"/>
+      <polygon id="leaf3c" points="36,210 58,270 14,270" fill="#3e8b2f"/>
+      <polygon id="leaf3b" points="36,228 56,275 16,275" fill="#4da03c"/>
+
+      <!-- 오른쪽 나무 그룹 -->
+      <!-- 나무 4 (큰 것) -->
+      <rect id="trunk4" x="1118" y="240" width="14" height="65" rx="4" fill="#6b4226"/>
+      <polygon id="leaf4c" points="1125,148 1165,243 1085,243" fill="#3e8b2f"/>
+      <polygon id="leaf4b" points="1125,175 1158,250 1092,250" fill="#4da03c"/>
+      <polygon id="leaf4a" points="1125,198 1155,258 1095,258" fill="#5cb84a"/>
+
+      <!-- 나무 5 (중간) -->
+      <rect id="trunk5" x="1058" y="256" width="10" height="50" rx="3" fill="#6b4226"/>
+      <polygon id="leaf5c" points="1063,186 1092,258 1034,258" fill="#3e8b2f"/>
+      <polygon id="leaf5b" points="1063,206 1088,264 1038,264" fill="#4da03c"/>
+      <polygon id="leaf5a" points="1063,223 1086,270 1040,270" fill="#5cb84a"/>
+
+      <!-- 나무 6 (작은) -->
+      <rect id="trunk6" x="1156" y="268" width="8" height="38" rx="2" fill="#6b4226"/>
+      <polygon id="leaf6c" points="1160,212 1182,270 1138,270" fill="#3e8b2f"/>
+      <polygon id="leaf6b" points="1160,230 1180,275 1140,275" fill="#4da03c"/>
+
+      <!-- 봄 꽃잎 파티클 (기본 숨김) -->
+      <g id="petalGroup" opacity="0" class="petal-group">
+        <circle cx="120" cy="220" r="5" fill="#ffb7c5" opacity="0.8"/>
+        <circle cx="200" cy="180" r="4" fill="#ff9eb5" opacity="0.7"/>
+        <circle cx="80"  cy="160" r="6" fill="#ffc8d5" opacity="0.9"/>
+        <circle cx="1050" cy="200" r="5" fill="#ffb7c5" opacity="0.8"/>
+        <circle cx="1130" cy="170" r="4" fill="#ff9eb5" opacity="0.7"/>
+        <circle cx="1160" cy="230" r="6" fill="#ffc8d5" opacity="0.9"/>
+        <circle cx="300"  cy="295" r="4" fill="#ffe0ea" opacity="0.8"/>
+        <circle cx="900"  cy="290" r="5" fill="#ffb7c5" opacity="0.7"/>
+      </g>
+
+      <!-- 가을 낙엽 (기본 숨김) -->
+      <g id="autumnLeaves" opacity="0">
+        <ellipse cx="90"  cy="245" rx="8" ry="5" fill="#e8640a" transform="rotate(-20,90,245)"/>
+        <ellipse cx="55"  cy="270" rx="7" ry="4" fill="#d4500a" transform="rotate(15,55,270)"/>
+        <ellipse cx="1110" cy="238" rx="8" ry="5" fill="#e8640a" transform="rotate(10,1110,238)"/>
+        <ellipse cx="1150" cy="262" rx="6" ry="4" fill="#cc8800" transform="rotate(-15,1150,262)"/>
+        <ellipse cx="350" cy="298" rx="6" ry="4" fill="#e85000" transform="rotate(25,350,298)"/>
+        <ellipse cx="850" cy="295" rx="7" ry="4" fill="#d46800" transform="rotate(-10,850,295)"/>
+      </g>
+
+      <!-- 겨울 눈 (기본 숨김) -->
+      <g id="snowCaps" opacity="0">
+        <ellipse cx="75"  cy="158" rx="42" ry="10" fill="white" opacity="0.9"/>
+        <ellipse cx="133" cy="190" rx="32" ry="8"  fill="white" opacity="0.85"/>
+        <ellipse cx="1125" cy="150" rx="44" ry="10" fill="white" opacity="0.9"/>
+        <ellipse cx="1063" cy="188" rx="32" ry="8"  fill="white" opacity="0.85"/>
+      </g>
+
+      <!-- 겨울 땅 (기본 숨김) -->
+      <rect id="snowGround" x="0" y="298" width="1200" height="102" fill="white" opacity="0"/>
+    </svg>
+  </div>
+
+  <!-- 계절 선택 버튼 -->
+  <div class="season-switcher" id="seasonSwitcher">
+    <div class="season-label">계절</div>
+    <button class="season-btn active" data-season="spring" onclick="setSeason('spring')" title="봄">
+      <span class="season-icon">🌸</span>
+      <span class="season-name">봄</span>
+    </button>
+    <button class="season-btn" data-season="summer" onclick="setSeason('summer')" title="여름">
+      <span class="season-icon">🌿</span>
+      <span class="season-name">여름</span>
+    </button>
+    <button class="season-btn" data-season="autumn" onclick="setSeason('autumn')" title="가을">
+      <span class="season-icon">🍂</span>
+      <span class="season-name">가을</span>
+    </button>
+    <button class="season-btn" data-season="winter" onclick="setSeason('winter')" title="겨울">
+      <span class="season-icon">❄️</span>
+      <span class="season-name">겨울</span>
+    </button>
+  </div>
+
+  <!-- 좌측 장식 패널 -->
+  <aside class="side-panel left-panel">
+    <div class="panel-frame">
+      <div class="panel-title">CAMPUS<br/>QUEST</div>
+      <div class="panel-deco">
+        <div class="deco-line"></div>
+        <div class="deco-stat-preview">
+          <span class="stat-label">성실함</span>
+          <div class="stat-bar-mini"><div class="fill" style="width:72%"></div></div>
+          <span class="stat-label">나태함</span>
+          <div class="stat-bar-mini"><div class="fill lazy" style="width:28%"></div></div>
+          <span class="stat-label">사교성</span>
+          <div class="stat-bar-mini"><div class="fill social" style="width:55%"></div></div>
+          <span class="stat-label">집중력</span>
+          <div class="stat-bar-mini"><div class="fill focus" style="width:80%"></div></div>
+        </div>
+        <div class="deco-line"></div>
+      </div>
+      <div class="panel-quote">"오늘의 퀘스트가<br/>내일의 전설이 된다"</div>
+    </div>
+    <div class="floating-icons">
+      <div class="fi fi1">🌻</div>
+      <div class="fi fi2">📚</div>
+      <div class="fi fi3">⭐</div>
+      <div class="fi fi4">🍃</div>
+    </div>
+  </aside>
+
+  <!-- 우측 장식 패널 -->
+  <aside class="side-panel right-panel">
+    <div class="panel-frame">
+      <div class="panel-title">RANK<br/>BOARD</div>
+      <div class="rank-list">
+        <div class="rank-item gold">
+          <span class="rank-num">01</span>
+          <div class="rank-avatar" style="background:#f5c06e">🧙</div>
+          <div class="rank-info">
+            <span class="rank-name">김현우</span>
+            <span class="rank-class">현자 Lv.42</span>
+          </div>
+          <span class="rank-xp">9,840 XP</span>
+        </div>
+        <div class="rank-item silver">
+          <span class="rank-num">02</span>
+          <div class="rank-avatar" style="background:#a8d8ea">🧝</div>
+          <div class="rank-info">
+            <span class="rank-name">이지은</span>
+            <span class="rank-class">탐험가 Lv.38</span>
+          </div>
+          <span class="rank-xp">8,210 XP</span>
+        </div>
+        <div class="rank-item bronze">
+          <span class="rank-num">03</span>
+          <div class="rank-avatar" style="background:#b5e8c3">🧑‍💻</div>
+          <div class="rank-info">
+            <span class="rank-name">박서준</span>
+            <span class="rank-class">해커 Lv.35</span>
+          </div>
+          <span class="rank-xp">7,650 XP</span>
+        </div>
+        <div class="rank-item">
+          <span class="rank-num">04</span>
+          <div class="rank-avatar" style="background:#f8b4c4">🧚</div>
+          <div class="rank-info">
+            <span class="rank-name">최민지</span>
+            <span class="rank-class">예술가 Lv.31</span>
+          </div>
+          <span class="rank-xp">6,400 XP</span>
+        </div>
+        <div class="rank-item">
+          <span class="rank-num">05</span>
+          <div class="rank-avatar" style="background:#ffd4a3">🧑‍🎓</div>
+          <div class="rank-info">
+            <span class="rank-name">정도윤</span>
+            <span class="rank-class">학자 Lv.28</span>
+          </div>
+          <span class="rank-xp">5,980 XP</span>
+        </div>
+      </div>
+      <div class="deco-line"></div>
+      <div class="today-event">
+        <div class="event-badge">TODAY</div>
+        <div class="event-text">🌟 더블 XP 데이!</div>
+        <div class="event-sub">오늘 퀘스트 완료 시<br/>경험치 2배 획득</div>
+      </div>
+    </div>
+    <div class="floating-icons right">
+      <div class="fi fi5">🎯</div>
+      <div class="fi fi6">🌸</div>
+      <div class="fi fi7">🎮</div>
+      <div class="fi fi8">💎</div>
+    </div>
+  </aside>
+
+  <!-- 중앙 스마트폰 영역 -->
+  <main class="phone-stage">
+    <!-- 폰 외부 글로우 -->
+    <div class="phone-glow"></div>
+
+    <!-- 스마트폰 프레임 -->
+    <div class="phone-frame">
+      <!-- 노치 -->
+      <div class="phone-notch">
+        <div class="notch-camera"></div>
+        <div class="notch-speaker"></div>
+      </div>
+
+      <!-- 폰 화면 -->
+      <div class="phone-screen" id="phoneScreen">
+
+        <!-- ===== 화면 1: 로그인 ===== -->
+        <div class="screen active" id="screenLogin">
+          <div class="login-bg"></div>
+          <div class="login-content">
+            <div class="game-logo">
+              <div class="logo-pixel">CQ</div>
+              <div class="logo-title">CampusQuest</div>
+              <div class="logo-sub">나의 대학생활을 RPG로</div>
+            </div>
+            <div class="login-form">
+              <div class="input-group">
+                <span class="input-icon">👤</span>
+                <input type="text" placeholder="학번 또는 이메일" class="game-input" />
+              </div>
+              <div class="input-group">
+                <span class="input-icon">🔑</span>
+                <input type="password" placeholder="비밀번호" class="game-input" />
+              </div>
+              <button class="btn-primary" onclick="goToScreen('screenHome')">
+                <span>모험 시작!</span>
+                <div class="btn-shine"></div>
+              </button>
+              <button class="btn-secondary" onclick="goToScreen('screenHome')">
+                새 캐릭터 생성
+              </button>
+            </div>
+            <div class="login-deco">
+              <div class="pixel-char char-idle" id="loginChar">🧑‍🎓</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 화면 2: 홈 (메인 대시보드) ===== -->
+        <div class="screen" id="screenHome">
+          <!-- 상단 HUD -->
+          <div class="hud-top">
+            <div class="hud-left">
+              <div class="avatar-frame" onclick="goToScreen('screenAvatar')">
+                <div class="avatar-img" id="avatarDisplay">🧑‍🎓</div>
+                <div class="avatar-level">Lv.7</div>
+              </div>
+              <div class="hud-info">
+                <div class="hud-name">김대학</div>
+                <div class="hud-class">🌱 새싹 모험가</div>
+              </div>
+            </div>
+            <div class="hud-right">
+              <div class="hud-currency">
+                <span>💎</span><span class="currency-val">240</span>
+              </div>
+              <div class="hud-currency">
+                <span>🔥</span><span class="currency-val streak-val">3일</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- XP 바 -->
+          <div class="xp-section">
+            <div class="xp-label">
+              <span>EXP</span>
+              <span>1,240 / 2,000</span>
+            </div>
+            <div class="xp-bar">
+              <div class="xp-fill" style="width:62%">
+                <div class="xp-shine"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오늘의 퀘스트 -->
+          <div class="section-header">
+            <span class="section-icon">📋</span>
+            <span>오늘의 퀘스트</span>
+            <span class="section-badge">3/5</span>
+          </div>
+          <div class="quest-list">
+            <div class="quest-item done">
+              <div class="quest-check">✓</div>
+              <div class="quest-info">
+                <div class="quest-name">아침 9시 전 기상</div>
+                <div class="quest-reward">+50 XP · 성실함 +1</div>
+              </div>
+              <div class="quest-xp done-badge">완료</div>
+            </div>
+            <div class="quest-item done">
+              <div class="quest-check">✓</div>
+              <div class="quest-info">
+                <div class="quest-name">강의 출석 완료</div>
+                <div class="quest-reward">+80 XP · 성실함 +2</div>
+              </div>
+              <div class="quest-xp done-badge">완료</div>
+            </div>
+            <div class="quest-item done">
+              <div class="quest-check">✓</div>
+              <div class="quest-info">
+                <div class="quest-name">도서관 2시간 공부</div>
+                <div class="quest-reward">+120 XP · 집중력 +2</div>
+              </div>
+              <div class="quest-xp done-badge">완료</div>
+            </div>
+            <div class="quest-item active" onclick="completeQuest(this)">
+              <div class="quest-check empty">○</div>
+              <div class="quest-info">
+                <div class="quest-name">과제 제출하기</div>
+                <div class="quest-reward">+150 XP · 성실함 +3</div>
+              </div>
+              <div class="quest-xp">+150</div>
+            </div>
+            <div class="quest-item" onclick="completeQuest(this)">
+              <div class="quest-check empty">○</div>
+              <div class="quest-info">
+                <div class="quest-name">동아리 활동 참여</div>
+                <div class="quest-reward">+100 XP · 사교성 +2</div>
+              </div>
+              <div class="quest-xp">+100</div>
+            </div>
+          </div>
+
+          <!-- 하단 네비게이션 -->
+          <div class="bottom-nav">
+            <div class="nav-item active" onclick="goToScreen('screenHome')">
+              <span>🏠</span><span>홈</span>
+            </div>
+            <div class="nav-item" onclick="goToScreen('screenStats')">
+              <span>📊</span><span>스탯</span>
+            </div>
+            <div class="nav-item" onclick="goToScreen('screenAvatar')">
+              <span>🧙</span><span>아바타</span>
+            </div>
+            <div class="nav-item" onclick="goToScreen('screenAchieve')">
+              <span>🏆</span><span>업적</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 화면 3: 스탯 ===== -->
+        <div class="screen" id="screenStats">
+          <div class="screen-header">
+            <button class="back-btn" onclick="goToScreen('screenHome')">←</button>
+            <span>캐릭터 스탯</span>
+            <span class="header-lv">Lv.7</span>
+          </div>
+
+          <div class="stat-avatar-section">
+            <div class="stat-avatar-wrap">
+              <div class="stat-avatar-glow"></div>
+              <div class="stat-avatar-char">🧑‍🎓</div>
+              <div class="stat-avatar-name">새싹 모험가</div>
+            </div>
+          </div>
+
+          <!-- 레이더 차트 영역 (CSS 구현) -->
+          <div class="radar-wrap">
+            <div class="radar-bg">
+              <div class="radar-ring r1"></div>
+              <div class="radar-ring r2"></div>
+              <div class="radar-ring r3"></div>
+              <div class="radar-label rl1">성실함</div>
+              <div class="radar-label rl2">집중력</div>
+              <div class="radar-label rl3">사교성</div>
+              <div class="radar-label rl4">나태함</div>
+              <div class="radar-label rl5">창의력</div>
+              <div class="radar-label rl6">체력</div>
+              <svg class="radar-svg" viewBox="0 0 200 200">
+                <polygon class="radar-area" points="100,30 155,65 155,135 100,170 45,135 45,65"/>
+                <polygon class="radar-fill" points="100,45 140,72 138,128 100,152 62,128 60,72"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 스탯 상세 -->
+          <div class="stat-detail-list">
+            <div class="stat-row">
+              <span class="stat-icon">💪</span>
+              <span class="stat-name">성실함</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar-track">
+                  <div class="stat-bar-fill diligent" style="width:72%"></div>
+                </div>
+              </div>
+              <span class="stat-val">72</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-icon">🎯</span>
+              <span class="stat-name">집중력</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar-track">
+                  <div class="stat-bar-fill focus" style="width:80%"></div>
+                </div>
+              </div>
+              <span class="stat-val">80</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-icon">🤝</span>
+              <span class="stat-name">사교성</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar-track">
+                  <div class="stat-bar-fill social" style="width:55%"></div>
+                </div>
+              </div>
+              <span class="stat-val">55</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-icon">😴</span>
+              <span class="stat-name">나태함</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar-track">
+                  <div class="stat-bar-fill lazy" style="width:28%"></div>
+                </div>
+              </div>
+              <span class="stat-val">28</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-icon">💡</span>
+              <span class="stat-name">창의력</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar-track">
+                  <div class="stat-bar-fill creative" style="width:63%"></div>
+                </div>
+              </div>
+              <span class="stat-val">63</span>
+            </div>
+            <div class="stat-row">
+              <span class="stat-icon">🏃</span>
+              <span class="stat-name">체력</span>
+              <div class="stat-bar-wrap">
+                <div class="stat-bar-track">
+                  <div class="stat-bar-fill health" style="width:45%"></div>
+                </div>
+              </div>
+              <span class="stat-val">45</span>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goToScreen('screenHome')"><span>🏠</span><span>홈</span></div>
+            <div class="nav-item active" onclick="goToScreen('screenStats')"><span>📊</span><span>스탯</span></div>
+            <div class="nav-item" onclick="goToScreen('screenAvatar')"><span>🧙</span><span>아바타</span></div>
+            <div class="nav-item" onclick="goToScreen('screenAchieve')"><span>🏆</span><span>업적</span></div>
+          </div>
+        </div>
+
+        <!-- ===== 화면 4: 아바타 ===== -->
+        <div class="screen" id="screenAvatar">
+          <div class="screen-header">
+            <button class="back-btn" onclick="goToScreen('screenHome')">←</button>
+            <span>나의 아바타</span>
+            <span class="header-lv">Lv.7</span>
+          </div>
+
+          <div class="avatar-showcase">
+            <div class="avatar-bg-glow"></div>
+            <div class="current-avatar" id="currentAvatarDisplay">🧑‍🎓</div>
+            <div class="avatar-class-name">새싹 모험가</div>
+            <div class="avatar-class-desc">성실함이 쌓이면 더 강한 클래스로 진화합니다!</div>
+          </div>
+
+          <!-- 진화 경로 -->
+          <div class="evolution-section">
+            <div class="evo-title">캐릭터 진화 경로</div>
+            <div class="evo-path">
+              <div class="evo-node current">
+                <div class="evo-char">🧑‍🎓</div>
+                <div class="evo-name">새싹<br/>모험가</div>
+                <div class="evo-req">현재</div>
+              </div>
+              <div class="evo-arrow">→</div>
+              <div class="evo-node locked">
+                <div class="evo-char">🧑‍💻</div>
+                <div class="evo-name">열정<br/>학도</div>
+                <div class="evo-req">Lv.15</div>
+              </div>
+              <div class="evo-arrow">→</div>
+              <div class="evo-node locked">
+                <div class="evo-char">🧙</div>
+                <div class="evo-name">지식<br/>현자</div>
+                <div class="evo-req">Lv.30</div>
+              </div>
+              <div class="evo-arrow">→</div>
+              <div class="evo-node locked">
+                <div class="evo-char">👑</div>
+                <div class="evo-name">전설의<br/>졸업생</div>
+                <div class="evo-req">Lv.50</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 클래스 분기 -->
+          <div class="class-branch">
+            <div class="branch-title">스탯 기반 클래스 분기</div>
+            <div class="branch-grid">
+              <div class="branch-card" style="border-color:#f5c06e">
+                <div class="bc-icon">📚</div>
+                <div class="bc-name">학자형</div>
+                <div class="bc-cond">성실함 80+</div>
+              </div>
+              <div class="branch-card" style="border-color:#a8d8ea">
+                <div class="bc-icon">🎨</div>
+                <div class="bc-name">창작형</div>
+                <div class="bc-cond">창의력 80+</div>
+              </div>
+              <div class="branch-card" style="border-color:#b5e8c3">
+                <div class="bc-icon">🤝</div>
+                <div class="bc-name">사교형</div>
+                <div class="bc-cond">사교성 80+</div>
+              </div>
+              <div class="branch-card" style="border-color:#f8b4c4">
+                <div class="bc-icon">😈</div>
+                <div class="bc-name">방랑자형</div>
+                <div class="bc-cond">나태함 70+</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goToScreen('screenHome')"><span>🏠</span><span>홈</span></div>
+            <div class="nav-item" onclick="goToScreen('screenStats')"><span>📊</span><span>스탯</span></div>
+            <div class="nav-item active" onclick="goToScreen('screenAvatar')"><span>🧙</span><span>아바타</span></div>
+            <div class="nav-item" onclick="goToScreen('screenAchieve')"><span>🏆</span><span>업적</span></div>
+          </div>
+        </div>
+
+        <!-- ===== 화면 5: 업적 ===== -->
+        <div class="screen" id="screenAchieve">
+          <div class="screen-header">
+            <button class="back-btn" onclick="goToScreen('screenHome')">←</button>
+            <span>업적 & 뱃지</span>
+            <span class="header-lv">12/40</span>
+          </div>
+
+          <div class="achieve-summary">
+            <div class="achieve-count">
+              <span class="ac-num">12</span>
+              <span class="ac-label">달성 완료</span>
+            </div>
+            <div class="achieve-progress-wrap">
+              <div class="achieve-progress-bar">
+                <div class="achieve-progress-fill" style="width:30%"></div>
+              </div>
+              <span class="achieve-pct">30%</span>
+            </div>
+          </div>
+
+          <div class="achieve-grid">
+            <div class="achieve-card unlocked">
+              <div class="ac-icon">🌅</div>
+              <div class="ac-name">새벽의 전사</div>
+              <div class="ac-desc">7일 연속 9시 전 기상</div>
+            </div>
+            <div class="achieve-card unlocked">
+              <div class="ac-icon">📖</div>
+              <div class="ac-name">독서광</div>
+              <div class="ac-desc">도서관 10회 방문</div>
+            </div>
+            <div class="achieve-card unlocked">
+              <div class="ac-icon">🎯</div>
+              <div class="ac-name">퀘스트 마스터</div>
+              <div class="ac-desc">퀘스트 50개 완료</div>
+            </div>
+            <div class="achieve-card unlocked">
+              <div class="ac-icon">🔥</div>
+              <div class="ac-name">불꽃 의지</div>
+              <div class="ac-desc">7일 연속 로그인</div>
+            </div>
+            <div class="achieve-card unlocked">
+              <div class="ac-icon">🤝</div>
+              <div class="ac-name">인맥왕</div>
+              <div class="ac-desc">동아리 5회 참여</div>
+            </div>
+            <div class="achieve-card locked">
+              <div class="ac-icon">🏅</div>
+              <div class="ac-name">?????</div>
+              <div class="ac-desc">Lv.15 달성 시 해금</div>
+            </div>
+            <div class="achieve-card locked">
+              <div class="ac-icon">💎</div>
+              <div class="ac-name">?????</div>
+              <div class="ac-desc">성실함 100 달성</div>
+            </div>
+            <div class="achieve-card locked">
+              <div class="ac-icon">👑</div>
+              <div class="ac-name">?????</div>
+              <div class="ac-desc">전설 등급 달성</div>
+            </div>
+          </div>
+
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goToScreen('screenHome')"><span>🏠</span><span>홈</span></div>
+            <div class="nav-item" onclick="goToScreen('screenStats')"><span>📊</span><span>스탯</span></div>
+            <div class="nav-item" onclick="goToScreen('screenAvatar')"><span>🧙</span><span>아바타</span></div>
+            <div class="nav-item active" onclick="goToScreen('screenAchieve')"><span>🏆</span><span>업적</span></div>
+          </div>
+        </div>
+
+      </div><!-- /phone-screen -->
+
+      <!-- 홈 버튼 -->
+      <div class="phone-home-btn"></div>
+    </div><!-- /phone-frame -->
+
+    <!-- 레벨업 오버레이 -->
+    <div class="levelup-overlay" id="levelupOverlay">
+      <div class="levelup-box">
+        <div class="levelup-title">LEVEL UP!</div>
+        <div class="levelup-num">Lv. 8</div>
+        <div class="levelup-char">✨🧑‍🎓✨</div>
+        <div class="levelup-rewards">
+          <div class="lv-reward">성실함 +5</div>
+          <div class="lv-reward">집중력 +3</div>
+          <div class="lv-reward">💎 +50</div>
+        </div>
+        <button class="btn-primary small" onclick="closeLevelup()">계속하기</button>
+      </div>
+    </div>
+
+  </main><!-- /phone-stage -->
+
+  <script src="site/js/app.js"></script>
+</body>
+</html>
