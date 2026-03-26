@@ -4,27 +4,22 @@ import BottomNav from '../components/BottomNav';
 import '../styles/FriendsPage.css';
 
 const FriendsPage = () => {
+  // 임시 데이터: 펫 이름과 레벨 추가
   const [friends, setFriends] = useState([
-    { id: 1, name: '김현우', major: '컴퓨터공학과', level: 12, online: true },
-    { id: 2, name: '이지은', major: '경영학과', level: 9, online: false },
-    { id: 3, name: '박서준', major: '전자공학과', level: 15, online: true },
+    { id: 1, name: '김현우', petName: '불꽃드래곤', petLevel: 12, online: true },
+    { id: 2, name: '이지은', petName: '아기슬라임', petLevel: 9, online: false },
+    { id: 3, name: '박서준', petName: '바람정령', petLevel: 15, online: true },
+    { id: 4, name: '최민지', petName: '황금독수리', petLevel: 22, online: true },
+    { id: 5, name: '정도윤', petName: '물개구리', petLevel: 5, online: false },
+    { id: 6, name: '한지수', petName: '숲의요정', petLevel: 18, online: true },
+    { id: 7, name: '오세훈', petName: '그림자늑대', petLevel: 30, online: false },
   ]);
+  
   const [requests, setRequests] = useState([
-    { id: 11, name: '최민지', message: '스터디 같이 할래요?' },
-    { id: 12, name: '정도윤', message: '오늘 동아리 퀘스트 같이 깨요!' },
+    { id: 11, name: '최민지' },
   ]);
+  
   const [friendSearch, setFriendSearch] = useState('');
-  const [memberSearch, setMemberSearch] = useState('');
-  const [addMessage, setAddMessage] = useState('');
-
-  // TODO: 실제 연동 시 DB API 결과로 대체
-  const membersInDb = [
-    { memberId: '20230001', name: '김현우', major: '컴퓨터공학과', level: 12, online: true },
-    { memberId: '20230018', name: '최민지', major: '디자인학과', level: 10, online: false },
-    { memberId: '20230035', name: '정도윤', major: '경영학과', level: 14, online: true },
-    { memberId: '20230102', name: '한지수', major: '전자공학과', level: 8, online: false },
-    { memberId: '20230177', name: '오세훈', major: '컴퓨터공학과', level: 11, online: true },
-  ];
 
   const filteredFriends = useMemo(() => {
     const keyword = friendSearch.trim().toLowerCase();
@@ -32,209 +27,67 @@ const FriendsPage = () => {
     return friends.filter((friend) => friend.name.toLowerCase().includes(keyword));
   }, [friendSearch, friends]);
 
-  const matchedMembers = useMemo(() => {
-    const keyword = memberSearch.trim().toLowerCase();
-    if (!keyword) return [];
-    return membersInDb.filter(
-      (member) =>
-        member.name.toLowerCase().includes(keyword) || member.memberId.toLowerCase().includes(keyword),
-    );
-  }, [memberSearch]);
-
-  const handleAddFriend = (member) => {
-    const alreadyFriend = friends.some((friend) => friend.name === member.name);
-    if (alreadyFriend) {
-      setAddMessage(`${member.name}님은 이미 친구 목록에 있어요.`);
-      return;
-    }
-
-    setFriends((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        name: member.name,
-        major: member.major,
-        level: member.level,
-        online: member.online,
-      },
-    ]);
-    setAddMessage(`${member.name}님을 친구로 추가했어요.`);
-  };
-
-  const handleAcceptRequest = (request) => {
-    const member = membersInDb.find((item) => item.name === request.name);
-    const alreadyFriend = friends.some((friend) => friend.name === request.name);
-
-    if (!alreadyFriend) {
-      setFriends((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          name: request.name,
-          major: member?.major ?? '미확인 학과',
-          level: member?.level ?? 1,
-          online: member?.online ?? false,
-        },
-      ]);
-    }
-
-    setRequests((prev) => prev.filter((item) => item.id !== request.id));
-    setAddMessage(
-      alreadyFriend
-        ? `${request.name}님은 이미 친구 목록에 있어요. 요청만 정리했어요.`
-        : `${request.name}님의 요청을 수락하고 친구에 추가했어요.`,
-    );
-  };
-
-  const handleRejectRequest = (requestId) => {
-    setRequests((prev) => prev.filter((item) => item.id !== requestId));
-  };
-
   return (
     <div className="screen active" id="screenFriends">
       <TopBar />
-      <div className="screen-header">
-        <span>👥 친구 목록</span>
-        <span className="header-lv">{friends.length}명</span>
-      </div>
-
-      <div style={{ padding: '10px 12px 6px', display: 'flex', gap: 8 }}>
-        <input
-          type="text"
-          className="game-input"
-          placeholder="내 친구 이름 검색"
-          value={friendSearch}
-          onChange={(e) => setFriendSearch(e.target.value)}
-          style={{ border: '2px solid var(--border)', borderRadius: 8, padding: '10px 12px' }}
-        />
-      </div>
-
-      <div className="section-header">
-        <span className="section-icon">🟢</span>
-        <span>내 친구 {friendSearch ? '(검색 결과)' : ''}</span>
-      </div>
-
-      <div className="quest-list" style={{ flex: 0, maxHeight: 220 }}>
-        {filteredFriends.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-sub)', padding: '20px 0' }}>
-            검색 결과가 없습니다.
+      
+      <div className="friends-container">
+        {/* 상단 액션 바 (검색 및 버튼들) */}
+        <div className="friends-top-actions">
+          <div className="friend-search-wrap">
+            <span className="friend-search-icon">🔍</span>
+            <input
+              type="text"
+              className="friend-search-input"
+              placeholder="이름 검색"
+              value={friendSearch}
+              onChange={(e) => setFriendSearch(e.target.value)}
+            />
           </div>
-        ) : (
-          filteredFriends.map((friend) => (
-            <div key={friend.id} className="quest-item" style={{ cursor: 'default' }}>
-              <div
-                style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: '50%',
-                  background: friend.online ? 'var(--accent2)' : 'var(--text-dim)',
-                  border: '2px solid var(--bg-wood)',
-                  flexShrink: 0,
-                }}
-              />
-              <div className="quest-info">
-                <div className="quest-name">{friend.name} · Lv.{friend.level}</div>
-                <div className="quest-reward">{friend.major}</div>
-              </div>
-              <div className="quest-xp" style={{ color: friend.online ? 'var(--accent3)' : 'var(--text-dim)' }}>
-                {friend.online ? '온라인' : '오프라인'}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      <div className="section-header">
-        <span className="section-icon">➕</span>
-        <span>친구 추가</span>
-      </div>
-
-      <div style={{ padding: '0 12px 8px', display: 'flex', gap: 8 }}>
-        <input
-          type="text"
-          className="game-input"
-          placeholder="회원 이름 또는 고유 ID 검색"
-          value={memberSearch}
-          onChange={(e) => setMemberSearch(e.target.value)}
-          style={{ border: '2px solid var(--border)', borderRadius: 8, padding: '10px 12px' }}
-        />
-      </div>
-
-      {addMessage && (
-        <div style={{ padding: '0 12px 6px', fontSize: 11, color: 'var(--accent3)' }}>
-          {addMessage}
+          
+          <div className="friend-action-btns">
+            <button className="f-action-btn" onClick={() => console.log('친구요청 클릭')}>
+              <span className="f-action-icon">📨</span>
+              <span className="f-action-label">요청</span>
+              {requests.length > 0 && <span className="f-badge">{requests.length}</span>}
+            </button>
+            <button className="f-action-btn" onClick={() => console.log('친구추가 클릭')}>
+              <span className="f-action-icon">➕</span>
+              <span className="f-action-label">추가</span>
+            </button>
+            <button className="f-action-btn" onClick={() => console.log('친구관리 클릭')}>
+              <span className="f-action-icon">⚙️</span>
+              <span className="f-action-label">관리</span>
+            </button>
+          </div>
         </div>
-      )}
 
-      <div className="quest-list" style={{ flex: 0, maxHeight: 170, paddingBottom: 8 }}>
-        {memberSearch.trim() === '' ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-sub)', padding: '20px 0' }}>
-            이름 또는 ID로 회원을 검색해 주세요.
-          </div>
-        ) : matchedMembers.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-sub)', padding: '20px 0' }}>
-            등록된 회원을 찾지 못했습니다.
-          </div>
-        ) : (
-          matchedMembers.map((member) => (
-            <div key={member.memberId} className="quest-item" style={{ cursor: 'default' }}>
-              <div className="quest-check empty">👤</div>
-              <div className="quest-info">
-                <div className="quest-name">
-                  {member.name} · Lv.{member.level}
+        {/* 친구 목록 (스크롤 영역) */}
+        <div className="friends-list-wrap">
+          {filteredFriends.length === 0 ? (
+            <div className="friends-empty">검색된 친구가 없습니다.</div>
+          ) : (
+            filteredFriends.map((friend) => (
+              <div key={friend.id} className="friend-card">
+                {/* 왼쪽: 펫 정보 */}
+                <div className="fc-pet-info">
+                  <span className="fc-pet-name">{friend.petName}</span>
+                  <span className="fc-pet-level">Lv. {friend.petLevel}</span>
                 </div>
-                <div className="quest-reward">
-                  ID: {member.memberId} · {member.major}
+                
+                {/* 오른쪽: 유저 정보 및 아이콘 */}
+                <div className="fc-user-info">
+                  <span className="fc-username">{friend.name}</span>
+                  <div className={`fc-avatar ${friend.online ? '' : 'offline'}`}>
+                    🥚
+                  </div>
                 </div>
               </div>
-              <button
-                type="button"
-                className="btn-primary small"
-                onClick={() => handleAddFriend(member)}
-                style={{ paddingInline: 12 }}
-              >
-                친구 추가
-              </button>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
 
-      <div className="section-header">
-        <span className="section-icon">📨</span>
-        <span>친구 요청</span>
-        <span className="section-badge">{requests.length}</span>
-      </div>
-
-      <div className="quest-list" style={{ paddingBottom: 12 }}>
-        {requests.map((request) => (
-          <div key={request.id} className="quest-item" style={{ cursor: 'default' }}>
-            <div className="quest-check empty">👤</div>
-            <div className="quest-info">
-              <div className="quest-name">{request.name}</div>
-              <div className="quest-reward">{request.message}</div>
-            </div>
-            <div style={{ display: 'flex', gap: 6 }}>
-              <button
-                type="button"
-                className="btn-primary small"
-                style={{ paddingInline: 12 }}
-                onClick={() => handleAcceptRequest(request)}
-              >
-                수락
-              </button>
-              <button
-                type="button"
-                className="btn-secondary"
-                style={{ width: 'auto', padding: '8px 10px' }}
-                onClick={() => handleRejectRequest(request.id)}
-              >
-                거절
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
       <BottomNav />
     </div>
   );

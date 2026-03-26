@@ -8,7 +8,7 @@ const TopBar = () => {
   return (
     <div className="top-bar">
       <div className="top-bar-left">
-        <div className="top-profile-icon">🧑‍🎓</div>
+        <div className="top-profile-icon">🥚</div>
         <div className="top-nickname">닉네임</div>
       </div>
       <div className="top-bar-right">

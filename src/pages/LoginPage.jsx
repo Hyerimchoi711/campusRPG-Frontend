@@ -28,11 +28,11 @@ const LoginPage = () => {
             <div className="btn-shine"></div>
           </button>
           <button className="btn-secondary" onClick={() => navigate('/home')}>
-            새 캐릭터 생성
+            새 알 부화하기
           </button>
         </div>
         <div className="login-deco">
-          <div className="pixel-char char-idle" id="loginChar">🧑‍🎓</div>
+          <div className="pixel-char char-idle" id="loginChar">🥚</div>
         </div>
       </div>
     </div>

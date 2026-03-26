@@ -18,14 +18,14 @@ const StatsPage = () => {
       <TopBar />
       <div className="screen-header">
         <button className="back-btn" onClick={() => navigate('/home')}>←</button>
-        <span>캐릭터 스탯</span>
+        <span>동물 스탯</span>
         <span className="header-lv">Lv.7</span>
       </div>
 
       <div className="stat-avatar-section">
         <div className="stat-avatar-wrap">
           <div className="stat-avatar-glow"></div>
-          <div className="stat-avatar-char">🧑‍🎓</div>
+          <div className="stat-avatar-char">🥚</div>
           <div className="stat-avatar-name">새싹 모험가</div>
         </div>
       </div>

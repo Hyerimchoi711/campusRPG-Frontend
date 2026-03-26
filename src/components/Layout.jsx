@@ -79,7 +79,7 @@ const Layout = () => {
             </div>
             <div className="rank-item">
               <span className="rank-num">05</span>
-              <div className="rank-avatar" style={{background: '#ffd4a3'}}>🧑‍🎓</div>
+              <div className="rank-avatar" style={{background: '#ffd4a3'}}>🥚</div>
               <div className="rank-info">
                 <span className="rank-name">정도윤</span>
                 <span className="rank-class">학자 Lv.28</span>
@@ -123,7 +123,7 @@ const Layout = () => {
           <div className="levelup-box">
             <div className="levelup-title">LEVEL UP!</div>
             <div className="levelup-num">Lv. 8</div>
-            <div className="levelup-char">✨🧑‍🎓✨</div>
+            <div className="levelup-char">✨🥚✨</div>
             <div className="levelup-rewards">
               <div className="lv-reward">성실함 +5</div>
               <div className="lv-reward">집중력 +3</div>

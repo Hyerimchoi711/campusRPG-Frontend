@@ -10,18 +10,18 @@ const HomePage = () => {
       
       <div className="home-container" >
         <div className="home-level-box">
-          Lv. 100
+          Lv. 0
         </div>
         
         <img 
-          src="/images/characters/character1_male.png" 
-          alt="캐릭터" 
+          src="/images/animals/egg.png" 
+          alt="알" 
           className="home-character-img"
         />
         
         <div className="home-info-box">
-          <div className="home-info-nickname">닉네임</div>
-          <div className="home-info-title">칭호: 전설의 대학생</div>
+          <div className="home-info-nickname">부화중인 알</div>
+          <div className="home-info-title">키워주세요</div>
         </div>
       </div>
 

@@ -1,6 +1,3 @@
-/* ============================================================
-   NEW HOME PAGE (Character View)
-   ============================================================ */
 .home-container {
   flex: 1;
   display: flex;
@@ -8,7 +5,7 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  gap: 16px;
+  gap: 30px;
 }
 
 .home-level-box {
@@ -25,7 +22,7 @@
 }
 
 .home-character-img {
-  width: 130px;
+  width: 170px;
   height: auto;
   object-fit: cover;
 }
