@@ -15,8 +15,19 @@ const formatDateLabel = (date) => {
   return `${year}.${month}.${day}`;
 };
 
+// 특정 날짜가 속한 달의 몇 주차인지 계산하는 함수
+const getWeekOfMonth = (date) => {
+  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const firstDayWeekday = firstDayOfMonth.getDay(); // 0 (일) ~ 6 (토)
+  const offsetDate = date.getDate() + firstDayWeekday - 1;
+  return Math.floor(offsetDate / 7) + 1;
+};
+
 const TodoPage = () => {
   const [selectedDate, setSelectedDate] = useState(() => toDateKey(new Date()));
+  // 주간 뷰의 기준이 되는 날짜 (해당 날짜가 속한 주를 보여줌)
+  const [currentWeekDate, setCurrentWeekDate] = useState(() => new Date());
+  
   const [newTodo, setNewTodo] = useState('');
   const [todoByDate, setTodoByDate] = useState({
     '2026-03-24': [
@@ -27,29 +38,55 @@ const TodoPage = () => {
       { id: 3, text: '중간고사 시간표 확인', done: false, category: '학사일정', source: 'academic' },
       { id: 4, text: '헬스장 1시간', done: false, category: '건강', source: 'manual' },
     ],
+    '2026-04-01': [
+      { id: 5, text: '만우절 이벤트 참여', done: false, category: '이벤트', source: 'manual' },
+    ]
   });
 
   const calendarMeta = useMemo(() => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const monthIndex = now.getMonth();
-    const firstDay = new Date(year, monthIndex, 1).getDay();
-    const lastDate = new Date(year, monthIndex + 1, 0).getDate();
+    const year = currentWeekDate.getFullYear();
+    const monthIndex = currentWeekDate.getMonth();
+    const weekNumber = getWeekOfMonth(currentWeekDate);
+    
+    // 현재 기준일의 요일 (0: 일요일 ~ 6: 토요일)
+    const dayOfWeek = currentWeekDate.getDay();
+    
+    // 이번 주의 일요일 날짜 계산
+    const sunday = new Date(currentWeekDate);
+    sunday.setDate(currentWeekDate.getDate() - dayOfWeek);
+    
     const cells = [];
-
-    for (let i = 0; i < firstDay; i += 1) cells.push(null);
-    for (let day = 1; day <= lastDate; day += 1) {
-      const dateKey = toDateKey(new Date(year, monthIndex, day));
-      cells.push(dateKey);
+    
+    // 일요일부터 토요일까지 7일간의 날짜 생성
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(sunday);
+      date.setDate(sunday.getDate() + i);
+      cells.push(toDateKey(date));
     }
 
     return {
-      title: `${year}년 ${monthIndex + 1}월`,
+      title: `${year}년 ${monthIndex + 1}월 ${weekNumber}주차`,
       cells,
       year,
       monthIndex,
     };
-  }, []);
+  }, [currentWeekDate]);
+
+  const handlePrevWeek = () => {
+    setCurrentWeekDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setDate(prev.getDate() - 7);
+      return newDate;
+    });
+  };
+
+  const handleNextWeek = () => {
+    setCurrentWeekDate(prev => {
+      const newDate = new Date(prev);
+      newDate.setDate(prev.getDate() + 7);
+      return newDate;
+    });
+  };
 
   const selectedTodos = useMemo(() => todoByDate[selectedDate] ?? [], [todoByDate, selectedDate]);
   const completedCount = useMemo(
@@ -99,10 +136,6 @@ const TodoPage = () => {
   return (
     <div className="screen active" id="screenTodo">
       <TopBar />
-      <div className="screen-header">
-   <span>📅 일정 관리</span>
-        <span className="section-badge">{completedCount}/{selectedTodos.length}</span>
-      </div>
 
       <div style={{ padding: '12px 12px 8px' }}>
         <div
@@ -125,8 +158,33 @@ const TodoPage = () => {
               fontSize: 12,
             }}
           >
+            <button 
+              onClick={handlePrevWeek}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '16px',
+                color: 'var(--text-main)',
+                padding: '0 8px'
+              }}
+            >
+              ◀
+            </button>
             <span>📆 {calendarMeta.title}</span>
-            <span style={{ fontSize: 10, color: 'var(--text-sub)' }}>일정 있는 날짜는 강조</span>
+            <button 
+              onClick={handleNextWeek}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '16px',
+                color: 'var(--text-main)',
+                padding: '0 8px'
+              }}
+            >
+              ▶
+            </button>
           </div>
 
           <div
@@ -146,11 +204,7 @@ const TodoPage = () => {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
-            {calendarMeta.cells.map((dateKey, idx) => {
-              if (!dateKey) {
-                return <div key={`empty-${idx}`} style={{ height: 34 }} />;
-              }
-
+            {calendarMeta.cells.map((dateKey) => {
               const day = Number(dateKey.split('-')[2]);
               const hasTodos = (todoByDate[dateKey] ?? []).length > 0;
               const isSelected = selectedDate === dateKey;
@@ -195,23 +249,6 @@ const TodoPage = () => {
             })}
           </div>
         </div>
-      </div>
-
-      <div style={{ padding: '8px 12px 8px', display: 'flex', gap: 8 }}>
-        <input
-          type="text"
-          className="game-input"
-          placeholder={`${formatDateLabel(selectedDate)} 일정 추가`}
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleAddTodo();
-          }}
-          style={{ border: '2px solid var(--border)', borderRadius: 8, padding: '10px 12px' }}
-        />
-        <button type="button" className="btn-primary small" onClick={handleAddTodo}>
-          추가
-        </button>
       </div>
 
       <div className="section-header" style={{ paddingTop: 0 }}>
@@ -264,6 +301,24 @@ const TodoPage = () => {
             </div>
           ))
         )}
+      </div>
+
+      <div style={{ padding: '8px 12px 8px', display: 'flex', gap: 8 }}>
+        <input
+          type="text"
+          className="game-input"
+          placeholder={`${formatDateLabel(selectedDate)} 일정 추가`}
+          value={newTodo}
+          onChange={(e) => setNewTodo(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.nativeEvent.isComposing) return;
+            if (e.key === 'Enter') handleAddTodo();
+          }}
+          style={{ border: '2px solid var(--border)', borderRadius: 8, padding: '10px 12px' }}
+        />
+        <button type="button" className="btn-primary small" onClick={handleAddTodo}>
+          추가
+        </button>
       </div>
 
       <BottomNav />

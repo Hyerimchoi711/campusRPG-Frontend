@@ -117,6 +117,17 @@
   font-weight: 700;
   color: var(--text-main);
   flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.2s;
+}
+.section-header:hover {
+  opacity: 0.8;
+}
+.section-toggle {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-left: 2px;
 }
 .section-icon { font-size: 14px; }
 .section-badge {
