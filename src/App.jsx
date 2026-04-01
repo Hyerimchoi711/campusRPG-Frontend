@@ -7,6 +7,7 @@ import StatsPage from './pages/StatsPage';
 import TodoPage from './pages/TodoPage';
 import QuestsPage from './pages/QuestsPage';
 import FriendsPage from './pages/FriendsPage';
+import ShopPage from './pages/ShopPage';
 import './index.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="todo" element={<TodoPage />} />
           <Route path="quests" element={<QuestsPage />} />
           <Route path="friends" element={<FriendsPage />} />
+          <Route path="shop" element={<ShopPage />} />
         </Route>
       </Routes>
     </Router>

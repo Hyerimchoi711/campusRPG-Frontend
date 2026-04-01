@@ -17,7 +17,7 @@ const TopBar = () => {
         </div>
       </div>
       <div className="top-bar-right">
-        <button className="top-btn" onClick={() => console.log('상점 클릭')}>
+        <button className="top-btn" onClick={() => navigate('/shop')}>
           <span>🛒</span>
           <span className="top-btn-text">상점</span>
         </button>
