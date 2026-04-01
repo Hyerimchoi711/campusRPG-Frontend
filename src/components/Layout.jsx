@@ -34,7 +34,7 @@ const Layout = () => {
           <div className="fi fi3">⭐</div>
           <div className="fi fi4">🍃</div>
         </div> */}
-      </aside>
+      </aside >
 
       {/* 우측 장식 패널 */}
       <aside className="side-panel right-panel">
@@ -101,6 +101,7 @@ const Layout = () => {
           <div className="fi fi8">💎</div>
         </div> */}
       </aside>
+
 
       {/* 중앙 스마트폰 영역 */}
       <main className="phone-stage">
