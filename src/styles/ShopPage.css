@@ -25,12 +25,12 @@
 /* 보유 코인 수 */
 .shop-coin-display {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 10px;
+  left: 10px;
   background: var(--bg-card);
-  border: 3px solid var(--bg-wood);
+  border: 2px solid var(--bg-wood);
   border-radius: 8px;
-  padding: 6px 12px;
+  padding: 3px 8px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -107,10 +107,10 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 12px 10px;
+  /* padding: 12px 10px; */
   display: grid;
   grid-template-columns: 1fr 1fr; /* 2열 그리드 */
-  gap: 8px; /* 간격 축소 */
+  gap: 2px; /* 간격 축소 */
   background: var(--bg-card2);
   scrollbar-width: none;
 }
@@ -121,19 +121,18 @@
 /* 아이템 카드 */
 .shop-item-card {
   background: var(--bg-card);
-  border: 3px solid var(--border);
-  border-radius: 8px;
-  padding: 6px; /* 패딩 축소 */
+  border: 1px solid var(--border);
+  /* border-radius: 8px; */
+  padding: 1px 2px; /* 패딩 축소 */
   display: flex;
   align-items: center;
-  gap: 6px; /* 내부 간격 축소 */
+  gap: 5px; /* 내부 간격 축소 */
   box-shadow: 2px 2px 0 var(--border2);
   transition: all 0.2s;
   cursor: pointer;
   min-width: 0; /* 그리드 내에서 넘침 방지 */
 }
 .shop-item-card:hover {
-  transform: translateY(-2px);
   border-color: var(--accent);
   background: #fff;
   box-shadow: 2px 4px 0 var(--border2);
@@ -184,9 +183,9 @@
   justify-content: center;
   gap: 2px;
   flex-shrink: 0;
-  min-width: 30px;
+  min-width: 32px;
   border-left: 1px dashed var(--border2);
-  padding-left: 6px;
+  padding-left: 1px;
 }
 .shop-item-price .price-icon {
   font-size: 10px;

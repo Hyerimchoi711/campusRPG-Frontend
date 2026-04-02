@@ -32,8 +32,8 @@ const ShopPage = () => {
           </div>
           
           <div className="shop-speech-bubble">
-            <p>어서오세요!</p>
-            <p>무엇을 찾으시나요?</p>
+            <p>어서오시게!</p>
+            <p>무엇을 찾으려왔나?</p>
           </div>
         </div>
 
