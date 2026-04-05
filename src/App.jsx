@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ProfileProvider } from './context/ProfileContext';
+import { QuestProvider } from './context/QuestContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import HomePage from './pages/HomePage';
@@ -15,6 +16,7 @@ import './index.css';
 function App() {
   return (
     <ProfileProvider>
+      <QuestProvider>
       <Router>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -31,6 +33,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      </QuestProvider>
     </ProfileProvider>
   );
 }

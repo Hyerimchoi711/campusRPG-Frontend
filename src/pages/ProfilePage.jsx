@@ -11,6 +11,7 @@ const MAX_LEN = {
   university: 40,
   realName: 24,
   major: 40,
+  schoolYear: 2,
   age: 3,
   intro: 160,
 };
@@ -100,8 +101,8 @@ const ProfilePage = () => {
     if (key === 'intro') {
       value = draft;
       if (value.length > MAX_LEN.intro) value = value.slice(0, MAX_LEN.intro);
-    } else if (key === 'age') {
-      value = draft.replace(/\D/g, '').slice(0, MAX_LEN.age);
+    } else if (key === 'age' || key === 'schoolYear') {
+      value = draft.replace(/\D/g, '').slice(0, MAX_LEN[key]);
     } else if (typeof draft === 'string') {
       value = draft.trim();
       const max = MAX_LEN[key];
@@ -271,12 +272,13 @@ const ProfilePage = () => {
               <input
                 ref={fieldRef}
                 type="text"
-                inputMode={fieldKey === 'age' ? 'numeric' : undefined}
+                inputMode={fieldKey === 'age' || fieldKey === 'schoolYear' ? 'numeric' : undefined}
                 className="profile-simple-input"
                 value={draft}
                 onChange={(e) => {
-                  if (fieldKey === 'age') {
-                    setDraft(e.target.value.replace(/\D/g, '').slice(0, MAX_LEN.age));
+                  if (fieldKey === 'age' || fieldKey === 'schoolYear') {
+                    const max = MAX_LEN[fieldKey];
+                    setDraft(e.target.value.replace(/\D/g, '').slice(0, max));
                   } else {
                     setDraft(e.target.value);
                   }
@@ -422,13 +424,16 @@ const ProfilePage = () => {
               <div className="profile-simple-rows">
                 {renderLine('university', '대학', 'text', 'OO대학교')}
                 {renderLine('major', '학과', 'text', 'OO학과')}
+                {renderLine('schoolYear', '학년', 'text', '예: 2')}
                 {renderLine('age', '나이', 'text', '예: 21')}
               </div>
             </div>
           </section>
 
           {!isFriendView && (
-            <p className="profile-simple-hint">위 프로필 박스에서 이름·한줄 소개를, 아래 상세 박스에서 대학·학과·나이를 ✏️로 수정할 수 있어요.</p>
+            <p className="profile-simple-hint">
+              위 프로필 박스에서 이름·한줄 소개를, 아래에서 대학·학과·학년·나이를 ✏️로 수정할 수 있어요. 퀘스트 NPC는 학과·학년을 참고해 맞춤 퀘스트를 만듭니다.
+            </p>
           )}
         </div>
       </div>
