@@ -289,7 +289,7 @@
   height: auto;
   min-height: 84px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--mint), var(--sky-blue));
+  background: linear-gradient(135deg, #c4a882, #8fa8b8);
   border: 3px solid var(--bg-wood);
   display: flex;
   align-items: center;

@@ -18,7 +18,7 @@ const HomePage = () => {
         </div>
         
         {/* XP 바 */}
-        <div className="xp-section" style={{ width: '100%', padding: '0 20px' }}>
+        <div className="xp-section home-xp-wrap">
           <div className="xp-label">
             <span>EXP</span>
             <span>1,240 / 2,000</span>

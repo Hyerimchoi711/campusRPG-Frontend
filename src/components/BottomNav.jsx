@@ -11,19 +11,24 @@ const BottomNav = () => {
   return (
     <div className="bottom-nav">
       <div className={`nav-item ${isActive('/stats')}`} onClick={() => navigate('/stats')}>
-        <span>📊</span><span>스탯</span>
+        <span className="nav-item-icon" aria-hidden>📊</span>
+        <span className="nav-item-label">스탯</span>
       </div>
       <div className={`nav-item ${isActive('/todo')}`} onClick={() => navigate('/todo')}>
-        <span>📅</span><span>일정</span>
+        <span className="nav-item-icon" aria-hidden>📅</span>
+        <span className="nav-item-label">일정</span>
       </div>
       <div className={`nav-item ${isActive('/home')}`} onClick={() => navigate('/home')}>
-        <span>🏠</span><span>홈</span>
+        <span className="nav-item-icon" aria-hidden>🏠</span>
+        <span className="nav-item-label">홈</span>
       </div>
       <div className={`nav-item ${isActive('/quests')}`} onClick={() => navigate('/quests')}>
-        <span>📋</span><span>퀘스트</span>
+        <span className="nav-item-icon" aria-hidden>📋</span>
+        <span className="nav-item-label">퀘스트</span>
       </div>
       <div className={`nav-item ${isActive('/friends')}`} onClick={() => navigate('/friends')}>
-        <span>👥</span><span>친구</span>
+        <span className="nav-item-icon" aria-hidden>👥</span>
+        <span className="nav-item-label">친구</span>
       </div>
     </div>
   );

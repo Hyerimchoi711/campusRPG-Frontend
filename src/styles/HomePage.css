@@ -38,32 +38,40 @@
 }
 
 .home-level-box {
-  background: var(--bg-card2);
-  border: 3px solid var(--bg-wood);
+  background: rgba(255, 248, 238, 0.96);
+  border: 3px solid var(--bg-wood-dark);
   border-radius: 8px;
   padding: 6px 20px;
   font-family: var(--pixel-font);
   font-size: 16px;
   color: var(--text-main);
-  box-shadow: 2px 2px 0 var(--bg-wood-dark);
   text-align: center;
   min-width: 120px;
+  box-shadow:
+    2px 2px 0 var(--bg-wood-dark),
+    0 6px 16px rgba(15, 10, 6, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .home-character-img {
   width: 170px;
   height: auto;
   object-fit: cover;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 8px rgba(10, 8, 6, 0.45));
 }
 
 .home-info-box {
-  background: var(--bg-card2);
-  border: 3px solid var(--bg-wood);
+  background: rgba(255, 248, 238, 0.96);
+  border: 3px solid var(--bg-wood-dark);
   border-radius: 8px;
   padding: 10px 20px;
   text-align: center;
-  box-shadow: 2px 2px 0 var(--bg-wood-dark);
   min-width: 180px;
+  box-shadow:
+    2px 2px 0 var(--bg-wood-dark),
+    0 6px 16px rgba(15, 10, 6, 0.4);
 }
 
 .home-info-nickname {
@@ -73,6 +81,7 @@
   margin-bottom: 4px;
   border-bottom: 2px dashed var(--border2);
   padding-bottom: 4px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .home-info-title {
@@ -81,3 +90,56 @@
   font-family: var(--body-font);
 }
 
+/* 홈 전용 EXP — 배경과 대비되는 싱그러운 성장색 (연두 + 살짝 청록) */
+.home-container .xp-section.home-xp-wrap {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px 20px;
+  flex-shrink: 0;
+}
+
+.home-container .xp-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  font-family: var(--pixel-font);
+  margin-bottom: 5px;
+  color: #f5f0e6;
+  text-shadow:
+    0 1px 0 #1a120c,
+    0 0 6px rgba(0, 0, 0, 0.45);
+}
+
+.home-container .xp-bar {
+  height: 14px;
+  background: rgba(35, 28, 22, 0.55);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 3px solid var(--bg-wood-dark);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 2px 0 rgba(255, 248, 238, 0.12);
+}
+
+.home-container .xp-fill {
+  height: 100%;
+  border-radius: 3px;
+  position: relative;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(180deg, #9ee085 0%, #5cb85c 45%, #3d8f45 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.home-container .xp-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(200, 240, 255, 0.45), transparent);
+  border-radius: 3px 3px 0 0;
+}

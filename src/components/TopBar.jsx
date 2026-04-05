@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../context/ProfileContext';
+import SettingsModal from './SettingsModal';
 import '../styles/TopBar.css';
 
 const TopBar = () => {
   const navigate = useNavigate();
   const { profile } = useProfile();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <div className="top-bar">
@@ -19,10 +21,10 @@ const TopBar = () => {
           <div className="top-profile-icon">{profile.avatar || '🥚'}</div>
           <div className="top-nickname">{profile.realName?.trim() || profile.nickname || '이름'}</div>
         </button>
-        <div style={{ color: 'var(--border)', margin: '0', fontSize: '15px', fontWeight: 'bold' }}>|</div>
-        <div className="top-coin" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span style={{ fontSize: '12px' }}>🪙</span>
-          <span style={{ fontFamily: 'var(--pixel-font)', fontSize: '12px', color: 'var(--gold2)', textShadow: '1px 1px 0 var(--bg-wood)' }}>1,200</span>
+        <span className="top-bar-sep" aria-hidden>|</span>
+        <div className="top-coin">
+          <span className="top-coin-icon" aria-hidden>🪙</span>
+          <span className="top-coin-amount">1,200</span>
         </div>
       </div>
       <div className="top-bar-right">
@@ -30,11 +32,12 @@ const TopBar = () => {
           <span>🛒</span>
           <span className="top-btn-text">상점</span>
         </button>
-        <button className="top-btn" onClick={() => console.log('설정 클릭')}>
+        <button type="button" className="top-btn" onClick={() => setSettingsOpen(true)} aria-label="설정 열기">
           <span>⚙️</span>
           <span className="top-btn-text">설정</span>
         </button>
       </div>
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 };

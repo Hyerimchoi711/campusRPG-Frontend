@@ -148,8 +148,8 @@
   min-width: 0; /* 그리드 내에서 넘침 방지 */
 }
 .shop-item-card:hover {
-  border-color: var(--accent);
-  background: #fff;
+  border-color: var(--accent2);
+  background: #faf6f0;
   box-shadow: 2px 4px 0 var(--border2);
 }
 

@@ -1,41 +1,44 @@
 /* ============================================================
-   CAMPUSQUEST — STARDEW VALLEY / PIXEL ARK STYLE
-   Soft, cozy pixel art aesthetic with warm pastel colors
+   CAMPUSQUEST — Cozy wood shop / nest interior tone
+   Warm browns, parchment panels, lantern-gold accents (픽셀 상점·숲 보금자리)
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* Warm, cozy color palette inspired by Stardew Valley */
-  --bg-deep:    #4a6741;    /* Forest green */
-  --bg-mid:     #5c7a50;    /* Meadow green */
-  --bg-card:    #f5ebe0;    /* Warm cream */
-  --bg-card2:   #fff8f0;    /* Soft white */
-  --bg-wood:    #8b6914;    /* Wood frame */
-  --bg-wood-light: #c4a35a; /* Light wood */
-  --bg-wood-dark:  #5a4510; /* Dark wood */
-  
-  --accent:     #6b9b4b;    /* Spring green */
-  --accent2:    #8bc34a;    /* Bright green */
-  --accent3:    #4a7c31;    /* Deep green */
-  
-  --gold:       #f5c06e;    /* Warm gold */
-  --gold2:      #ffd700;    /* Bright gold */
-  --copper:     #cd7f32;    /* Copper */
-  
-  --sky-blue:   #a8d8ea;    /* Sky blue */
-  --sunset:     #ffb347;    /* Sunset orange */
-  --rose:       #f8b4c4;    /* Soft rose */
-  --mint:       #b5e8c3;    /* Fresh mint */
-  --lavender:   #d4b8e0;    /* Soft lavender */
-  --coral:      #ff7f7f;    /* Coral red */
-  
-  --text-main:  #3d2914;    /* Dark brown */
-  --text-sub:   #6b5344;    /* Medium brown */
-  --text-dim:   #9a8478;    /* Light brown */
-  --text-light: #fff8f0;    /* Cream white */
-  
-  --border:     rgba(139,105,20,0.5);
-  --border2:    rgba(139,105,20,0.25);
+  /* 바깥·깊이: 어두운 목재 */
+  --bg-deep:    #2a1c12;
+  --bg-mid:     #3d2a1c;
+  /* 폰 안 패널: 양피지 느낌 크림 */
+  --bg-card:    #e5d9ca;
+  --bg-card2:   #efe6d8;
+  /* 프레임·가구 목재 */
+  --bg-wood:    #6b4423;
+  --bg-wood-light: #a67c52;
+  --bg-wood-dark:  #3d2615;
+
+  /* 포인트: 호박색·구리 (초록 대신 잔잔한 올리브 보조) */
+  --accent:     #8b6914;
+  --accent2:    #c9a43c;
+  --accent3:    #5c4a2a;
+
+  --gold:       #e8b84a;
+  --gold2:      #f0d060;
+  --copper:     #a85c32;
+
+  --sky-blue:   #8fa3b0;
+  --sunset:     #d4954c;
+  --rose:       #c9a090;
+  --mint:       #7d9070;
+  --lavender:   #a898b8;
+  --coral:      #c45c4a;
+
+  --text-main:  #2a1a10;
+  --text-sub:   #5c4838;
+  --text-dim:   #8a7868;
+  --text-light: #fff8f0;
+
+  --border:     rgba(74, 48, 28, 0.45);
+  --border2:    rgba(74, 48, 28, 0.22);
   
   --phone-w:    340px;
   --phone-h:    680px;
@@ -51,7 +54,7 @@
 html, body {
   width: 100%; height: 100%;
   overflow: hidden;
-  background: #87CEEB;
+  background: linear-gradient(165deg, #4a3224 0%, #2e2016 42%, #1a120d 100%);
   font-family: var(--body-font);
   color: var(--text-main);
   image-rendering: pixelated;
@@ -155,7 +158,7 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
   inset: 0;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, var(--bg-card2) 0%, var(--bg-card) 100%);
+  background: linear-gradient(180deg, var(--bg-card2) 0%, var(--bg-card) 55%, #d8cdc0 100%);
   overflow-y: auto;
   overflow-x: hidden;
   opacity: 0;
@@ -179,7 +182,7 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: linear-gradient(to bottom, rgba(139,195,74,0.2), transparent);
+  background: linear-gradient(to bottom, rgba(180, 140, 95, 0.28), transparent);
   border-bottom: 3px solid var(--border2);
   font-family: var(--pixel-font);
   font-size: 10px;
@@ -199,8 +202,8 @@ body.season-winter #skyBot { stop-color: #d8eaf8; }
   box-shadow: 2px 2px 0 var(--border2);
 }
 .back-btn:hover { 
-  background: #fff; 
-  border-color: var(--accent);
+  background: #faf6f0; 
+  border-color: var(--accent2);
   transform: translateY(1px);
   box-shadow: 1px 1px 0 var(--border2);
 }
