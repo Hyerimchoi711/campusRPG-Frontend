@@ -1,11 +1,40 @@
 .home-container {
+  position: relative;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 20px;
   gap: 20px;
+  overflow: hidden;
+  background-color: #2a3828;
+  background-image: var(--home-bg-image);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* 배경 위 UI가 잘 보이도록 아주 약한 비네트 (알·카드는 그대로 유지) */
+.home-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 85% 70% at 50% 45%,
+    transparent 30%,
+    rgba(20, 28, 22, 0.25) 100%
+  );
+  z-index: 0;
+}
+
+.home-container > * {
+  position: relative;
+  z-index: 1;
 }
 
 .home-level-box {

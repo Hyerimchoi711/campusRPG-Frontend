@@ -1,19 +1,12 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import { MOCK_FRIENDS } from '../data/mockFriends';
 import '../styles/FriendsPage.css';
 
 const FriendsPage = () => {
-  // 임시 데이터: 펫 이름과 레벨 추가
-  const [friends, setFriends] = useState([
-    { id: 1, name: '김현우', petName: '불꽃드래곤', petLevel: 12, online: true },
-    { id: 2, name: '이지은', petName: '아기슬라임', petLevel: 9, online: false },
-    { id: 3, name: '박서준', petName: '바람정령', petLevel: 15, online: true },
-    { id: 4, name: '최민지', petName: '황금독수리', petLevel: 22, online: true },
-    { id: 5, name: '정도윤', petName: '물개구리', petLevel: 5, online: false },
-    { id: 6, name: '한지수', petName: '숲의요정', petLevel: 18, online: true },
-    { id: 7, name: '오세훈', petName: '그림자늑대', petLevel: 30, online: false },
-  ]);
+  const navigate = useNavigate();
   
   const [requests, setRequests] = useState([
     { id: 11, name: '최민지' },
@@ -23,9 +16,9 @@ const FriendsPage = () => {
 
   const filteredFriends = useMemo(() => {
     const keyword = friendSearch.trim().toLowerCase();
-    if (!keyword) return friends;
-    return friends.filter((friend) => friend.name.toLowerCase().includes(keyword));
-  }, [friendSearch, friends]);
+    if (!keyword) return MOCK_FRIENDS;
+    return MOCK_FRIENDS.filter((friend) => friend.realName.toLowerCase().includes(keyword));
+  }, [friendSearch]);
 
   return (
     <div className="screen active" id="screenFriends">
@@ -68,21 +61,21 @@ const FriendsPage = () => {
             <div className="friends-empty">검색된 친구가 없습니다.</div>
           ) : (
             filteredFriends.map((friend) => (
-              <div key={friend.id} className="friend-card">
-                {/* 왼쪽: 펫 정보 */}
+              <button
+                key={friend.id}
+                type="button"
+                className="friend-card"
+                onClick={() => navigate(`/profile/friend/${friend.id}`)}
+              >
                 <div className="fc-pet-info">
                   <span className="fc-pet-name">{friend.petName}</span>
                   <span className="fc-pet-level">Lv. {friend.petLevel}</span>
                 </div>
-                
-                {/* 오른쪽: 유저 정보 및 아이콘 */}
                 <div className="fc-user-info">
-                  <span className="fc-username">{friend.name}</span>
-                  <div className={`fc-avatar ${friend.online ? '' : 'offline'}`}>
-                    🥚
-                  </div>
+                  <span className="fc-username">{friend.realName}</span>
+                  <div className={`fc-avatar ${friend.online ? '' : 'offline'}`}>{friend.avatar || '🥚'}</div>
                 </div>
-              </div>
+              </button>
             ))
           )}
         </div>

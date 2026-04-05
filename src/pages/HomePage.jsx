@@ -1,6 +1,7 @@
 import React from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import homeForestBg from '../assets/images/home-forest-nest.png';
 import '../styles/HomePage.css';
 
 const HomePage = () => {
@@ -8,7 +9,10 @@ const HomePage = () => {
     <div className="screen active" id="screenHome">
       <TopBar />
       
-      <div className="home-container" >
+      <div
+        className="home-container"
+        style={{ '--home-bg-image': `url(${homeForestBg})` }}
+      >
         <div className="home-level-box">
           Lv. 0
         </div>

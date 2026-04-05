@@ -22,15 +22,17 @@ const ShopPage = () => {
       <div className="shop-content-wrapper">
         {/* 상단 고정 영역 (상점 주인) */}
         <div className="shop-header-section">
+          <img
+            src="/images/shop/shopkeeper.png"
+            alt=""
+            className="shop-header-bg-img"
+            decoding="async"
+          />
+          <div className="shop-header-overlay" aria-hidden="true" />
           <div className="shop-coin-display">
             <span className="coin-icon">🪙</span>
             <span className="coin-amount">1,200</span>
           </div>
-          
-          <div className="shop-npc-container">
-            <img src="/images/animals/egg.png" alt="상점 주인" className="shop-npc-img" />
-          </div>
-          
           <div className="shop-speech-bubble">
             <p>어서오시게!</p>
             <p>무엇을 찾으려왔나?</p>

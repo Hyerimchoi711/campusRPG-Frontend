@@ -9,32 +9,62 @@
   overflow: hidden;
 }
 
-/* 상단 고정 영역 (상점 주인) */
+/* 상단: 일러스트 전면 + 코인·말풍선 오버레이 */
 .shop-header-section {
   position: relative;
-  height: 200px;
-  background: linear-gradient(180deg, var(--sky-blue), var(--mint));
+  height: 240px;
+  overflow: hidden;
   border-bottom: 4px solid var(--bg-wood);
   flex-shrink: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  padding-bottom: 10px;
+  /* 이미지 로딩 전 잠깐 보이는 색만 */
+  background: #1e1610;
 }
 
-/* 보유 코인 수 */
+/* 상점 일러스트만으로 헤더 전체 채움 (갈색 베이스·블렌드 없음) */
+.shop-header-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 코인·말풍선 가독성 (배경이 복잡할 때 상단만 살짝 어둡게) */
+.shop-header-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(30, 22, 16, 0.5) 0%,
+    rgba(30, 22, 16, 0.12) 38%,
+    transparent 62%
+  );
+}
+
+/* 보유 코인 — 헤더 이미지 위 */
 .shop-coin-display {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: var(--bg-card);
+  z-index: 3;
+  background: rgba(255, 253, 245, 0.94);
   border: 2px solid var(--bg-wood);
   border-radius: 8px;
-  padding: 3px 8px;
+  padding: 4px 10px;
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 2px 2px 0 var(--bg-wood-dark);
+  box-shadow:
+    2px 2px 0 var(--bg-wood-dark),
+    0 2px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
 }
 .shop-coin-display .coin-icon {
   font-size: 18px;
@@ -43,30 +73,14 @@
   font-family: var(--pixel-font);
   font-size: 16px;
   color: var(--gold2);
-  text-shadow: 1px 1px 0 var(--bg-wood);
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6);
 }
 
-/* 상점 주인 이미지 */
-.shop-npc-container {
-  width: 120px;
-  height: 160px; /* 3:4 비율 예상 */
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-}
-.shop-npc-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(3px 3px 0 rgba(0,0,0,0.2));
-  animation: floatSoft 3s ease-in-out infinite;
-}
-
-/* 픽셀 말풍선 */
+/* 픽셀 말풍선 — 이미지 위 */
 .shop-speech-bubble {
   position: absolute;
   top: 20px;
-  right: 16px;
+  right: 10px;
   background: white;
   padding: 10px 14px;
   font-family: var(--pixel-font);
@@ -82,9 +96,10 @@
     -3px -3px 0 0 black,
     3px -3px 0 0 black,
     3px 3px 0 0 black,
-    -3px 3px 0 0 black;
+    -3px 3px 0 0 black,
+    0 4px 14px rgba(0, 0, 0, 0.2);
   max-width: 120px;
-  z-index: 2;
+  z-index: 3;
 }
 /* 말풍선 꼬리 */
 .shop-speech-bubble::after {
