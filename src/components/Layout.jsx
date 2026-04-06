@@ -1,15 +1,18 @@
 import React from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import '../styles/Layout.css';
 
+/** 이 경로에서만 중앙 휴대폰 프레임에 떠다니는(deviceFloat) 애니메이션 적용 */
+const PHONE_FLOAT_PATHS = ['/login', '/signup'];
+
 const Layout = () => {
-  const navigate = useNavigate();
   const location = useLocation();
+  const phoneAuthFloat = PHONE_FLOAT_PATHS.includes(location.pathname);
 
   return (
     <>
       {/* 좌측 장식 패널 */}
-      <aside className="side-panel left-panel">
+      {/*<aside className="side-panel left-panel">
         <div className="panel-frame">
           <div className="panel-title">CAMPUS<br/>QUEST</div>
           <div className="panel-deco">
@@ -28,15 +31,17 @@ const Layout = () => {
           </div>
           <div className="panel-quote">"오늘의 퀘스트가<br/>내일의 전설이 된다"</div>
         </div>
-        {/* <div className="floating-icons">
+        {<div className="floating-icons">
           <div className="fi fi1">🌻</div>
           <div className="fi fi2">📚</div>
           <div className="fi fi3">⭐</div>
           <div className="fi fi4">🍃</div>
-        </div> */}
-      </aside >
+        </div>
+      </aside > */}
+
 
       {/* 우측 장식 패널 */}
+      {/*
       <aside className="side-panel right-panel">
         <div className="panel-frame">
           <div className="panel-title">RANK<br/>BOARD</div>
@@ -94,19 +99,20 @@ const Layout = () => {
             <div className="event-sub">오늘 퀘스트 완료 시<br/>경험치 2배 획득</div>
           </div>
         </div>
-        {/* <div className="floating-icons right">
+        {<div className="floating-icons right">
           <div className="fi fi5">🎯</div>
           <div className="fi fi6">🌸</div>
           <div className="fi fi7">🎮</div>
           <div className="fi fi8">💎</div>
-        </div> */}
-      </aside>
+        </div> 
+      </aside> 
+      */}
 
 
       {/* 중앙 스마트폰 영역 */}
       <main className="phone-stage">
         <div className="phone-glow"></div>
-        <div className="phone-frame">
+        <div className={`phone-frame${phoneAuthFloat ? ' phone-frame--auth-float' : ''}`}>
           <div className="phone-notch">
             <div className="notch-camera"></div>
             <div className="notch-speaker"></div>

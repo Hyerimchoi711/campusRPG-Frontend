@@ -235,7 +235,7 @@
 */
 
 /* Ranking list */
-.rank-list {
+/* .rank-list {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -320,7 +320,7 @@
   font-size: 9px;
   color: var(--text-sub);
   line-height: 1.5;
-}
+} */
 
 /* ============================================================
    PHONE STAGE (CENTER) - Cozy wooden device
@@ -375,6 +375,10 @@
   align-items: center;
   overflow: hidden;
   padding: 8px;
+}
+
+/* 로그인·회원가입 등 인증 화면에서만 휴대폰 프레임 떠다니는 효과 */
+.phone-frame--auth-float {
   animation: deviceFloat 5s ease-in-out infinite;
 }
 

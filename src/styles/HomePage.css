@@ -1,13 +1,10 @@
-.home-container {
+/* TopBar까지 같은 숲 배경이 깔리도록 상단까지 덮는 래퍼 */
+.home-immersive {
   position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  gap: 20px;
   overflow: hidden;
   background-color: #2a3828;
   background-image: var(--home-bg-image);
@@ -18,8 +15,8 @@
   image-rendering: crisp-edges;
 }
 
-/* 배경 위 UI가 잘 보이도록 아주 약한 비네트 (알·카드는 그대로 유지) */
-.home-container::after {
+/* 배경 위 UI가 잘 보이도록 아주 약한 비네트 */
+.home-immersive::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -32,13 +29,28 @@
   z-index: 0;
 }
 
+.home-container {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 20px;
+  overflow: hidden;
+  background: transparent;
+}
+
 .home-container > * {
   position: relative;
   z-index: 1;
 }
 
 .home-level-box {
-  background: rgba(255, 248, 238, 0.96);
+  background: rgba(246, 235, 220, 0.96);
   border: 3px solid var(--bg-wood-dark);
   border-radius: 8px;
   padding: 6px 20px;
@@ -63,7 +75,7 @@
 }
 
 .home-info-box {
-  background: rgba(255, 248, 238, 0.96);
+  background: rgba(246, 235, 220, 0.96);
   border: 3px solid var(--bg-wood-dark);
   border-radius: 8px;
   padding: 10px 20px;

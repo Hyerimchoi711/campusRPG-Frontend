@@ -3,6 +3,8 @@ import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import '../styles/ShopPage.css';
 
+const COIN_IMG = '/images/ui/coin.png';
+
 const ShopPage = () => {
   const shopItems = [
     { id: 1, name: '경험치 부스터', desc: '1시간 동안 획득 경험치 2배', price: 500, icon: '🔥' },
@@ -30,7 +32,7 @@ const ShopPage = () => {
           />
           <div className="shop-header-overlay" aria-hidden="true" />
           <div className="shop-coin-display">
-            <span className="coin-icon">🪙</span>
+            <img className="coin-icon" src={COIN_IMG} alt="" width={22} height={22} decoding="async" />
             <span className="coin-amount">1,200</span>
           </div>
           <div className="shop-speech-bubble">
@@ -49,7 +51,7 @@ const ShopPage = () => {
                 <div className="shop-item-desc">{item.desc}</div>
               </div>
               <div className="shop-item-price">
-                <span className="price-icon">🪙</span>
+                <img className="price-icon" src={COIN_IMG} alt="" width={14} height={14} decoding="async" />
                 <span className="price-amount">{item.price}</span>
               </div>
             </div>

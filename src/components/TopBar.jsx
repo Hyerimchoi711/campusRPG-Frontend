@@ -4,6 +4,8 @@ import { useProfile } from '../context/ProfileContext';
 import SettingsModal from './SettingsModal';
 import '../styles/TopBar.css';
 
+const COIN_IMG = '/images/ui/coin.png';
+
 const TopBar = () => {
   const navigate = useNavigate();
   const { profile } = useProfile();
@@ -23,7 +25,7 @@ const TopBar = () => {
         </button>
         <span className="top-bar-sep" aria-hidden>|</span>
         <div className="top-coin">
-          <span className="top-coin-icon" aria-hidden>🪙</span>
+          <img className="top-coin-icon" src={COIN_IMG} alt="" width={18} height={18} decoding="async" />
           <span className="top-coin-amount">1,200</span>
         </div>
       </div>

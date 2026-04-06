@@ -42,7 +42,7 @@
   --phone-r:    20px;
   
   --pixel-font: 'DotGothic16', monospace;
-  --body-font:  'Gowun Dodum', sans-serif;
+  --body-font: var(--pixel-font);
   
   /* Pixel border effect */
   --pixel-border: 3px solid var(--bg-wood);
