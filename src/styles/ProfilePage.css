@@ -1,6 +1,8 @@
 /* 내 프로필 — 상단 2윈도우(프로필 / 펫) + 하단 상세 윈도우 */
+/* position: relative 는 .screen 의 absolute/inset 을 덮어써 높이가 콘텐츠만큼 늘어나 하단이 잘림 → 영역 고정 후 내부만 스크롤 */
 #screenProfile {
-  position: relative;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -12,9 +14,10 @@
   min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 10px 10px 18px;
+  padding: 10px 10px 28px;
   -webkit-overflow-scrolling: touch;
   background: linear-gradient(180deg, var(--bg-card2) 0%, var(--bg-card) 100%);
+  overscroll-behavior: contain;
 }
 
 /* ----- 레트로 OS 스타일 3박스 ----- */
@@ -486,6 +489,28 @@
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.12));
+}
+
+.profile-pet-egg-hitbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-pet-egg-hitbox::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  right: -10px;
+  top: -32px;
+  bottom: -10px;
+  z-index: 2;
+}
+
+.profile-pet-egg-hitbox .pet-egg-hop {
+  position: relative;
+  z-index: 1;
 }
 
 .profile-pet-emoji {

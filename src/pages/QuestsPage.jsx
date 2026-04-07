@@ -1,10 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import TypewriterSpeech from '../components/TypewriterSpeech';
 import { useProfile } from '../context/ProfileContext';
 import { useQuests } from '../context/QuestContext';
 import { generateQuestsFromLLM } from '../api/generateQuests';
 import '../styles/QuestsPage.css';
+
+const QUEST_NPC_SPEECH_LINES = [
+  { text: '학과와 학년을 알려주면, 오늘의 길잡이를 짜 주지.' },
+  {
+    text: '프로필 정보로 맞춤 일일·주간 퀘스트를 만든다네.',
+    className: 'quest-npc-speech-bubble-sub',
+  },
+];
 
 const QuestsPage = () => {
   const { profile } = useProfile();
@@ -77,16 +86,19 @@ const QuestsPage = () => {
       <div className="quests-content-wrapper">
         {/* 퀘스트 NPC: 일러스트 전체 배경 + 그 위 말풍선·버튼 (상점 헤더와 동일 패턴) */}
         <div className="quest-npc-header" role="region" aria-label="퀘스트 안내 NPC">
-          <img
-            src="/images/quest/quest-npc.png"
-            alt=""
-            className="quest-npc-header-bg-img"
-            decoding="async"
-          />
+          <video
+            className="quest-npc-header-bg-video"
+            autoPlay
+            loop
+            muted
+            playsInline
+            aria-hidden
+          >
+            <source src="/images/quest/quest_npc.mp4" type="video/mp4" />
+          </video>
           <div className="quest-npc-header-overlay" aria-hidden />
-          <div className="quest-npc-speech-bubble">
-            <p>학과와 학년을 알려주면, 오늘의 길잡이를 짜 주지.</p>
-            <p className="quest-npc-speech-bubble-sub">프로필 정보로 맞춤 일일·주간 퀘스트를 만든다네.</p>
+          <div className="quest-npc-speech-bubble" aria-live="polite">
+            <TypewriterSpeech lines={QUEST_NPC_SPEECH_LINES} charMs={30} linePauseMs={420} />
           </div>
           <div className="quest-npc-header-bottom">
             <div className="quest-npc-actions">

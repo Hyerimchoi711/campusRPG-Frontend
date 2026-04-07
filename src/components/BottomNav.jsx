@@ -6,11 +6,11 @@ import '../styles/BottomNav.css';
 const ICON_SIZE = 32;
 
 /**
- * path 순서 = 바에 표시 순서 (스탯 · 일정 · 홈 · 퀘스트 · 친구)
- * icon: null 이면 아래 홈처럼 임시 표시(이미지 준비 후 public 경로 문자열로 교체)
+ * path 순서 = 바에 표시 순서 (보관함 · 일정 · 홈 · 퀘스트 · 친구)
+ * icon: null 이면 emoji 문자 사용 (가방 PNG 추가 시 icon 으로 교체 가능)
  */
 const NAV_ITEMS = [
-  { path: '/stats', label: '스탯', icon: '/images/bottom-nav/bottomnav_icon_stats.png' },
+  { path: '/inventory', label: '보관함', icon: null, emoji: '🎒' },
   { path: '/todo', label: '일정', icon: '/images/bottom-nav/bottomnav_icon_todo.png' },
   { path: '/home', label: '홈', icon: '/images/bottom-nav/bottomnav_icon_home.png' },
   { path: '/quests', label: '퀘스트', icon: '/images/bottom-nav/bottomnav_icon_quest.png' },
@@ -23,7 +23,7 @@ const BottomNav = () => {
 
   return (
     <nav className="bottom-nav" aria-label="하단 메뉴">
-      {NAV_ITEMS.map(({ path, label, icon }) => {
+      {NAV_ITEMS.map(({ path, label, icon, emoji }) => {
         const active = location.pathname === path;
         return (
           <button
@@ -46,8 +46,8 @@ const BottomNav = () => {
                     decoding="async"
                   />
                 ) : (
-                  <span className="nav-item-icon-fallback" title="홈 아이콘 제작 중">
-                    🏠
+                  <span className="nav-item-icon-fallback nav-item-icon-fallback--emoji" title={label}>
+                    {emoji || '🏠'}
                   </span>
                 )}
               </span>

@@ -330,7 +330,9 @@ const ProfilePage = () => {
       <div className="profile-pet-win-body" aria-label="펫 정보">
         <div className="profile-pet-win-visual">
           {isEgg ? (
-            <img src="/images/animals/egg.png" alt="" className="profile-pet-img" />
+            <div className="profile-pet-egg-hitbox pet-egg-hitbox">
+              <img src="/images/animals/egg.png" alt="" className="profile-pet-img pet-egg-hop" />
+            </div>
           ) : (
             <span className="profile-pet-emoji" aria-hidden>
               {p.petEmoji || '🐾'}

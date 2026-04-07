@@ -49,6 +49,15 @@
   z-index: 1;
 }
 
+.home-level-stats-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .home-level-box {
   background: rgba(246, 235, 220, 0.96);
   border: 3px solid var(--bg-wood-dark);
@@ -65,13 +74,122 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
-.home-character-img {
-  width: 170px;
+/* TopBar 상점·설정과 같은 세로 아이콘+라벨 형태 */
+.home-hud-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(22, 16, 10, 0.45);
+  border: 2px solid rgba(255, 250, 238, 0.38);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.home-hud-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(38, 30, 22, 0.58);
+  border-color: rgba(255, 250, 238, 0.52);
+}
+
+.home-hud-btn:focus-visible {
+  outline: 2px solid rgba(255, 230, 180, 0.95);
+  outline-offset: 2px;
+}
+
+.home-hud-btn-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+}
+
+.home-hud-btn-text {
+  font-size: 7px;
+  font-family: var(--pixel-font);
+  color: #fff8ee;
+  margin-top: 1px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  line-height: 1;
+}
+
+/* 둥지(아래) + 알(위) — 병합 PNG 대신 분리 에셋 */
+.home-nest-stage {
+  position: relative;
+  z-index: 1;
+  /* 둥지가 화면을 너무 차지하지 않도록 전체 스테이지 축소 */
+  width: min(200px, 62vw);
+  flex-shrink: 0;
+}
+
+.home-nest-img {
+  width: 100%;
   height: auto;
-  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  user-select: none;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  filter: drop-shadow(0 4px 8px rgba(10, 8, 6, 0.45));
+  filter: drop-shadow(0 4px 10px rgba(10, 8, 6, 0.38));
+  transform: translateX(-2px);
+}
+
+.home-egg-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 21%;
+  width: 52%;
+  max-width: 108px;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* 투명 히트 영역: 알이 위로 튀어도 커서가 안에서 벗어나지 않도록 */
+.home-egg-hitbox {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.home-egg-hitbox::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: -44px;
+  bottom: -14px;
+  z-index: 2;
+}
+
+.home-egg-hitbox .pet-egg-hop {
+  position: relative;
+  z-index: 1;
+}
+
+.home-character-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 6px rgba(10, 8, 6, 0.35));
+  display: block;
 }
 
 .home-info-box {

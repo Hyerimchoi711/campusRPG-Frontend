@@ -20,16 +20,14 @@
   background: #1e1610;
 }
 
-/* 상점 일러스트만으로 헤더 전체 채움 (갈색 베이스·블렌드 없음) */
-.shop-header-bg-img {
+/* 상점 NPC 루프 영상으로 헤더 전체 채움 */
+.shop-header-bg-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center center;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
   z-index: 0;
   pointer-events: none;
 }
@@ -143,20 +141,62 @@
 .shop-item-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  /* border-radius: 8px; */
-  padding: 1px 2px; /* 패딩 축소 */
+  padding: 6px 4px 8px;
   display: flex;
-  align-items: center;
-  gap: 5px; /* 내부 간격 축소 */
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   box-shadow: 2px 2px 0 var(--border2);
   transition: all 0.2s;
-  cursor: pointer;
-  min-width: 0; /* 그리드 내에서 넘침 방지 */
+  min-width: 0;
 }
-.shop-item-card:hover {
-  border-color: var(--accent2);
-  background: #faf6f0;
-  box-shadow: 2px 4px 0 var(--border2);
+
+.shop-item-top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.shop-buy-btn {
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 2px solid var(--bg-wood-dark);
+  background: linear-gradient(180deg, #f0e6d4, #dccfb8);
+  color: var(--text-main);
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--bg-wood-dark);
+  width: 100%;
+}
+
+.shop-buy-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.shop-buy-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.shop-toast {
+  flex-shrink: 0;
+  margin: 0 10px 8px;
+  padding: 8px 10px;
+  font-family: var(--body-font);
+  font-size: 11px;
+  text-align: center;
+  color: var(--text-main);
+  background: rgba(255, 253, 245, 0.95);
+  border: 2px solid var(--bg-wood);
+  border-radius: 8px;
+  box-shadow: 2px 2px 0 var(--bg-wood-dark);
+}
+
+.shop-toast--error {
+  border-color: #c45c4a;
+  background: rgba(255, 236, 232, 0.98);
 }
 
 .shop-item-icon {
@@ -170,6 +210,20 @@
   align-items: center;
   font-size: 18px;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.shop-item-icon-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.shop-item-icon-emoji {
+  font-size: 18px;
+  line-height: 1;
 }
 
 .shop-item-info {

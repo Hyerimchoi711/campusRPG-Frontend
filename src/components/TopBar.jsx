@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../context/ProfileContext';
+import { useGameUser } from '../context/GameUserContext';
+import { formatCoin } from '../api/rpgClient';
 import SettingsModal from './SettingsModal';
 import '../styles/TopBar.css';
 
@@ -9,6 +11,7 @@ const COIN_IMG = '/images/ui/coin.png';
 const TopBar = () => {
   const navigate = useNavigate();
   const { profile } = useProfile();
+  const { coins } = useGameUser();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
@@ -26,7 +29,7 @@ const TopBar = () => {
         <span className="top-bar-sep" aria-hidden>|</span>
         <div className="top-coin">
           <img className="top-coin-icon" src={COIN_IMG} alt="" width={18} height={18} decoding="async" />
-          <span className="top-coin-amount">1,200</span>
+          <span className="top-coin-amount">{formatCoin(coins)}</span>
         </div>
       </div>
       <div className="top-bar-right">

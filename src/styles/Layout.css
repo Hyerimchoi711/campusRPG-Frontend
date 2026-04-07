@@ -430,6 +430,7 @@
 /* Phone screen — 따뜻한 양피지 안쪽 */
 .phone-screen {
   flex: 1;
+  min-height: 0;
   width: 100%;
   overflow: hidden;
   position: relative;

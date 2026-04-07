@@ -1,59 +1,143 @@
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import TypewriterSpeech from '../components/TypewriterSpeech';
+import { useGameUser } from '../context/GameUserContext';
+import { fetchRpgJson, formatCoin } from '../api/rpgClient';
 import '../styles/ShopPage.css';
 
 const COIN_IMG = '/images/ui/coin.png';
 
+const SHOP_NPC_SPEECH_LINES = [{ text: '어서오시게!' }, { text: '무엇을 찾으려왔나?' }];
+
+function ShopItemIcon({ imageUrl, iconEmoji }) {
+  const [imgBroken, setImgBroken] = useState(false);
+  if (imageUrl && !imgBroken) {
+    return (
+      <img
+        className="shop-item-icon-img"
+        src={imageUrl}
+        alt=""
+        width={32}
+        height={32}
+        decoding="async"
+        onError={() => setImgBroken(true)}
+      />
+    );
+  }
+  return <span className="shop-item-icon-emoji">{iconEmoji || '❔'}</span>;
+}
+
 const ShopPage = () => {
-  const shopItems = [
-    { id: 1, name: '경험치 부스터', desc: '1시간 동안 획득 경험치 2배', price: 500, icon: '🔥' },
-    { id: 2, name: '스탯 초기화권', desc: '모든 스탯을 초기화합니다', price: 1000, icon: '🔄' },
-    { id: 3, name: '황금 알', desc: '희귀한 펫이 부화할 확률 증가', price: 2000, icon: '🥚' },
-    { id: 4, name: '에너지 드링크', desc: '오늘의 피로도를 10 회복', price: 300, icon: '🥤' },
-    { id: 5, name: '이름 변경권', desc: '펫의 이름을 변경합니다', price: 800, icon: '🏷️' },
-    { id: 6, name: '신비한 열매', desc: '무작위 스탯 1~3 증가', price: 1500, icon: '🍒' },
-    { id: 7, name: '부화 촉진제', desc: '알 부화 시간을 단축시킵니다', price: 600, icon: '⏱️' },
-    { id: 8, name: '펫 간식', desc: '펫의 친밀도를 소폭 상승시킵니다', price: 200, icon: '🍖' },
-  ];
+  const { userId, coins, applyPurchaseResult } = useGameUser();
+  const [items, setItems] = useState([]);
+  const [loadError, setLoadError] = useState(null);
+  const [purchasingId, setPurchasingId] = useState(null);
+  const [purchaseMsg, setPurchaseMsg] = useState(null);
+
+  const loadItems = useCallback(async () => {
+    setLoadError(null);
+    try {
+      const rows = await fetchRpgJson('/api/items');
+      setItems(Array.isArray(rows) ? rows : []);
+    } catch {
+      setItems([]);
+      setLoadError('상품 목록을 불러오지 못했습니다. 백엔드 서버와 DB를 확인해 주세요.');
+    }
+  }, []);
+
+  useEffect(() => {
+    loadItems();
+  }, [loadItems]);
+
+  const onPurchase = async (item) => {
+    setPurchaseMsg(null);
+    setPurchasingId(item.id);
+    try {
+      const result = await fetchRpgJson('/api/inventory/purchase', {
+        method: 'POST',
+        body: JSON.stringify({ userId, itemId: item.id }),
+      });
+      applyPurchaseResult(result);
+      setPurchaseMsg(`「${item.name}」을(를) 구매했습니다.`);
+    } catch (e) {
+      if (e.status === 402) {
+        setPurchaseMsg('코인이 부족합니다.');
+      } else {
+        setPurchaseMsg('구매에 실패했습니다.');
+      }
+    } finally {
+      setPurchasingId(null);
+    }
+  };
+
+  const canAfford = (price) => typeof coins === 'number' && coins >= price;
 
   return (
     <div className="screen active" id="screenShop">
       <TopBar />
-      
+
       <div className="shop-content-wrapper">
-        {/* 상단 고정 영역 (상점 주인) */}
         <div className="shop-header-section">
-          <img
-            src="/images/shop/shopkeeper.png"
-            alt=""
-            className="shop-header-bg-img"
-            decoding="async"
-          />
+          <video
+            className="shop-header-bg-video"
+            autoPlay
+            loop
+            muted
+            playsInline
+            aria-hidden
+          >
+            <source src="/images/shop/shop_npc.mp4" type="video/mp4" />
+          </video>
           <div className="shop-header-overlay" aria-hidden="true" />
           <div className="shop-coin-display">
             <img className="coin-icon" src={COIN_IMG} alt="" width={22} height={22} decoding="async" />
-            <span className="coin-amount">1,200</span>
+            <span className="coin-amount">{formatCoin(coins)}</span>
           </div>
-          <div className="shop-speech-bubble">
-            <p>어서오시게!</p>
-            <p>무엇을 찾으려왔나?</p>
+          <div className="shop-speech-bubble" aria-live="polite">
+            <TypewriterSpeech lines={SHOP_NPC_SPEECH_LINES} charMs={32} linePauseMs={380} />
           </div>
         </div>
 
-        {/* 하단 스크롤 영역 (아이템 리스트) */}
+        {purchaseMsg ? (
+          <div className="shop-toast" role="status">
+            {purchaseMsg}
+          </div>
+        ) : null}
+        {loadError ? (
+          <div className="shop-toast shop-toast--error" role="alert">
+            {loadError}
+          </div>
+        ) : null}
+
         <div className="shop-item-list">
-          {shopItems.map(item => (
+          {items.map((item) => (
             <div key={item.id} className="shop-item-card">
-              <div className="shop-item-icon">{item.icon}</div>
-              <div className="shop-item-info">
-                <div className="shop-item-name">{item.name}</div>
-                <div className="shop-item-desc">{item.desc}</div>
+              <div className="shop-item-top">
+                <div className="shop-item-icon">
+                  <ShopItemIcon imageUrl={item.imageUrl} iconEmoji={item.iconEmoji} />
+                </div>
+                <div className="shop-item-info">
+                  <div className="shop-item-name">{item.name}</div>
+                  <div className="shop-item-desc">{item.description}</div>
+                </div>
+                <div className="shop-item-price">
+                  <img className="price-icon" src={COIN_IMG} alt="" width={14} height={14} decoding="async" />
+                  <span className="price-amount">{item.price?.toLocaleString?.('ko-KR') ?? item.price}</span>
+                </div>
               </div>
-              <div className="shop-item-price">
-                <img className="price-icon" src={COIN_IMG} alt="" width={14} height={14} decoding="async" />
-                <span className="price-amount">{item.price}</span>
-              </div>
+              <button
+                type="button"
+                className="shop-buy-btn"
+                disabled={
+                  purchasingId === item.id ||
+                  coins == null ||
+                  !canAfford(item.price)
+                }
+                onClick={() => onPurchase(item)}
+              >
+                {purchasingId === item.id ? '처리 중…' : '구매'}
+              </button>
             </div>
           ))}
         </div>
