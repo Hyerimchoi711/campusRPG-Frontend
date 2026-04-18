@@ -1,0 +1,282 @@
+/* TopBar까지 같은 숲 배경이 깔리도록 상단까지 덮는 래퍼 */
+.home-immersive {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #2a3828;
+  background-image: var(--home-bg-image);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* 배경 위 UI가 잘 보이도록 아주 약한 비네트 */
+.home-immersive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 85% 70% at 50% 45%,
+    transparent 30%,
+    rgba(20, 28, 22, 0.25) 100%
+  );
+  z-index: 0;
+}
+
+.home-loading {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  margin-bottom: 8px;
+}
+
+.home-container {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 20px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.home-container > * {
+  position: relative;
+  z-index: 1;
+}
+
+.home-level-stats-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.home-level-box {
+  background: rgba(246, 235, 220, 0.96);
+  border: 3px solid var(--bg-wood-dark);
+  border-radius: 8px;
+  padding: 6px 20px;
+  font-family: var(--pixel-font);
+  font-size: 16px;
+  color: var(--text-main);
+  text-align: center;
+  min-width: 120px;
+  box-shadow:
+    2px 2px 0 var(--bg-wood-dark),
+    0 6px 16px rgba(15, 10, 6, 0.4);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* TopBar 상점·설정과 같은 세로 아이콘+라벨 형태 */
+.home-hud-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(22, 16, 10, 0.45);
+  border: 2px solid rgba(255, 250, 238, 0.38);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.home-hud-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(38, 30, 22, 0.58);
+  border-color: rgba(255, 250, 238, 0.52);
+}
+
+.home-hud-btn:focus-visible {
+  outline: 2px solid rgba(255, 230, 180, 0.95);
+  outline-offset: 2px;
+}
+
+.home-hud-btn-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+}
+
+.home-hud-btn-text {
+  font-size: 7px;
+  font-family: var(--pixel-font);
+  color: #fff8ee;
+  margin-top: 1px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  line-height: 1;
+}
+
+/* 둥지(아래) + 알(위) — 병합 PNG 대신 분리 에셋 */
+.home-nest-stage {
+  position: relative;
+  z-index: 1;
+  /* 둥지가 화면을 너무 차지하지 않도록 전체 스테이지 축소 */
+  width: min(200px, 62vw);
+  flex-shrink: 0;
+}
+
+.home-nest-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 10px rgba(10, 8, 6, 0.38));
+  transform: translateX(-2px);
+}
+
+.home-egg-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 21%;
+  width: 52%;
+  max-width: 108px;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* 투명 히트 영역: 알이 위로 튀어도 커서가 안에서 벗어나지 않도록 */
+.home-egg-hitbox {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.home-egg-hitbox::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  right: -16px;
+  top: -44px;
+  bottom: -14px;
+  z-index: 2;
+}
+
+.home-egg-hitbox .pet-egg-hop {
+  position: relative;
+  z-index: 1;
+}
+
+.home-character-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 6px rgba(10, 8, 6, 0.35));
+  display: block;
+}
+
+.home-info-box {
+  background: rgba(246, 235, 220, 0.96);
+  border: 3px solid var(--bg-wood-dark);
+  border-radius: 8px;
+  padding: 10px 20px;
+  text-align: center;
+  min-width: 180px;
+  box-shadow:
+    2px 2px 0 var(--bg-wood-dark),
+    0 6px 16px rgba(15, 10, 6, 0.4);
+}
+
+.home-info-nickname {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 4px;
+  border-bottom: 2px dashed var(--border2);
+  padding-bottom: 4px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.home-info-title {
+  font-size: 12px;
+  color: var(--text-sub);
+  font-family: var(--body-font);
+}
+
+/* 홈 전용 EXP — 배경과 대비되는 싱그러운 성장색 (연두 + 살짝 청록) */
+.home-container .xp-section.home-xp-wrap {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px 20px;
+  flex-shrink: 0;
+}
+
+.home-container .xp-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  font-family: var(--pixel-font);
+  margin-bottom: 5px;
+  color: #f5f0e6;
+  text-shadow:
+    0 1px 0 #1a120c,
+    0 0 6px rgba(0, 0, 0, 0.45);
+}
+
+.home-container .xp-bar {
+  height: 14px;
+  background: rgba(35, 28, 22, 0.55);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 3px solid var(--bg-wood-dark);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.35),
+    0 2px 0 rgba(255, 248, 238, 0.12);
+}
+
+.home-container .xp-fill {
+  height: 100%;
+  border-radius: 3px;
+  position: relative;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(180deg, #9ee085 0%, #5cb85c 45%, #3d8f45 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.home-container .xp-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(200, 240, 255, 0.45), transparent);
+  border-radius: 3px 3px 0 0;
+}

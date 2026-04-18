@@ -1,0 +1,125 @@
+/* .screen 과 동일하게 #phoneScreen 안에서 inset:0 으로 전체 높이를 채움 —
+   콘텐츠가 적을 때만 높이가 줄어들면 하단 Nav·TopBar 정렬이 깨짐 */
+.inventory-screen {
+  background: var(--bg-wood);
+}
+
+.inventory-main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 18px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+}
+
+.inventory-title {
+  font-family: var(--pixel-font);
+  font-size: 14px;
+  color: #fff8ee;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  margin: 0 0 16px;
+}
+
+.inventory-hint {
+  font-family: var(--body-font);
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(255, 248, 238, 0.75);
+  margin: 0 0 14px;
+  max-width: 300px;
+}
+
+.inventory-error {
+  font-family: var(--body-font);
+  font-size: 12px;
+  color: #ffc9c0;
+  margin: 0 0 12px;
+  max-width: 300px;
+}
+
+.inventory-placeholder {
+  font-family: var(--body-font);
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255, 248, 238, 0.85);
+  margin: 16px 0 0;
+  max-width: 280px;
+}
+
+/* RPG식 슬롯 그리드 (4×5) */
+.inv-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.inv-slot {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inv-slot--empty {
+  background: rgba(30, 22, 16, 0.35);
+  border: 2px dashed rgba(255, 250, 238, 0.22);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.inv-slot--filled {
+  background: linear-gradient(180deg, rgba(255, 252, 244, 0.95), rgba(230, 218, 200, 0.98));
+  border: 3px solid var(--bg-wood-dark);
+  box-shadow:
+    2px 2px 0 rgba(45, 32, 22, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.inv-slot-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+}
+
+.inv-slot-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.inv-slot-emoji {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+.inv-qty {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  min-width: 16px;
+  padding: 1px 4px;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: #fffdf8;
+  background: rgba(45, 32, 22, 0.88);
+  border: 1px solid rgba(255, 230, 180, 0.5);
+  border-radius: 4px;
+  text-align: center;
+  line-height: 1.2;
+}

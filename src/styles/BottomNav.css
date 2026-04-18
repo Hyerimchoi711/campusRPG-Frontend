@@ -1,0 +1,169 @@
+/* ============================================================
+   BOTTOM NAV — 가벼운 목재 톤 + 픽셀 HUD 느낌
+   아이콘: 도트 RPG식 이중 테두리(바깥 고정) + 안쪽 면만 active 시 변경
+   ============================================================ */
+.bottom-nav {
+  --nav-icon-frame-ink: #c9a87a;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  min-height: 60px;
+  padding: 0;
+  isolation: isolate;
+  /* 미리보기: 브라운 단색 + ::before 디더만. 계단식 복구 시 아래 주석 해제하고 background-image: none 제거 */
+  background-color: #b99479;
+  background-image: none;
+  border-top: 1px solid #3d2615;
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  box-shadow:
+    /* inset 0 1px 0 rgba(255, 248, 230, 0.35), */
+    inset 0 -1px 0 rgba(20, 10, 5, 0.25);
+}
+
+/*
+  픽셀 디더 타일: PNG 바꿨는데 화면이 그대로면 브라우저 캐시 → ?v= 숫자만 올리거나 Cmd+Shift+R
+  원본(크롭 전): public/images/bottom-nav/dither-pixel-gradient-full.png
+*/
+.bottom-nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url('/images/bottom-nav/dither-pixel-gradient.png?v=2');
+  background-repeat: repeat-x;
+  background-position: left center;
+  background-size: calc(100% / 5) auto;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  transform: translateZ(0);
+  opacity: 0.8;
+  filter: sepia(0.85) saturate(0.55) hue-rotate(318deg) brightness(0.94) contrast(1.05);
+  mix-blend-mode: multiply;
+}
+
+.nav-item {
+  container-type: size;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  flex: 1 1 0;
+  min-width: 0;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  transition: opacity 0.2s;
+  opacity: 0.88;
+}
+
+/* 탭 칸: 배경 없음 — 뒤의 .bottom-nav 한 장 그라데이션이 그대로 비침 */
+.nav-item-icon-frame {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* 탭 사이 세로 구분선 — 아래로 1px 짧게(맨 아래 1px 비움) */
+.nav-item:not(:last-child) .nav-item-icon-frame::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 1px;
+  width: 2px;
+  background: rgba(20, 10, 5, 0.26);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 현재 탭만 칸 전체 배경을 살짝 밝게 (::after는 아이콘 아래) */
+.nav-item.active .nav-item-icon-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(232, 222, 203, 0.38) 0%,
+    rgba(186, 172, 151, 0.26) 100%
+  );
+  mix-blend-mode: soft-light;
+  transition: opacity 0.18s ease;
+}
+
+/* 안쪽 면: 기본 / 선택 시 배경만 변경 */
+.nav-item-icon-inner {
+  position: relative;
+  z-index: 2;
+  width: 50px;
+  height: 50px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1px;
+  transition:
+    background-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.nav-item.active {
+  opacity: 1;
+}
+
+/* 1:1 픽셀 아이콘 (크기는 BottomNav.jsx ICON_SIZE) */
+.nav-item-icon-img {
+  width: 39px;
+  height: 39px;
+  flex-shrink: 0;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.nav-item-icon-fallback {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.nav-item:hover {
+  opacity: 1;
+}
+
+.nav-item:focus-visible {
+  outline: 2px solid rgba(255, 230, 180, 0.95);
+  outline-offset: 2px;
+}
+
+.nav-item:focus-visible .nav-item-icon-frame {
+  box-shadow:
+    0 0 0 2px var(--nav-icon-frame-ink),
+    0 0 0 3px rgba(255, 230, 180, 0.75);
+}
