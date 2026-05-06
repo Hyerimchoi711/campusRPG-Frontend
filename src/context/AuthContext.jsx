@@ -9,6 +9,12 @@ import React, {
 import { TOKEN_KEY } from '../constants/authStorage';
 import { apiUrl } from '../api/apiBase';
 import { useProfile } from './ProfileContext';
+import {
+  DEFAULT_EGG_PET_NAME,
+  getPetEmoji,
+  isPetEgg,
+  normalizePet,
+} from '../models/pet';
 
 const AuthContext = createContext(null);
 
@@ -38,6 +44,9 @@ export function AuthProvider({ children }) {
         return null;
       }
       const data = await res.json();
+      if (data && typeof data === 'object' && 'pet' in data) {
+        data.pet = data.pet ? normalizePet(data.pet) : null;
+      }
       setMe(data);
       return data;
     } catch {
@@ -59,13 +68,19 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!me?.user) return;
+    const p = me.pet;
     setProfile({
       realName: me.user.nickname,
       university: me.user.universityName || '',
       major: me.user.major || '',
       age: String(me.user.age ?? ''),
-      petName: me.pet?.name ?? '알',
-      petLevel: me.pet?.level ?? 0,
+      petName: p?.name ?? DEFAULT_EGG_PET_NAME,
+      petLevel: p?.level ?? 1,
+      petStage: isPetEgg(p) ? 'egg' : 'hatched',
+      petEmoji: p ? getPetEmoji(p.animalType) : '🥚',
+      petLineageType: p?.lineageType ?? null,
+      petAnimalType: p?.animalType ?? 'egg',
+      petLastEvolvedAt: p?.lastEvolvedAt ?? null,
     });
   }, [me, setProfile]);
 

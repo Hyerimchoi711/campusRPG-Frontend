@@ -1,8 +1,18 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TopBar from '../components/TopBar';
+import PetPortrait from '../components/PetPortrait';
 import { useProfile } from '../context/ProfileContext';
 import { getFriendById } from '../data/mockFriends';
+import {
+  DEFAULT_EGG_PET_NAME,
+  formatLastEvolvedAt,
+  getLineageBadgeText,
+  getPetSpeciesDescription,
+  getPetSpeciesLabel,
+  isPetEggUi,
+  normalizeAnimalTypeKey,
+} from '../models/pet';
 import '../styles/ProfilePage.css';
 
 const AVATAR_OPTIONS = ['🥚', '🧑‍🎓', '👩‍🎓', '🦉', '📚', '🌱', '⭐', '🎮'];
@@ -321,27 +331,37 @@ const ProfilePage = () => {
 
   const renderPetBody = () => {
     const p = displayProfile;
-    const isEgg = p.petStage !== 'hatched';
+    const isEgg = isPetEggUi(p.petAnimalType, p.petStage);
+    const rawAt = typeof p.petAnimalType === 'string' ? p.petAnimalType.trim() : '';
+    const animalType = isEgg ? 'egg' : normalizeAnimalTypeKey(rawAt || '파이루');
     const levelRaw = Number(p.petLevel);
-    const level = Number.isFinite(levelRaw) && levelRaw >= 0 ? Math.floor(levelRaw) : 0;
-    const petTitle = (p.petName && String(p.petName).trim()) || (isEgg ? '알' : '펫');
-    const statusLabel = isEgg ? '상태 · 알' : '상태 · 성장 중';
+    const level = Number.isFinite(levelRaw) && levelRaw >= 0 ? Math.floor(levelRaw) : 1;
+    const petTitle =
+      (p.petName && String(p.petName).trim()) ||
+      (isEgg ? DEFAULT_EGG_PET_NAME : getPetSpeciesLabel(animalType));
+    const statusLabel = isEgg ? '상태 · 부화중인 알' : `종족 · ${getPetSpeciesLabel(animalType)}`;
+    const lineageChip = !isEgg ? getLineageBadgeText(p.petLineageType) : null;
+    const evolvedLine = !isEgg ? formatLastEvolvedAt(p.petLastEvolvedAt) : null;
+    const desc = getPetSpeciesDescription(animalType);
+
     return (
       <div className="profile-pet-win-body" aria-label="펫 정보">
         <div className="profile-pet-win-visual">
-          {isEgg ? (
-            <div className="profile-pet-egg-hitbox pet-egg-hitbox">
-              <img src="/images/animals/egg.png" alt="" className="profile-pet-img pet-egg-hop" />
-            </div>
-          ) : (
-            <span className="profile-pet-emoji" aria-hidden>
-              {p.petEmoji || '🐾'}
-            </span>
-          )}
+          <div className={`profile-pet-egg-hitbox pet-egg-hitbox${isEgg ? '' : ' profile-pet-egg-hitbox--species'}`}>
+            <PetPortrait
+              animalType={animalType}
+              alt=""
+              imgClassName={`profile-pet-img${isEgg ? ' pet-egg-hop' : ' profile-pet-img--species'}`}
+              emojiClassName="profile-pet-emoji"
+            />
+          </div>
         </div>
         <div className="profile-pet-win-meta">
+          {lineageChip ? <span className="profile-pet-lineage-chip">계보 · {lineageChip}</span> : null}
           <span className="profile-pet-win-name">{petTitle}</span>
           <span className="profile-pet-win-stat">{statusLabel}</span>
+          {evolvedLine ? <span className="profile-pet-evolved-at">마지막 진화 · {evolvedLine}</span> : null}
+          <p className="profile-pet-desc">{desc}</p>
           <span className="profile-pet-level profile-pet-level--win">Lv. {level}</span>
         </div>
       </div>
