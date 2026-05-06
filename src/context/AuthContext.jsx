@@ -73,6 +73,12 @@ export function AuthProvider({ children }) {
       realName: me.user.nickname,
       university: me.user.universityName || '',
       major: me.user.major || '',
+      schoolYear:
+        me.user.schoolYear != null && String(me.user.schoolYear).trim() !== ''
+          ? String(me.user.schoolYear).trim()
+          : me.user.school_year != null && String(me.user.school_year).trim() !== ''
+            ? String(me.user.school_year).trim()
+            : '',
       age: String(me.user.age ?? ''),
       petName: p?.name ?? DEFAULT_EGG_PET_NAME,
       petLevel: p?.level ?? 1,

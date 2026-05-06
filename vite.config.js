@@ -43,6 +43,14 @@ export default defineConfig(({ mode }) => {
           target: backendTarget,
           changeOrigin: true,
         },
+        '/api/friends': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/users': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
         '/api': {
           target: questTarget,
           changeOrigin: true,
