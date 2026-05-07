@@ -1,13 +1,55 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/LoginPage.css';
+import '../styles/RouteLoadingOverlay.css';
 
 const TITLE_BANNER_SRC = '/images/campus-rpg-title-banner.png';
+const LOGIN_LOADING_MS = 3000;
+const LOGIN_LOADING_FADE_MS = 320;
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [loadingPhase, setLoadingPhase] = useState('hidden'); // hidden | entering | shown | fading
+  const timersRef = useRef([]);
+
+  useEffect(() => {
+    return () => {
+      timersRef.current.forEach((timerId) => clearTimeout(timerId));
+      timersRef.current = [];
+    };
+  }, []);
+
+  const startLoginTransition = () => {
+    if (loadingPhase !== 'hidden') return;
+
+    setLoadingPhase('entering');
+    timersRef.current = [
+      setTimeout(() => setLoadingPhase('shown'), 0),
+      // Fade in completes first, then switch route while overlay is still active.
+      setTimeout(
+        () =>
+          navigate('/home', {
+            state: {
+              loginLoadingTransition: true,
+              loginLoadingStartedAt: Date.now(),
+            },
+          }),
+        LOGIN_LOADING_FADE_MS
+      ),
+    ];
+  };
+
+  const loadingClassName = [
+    'route-loading-overlay',
+    loadingPhase === 'entering' ? 'route-loading-overlay--entering' : '',
+    loadingPhase === 'shown' ? 'route-loading-overlay--shown' : '',
+    loadingPhase === 'fading' ? 'route-loading-overlay--fading' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
+    <>
     <div className="login-page">
       <div className="login-page__stack">
         <header className="login-page__hero">
@@ -29,7 +71,7 @@ const LoginPage = () => {
               className="login-panel__form"
               onSubmit={(e) => {
                 e.preventDefault();
-                navigate('/home');
+                startLoginTransition();
               }}
             >
               <label className="login-field">
@@ -54,7 +96,11 @@ const LoginPage = () => {
                 />
               </label>
 
-              <button type="submit" className="login-btn login-btn--primary">
+              <button
+                type="submit"
+                className="login-btn login-btn--primary"
+                disabled={loadingPhase !== 'hidden'}
+              >
                 모험 시작!
               </button>
             </form>
@@ -70,6 +116,15 @@ const LoginPage = () => {
         </main>
       </div>
     </div>
+    {loadingPhase !== 'hidden' && (
+      <div className={loadingClassName} aria-live="polite" aria-label="Loading">
+        <div className="route-loading-overlay__content">
+          <div className="route-loading-overlay__spinner" aria-hidden="true" />
+          <div className="route-loading-overlay__text">Loading..</div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
 

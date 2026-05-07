@@ -8,6 +8,8 @@ import SettingsModal from './SettingsModal';
 import '../styles/TopBar.css';
 
 const COIN_IMG = '/images/ui/coin.png';
+const SHOP_IMG = '/images/ui/shop.png';
+const SETTINGS_IMG = '/images/ui/settings.png';
 
 const getPhoneScreenEl = () => document.getElementById('phoneScreen');
 
@@ -100,11 +102,11 @@ const TopBar = () => {
       </div>
       <div className="top-bar-right">
         <button type="button" className="top-btn" onClick={() => navigate('/shop')}>
-          <span>🛒</span>
+          <img className="top-btn-icon-img" src={SHOP_IMG} alt="" width={19} height={19} decoding="async" />
           <span className="top-btn-text">상점</span>
         </button>
         <button type="button" className="top-btn" onClick={openSettings} aria-label="설정 열기">
-          <span>⚙️</span>
+          <img className="top-btn-icon-img" src={SETTINGS_IMG} alt="" width={19} height={19} decoding="async" />
           <span className="top-btn-text">설정</span>
         </button>
         <button

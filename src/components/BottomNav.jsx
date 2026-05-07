@@ -10,7 +10,7 @@ const ICON_SIZE = 32;
  * icon: null 이면 emoji 문자 사용 (가방 PNG 추가 시 icon 으로 교체 가능)
  */
 const NAV_ITEMS = [
-  { path: '/inventory', label: '보관함', icon: null, emoji: '🎒' },
+  { path: '/inventory', label: '보관함', icon: '/images/bottom-nav/bottomnav_icon_inventory.png' },
   { path: '/todo', label: '일정', icon: '/images/bottom-nav/bottomnav_icon_todo.png' },
   { path: '/home', label: '홈', icon: '/images/bottom-nav/bottomnav_icon_home.png' },
   { path: '/quests', label: '퀘스트', icon: '/images/bottom-nav/bottomnav_icon_quest.png' },
@@ -38,7 +38,7 @@ const BottomNav = () => {
               <span className="nav-item-icon-inner">
                 {icon ? (
                   <img
-                    className="nav-item-icon-img"
+                    className={`nav-item-icon-img${path === '/inventory' ? ' nav-item-icon-img--inventory' : ''}`}
                     src={icon}
                     alt=""
                     width={ICON_SIZE}

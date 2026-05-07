@@ -5,6 +5,7 @@ import { QuestProvider } from './context/QuestContext';
 import { GameUserProvider } from './context/GameUserContext';
 import { RoleProvider } from './context/RoleContext';
 import Layout from './components/Layout';
+import RouteLoadingOverlay from './components/RouteLoadingOverlay';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
@@ -24,6 +25,7 @@ function App() {
     <ProfileProvider>
       <QuestProvider>
       <Router>
+        <RouteLoadingOverlay />
         <RoleProvider>
         <GameUserProvider>
         <Routes>

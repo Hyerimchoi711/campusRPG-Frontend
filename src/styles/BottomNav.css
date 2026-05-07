@@ -142,6 +142,11 @@
   image-rendering: crisp-edges;
 }
 
+.nav-item-icon-img--inventory {
+  width: 70px;
+  height: 70px;
+}
+
 .nav-item-icon-fallback {
   width: 32px;
   height: 32px;
