@@ -1,14 +1,8 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import '../styles/Layout.css';
 
-/** 이 경로에서만 중앙 휴대폰 프레임에 떠다니는(deviceFloat) 애니메이션 적용 */
-const PHONE_FLOAT_PATHS = ['/login', '/signup'];
-
 const Layout = () => {
-  const location = useLocation();
-  const phoneAuthFloat = PHONE_FLOAT_PATHS.includes(location.pathname);
-
   return (
     <>
       {/* 좌측 장식 패널 */}
@@ -112,7 +106,7 @@ const Layout = () => {
       {/* 중앙 스마트폰 영역 */}
       <main className="phone-stage">
         <div className="phone-glow"></div>
-        <div className={`phone-frame${phoneAuthFloat ? ' phone-frame--auth-float' : ''}`}>
+        <div className="phone-frame">
           <div className="phone-notch">
             <div className="notch-camera"></div>
             <div className="notch-speaker"></div>

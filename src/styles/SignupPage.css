@@ -1,0 +1,56 @@
+/* 회원가입 — 로그인과 동일 배경·패널, 필드만 많아서 스크롤 허용 */
+
+.login-page.login-page--scrollable {
+  /* 기본 .login-page 의 overflow: hidden 을 끊고, 이 컨테이너에서만 세로 스크롤 */
+  overflow-x: hidden;
+  overflow-y: auto;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
+}
+
+.signup-page .login-page__stack {
+  /* LoginPage.css 의 max-height:100% + overflow:hidden 이 폼을 잘라냄 → 회원가입에서는 해제 */
+  max-height: none;
+  overflow: visible;
+  flex: 0 0 auto;
+  min-height: min-content;
+  margin-top: clamp(8px, 2vmin, 16px);
+  margin-bottom: clamp(16px, 4vmin, 28px);
+}
+
+.signup-page__sub {
+  margin: -8px 0 12px;
+  text-align: center;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  line-height: 1.5;
+  color: var(--login-wood, #6b4423);
+  opacity: 0.92;
+}
+
+.signup-page__error {
+  margin: 0;
+  padding: 8px 10px;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  line-height: 1.45;
+  color: #8b2e1f;
+  background: rgba(196, 92, 74, 0.14);
+  border: 2px solid rgba(139, 46, 31, 0.35);
+  border-radius: 8px;
+}
+
+.signup-page__back-link {
+  display: block;
+  margin-top: 14px;
+  text-align: center;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  color: var(--login-wood-dark, #3d2615);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.signup-page__back-link:hover {
+  color: var(--login-wood, #6b4423);
+}

@@ -3,8 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ProfileProvider } from './context/ProfileContext';
 import { QuestProvider } from './context/QuestContext';
 import { GameUserProvider } from './context/GameUserContext';
+import { RoleProvider } from './context/RoleContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
 import StatsPage from './pages/StatsPage';
 import InventoryPage from './pages/InventoryPage';
@@ -13,6 +15,8 @@ import QuestsPage from './pages/QuestsPage';
 import FriendsPage from './pages/FriendsPage';
 import ShopPage from './pages/ShopPage';
 import ProfilePage from './pages/ProfilePage';
+import AnnouncementsPage from './pages/AnnouncementsPage';
+import EventsPage from './pages/EventsPage';
 import './index.css';
 
 function App() {
@@ -20,11 +24,13 @@ function App() {
     <ProfileProvider>
       <QuestProvider>
       <Router>
+        <RoleProvider>
         <GameUserProvider>
         <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/login" replace />} />
-            <Route path="login" element={<LoginPage />} />
             <Route path="home" element={<HomePage />} />
             <Route path="stats" element={<StatsPage />} />
             <Route path="inventory" element={<InventoryPage />} />
@@ -32,11 +38,14 @@ function App() {
             <Route path="quests" element={<QuestsPage />} />
             <Route path="friends" element={<FriendsPage />} />
             <Route path="shop" element={<ShopPage />} />
+            <Route path="announcements" element={<AnnouncementsPage />} />
+            <Route path="events" element={<EventsPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="profile/friend/:id" element={<ProfilePage />} />
           </Route>
         </Routes>
         </GameUserProvider>
+        </RoleProvider>
       </Router>
       </QuestProvider>
     </ProfileProvider>

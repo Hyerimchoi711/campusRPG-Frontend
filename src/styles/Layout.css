@@ -377,16 +377,6 @@
   padding: 8px;
 }
 
-/* 로그인·회원가입 등 인증 화면에서만 휴대폰 프레임 떠다니는 효과 */
-.phone-frame--auth-float {
-  animation: deviceFloat 5s ease-in-out infinite;
-}
-
-@keyframes deviceFloat {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-6px); }
-}
-
 /* Wood texture decorations */
 .phone-frame::before {
   content: '';
