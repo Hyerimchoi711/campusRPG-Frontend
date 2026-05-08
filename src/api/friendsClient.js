@@ -1,10 +1,17 @@
 import { fetchRpgJsonAuth } from './rpgClient';
 
+/** @typedef {{ userId: string, nickname: string, avatar: string, intro: string, sortOrder: number }} NormalizedFriend */
+
+/** @typedef {{ id: string, fromUserId?: string, nickname: string, intro: string, avatar: string }} FriendRequestRow */
 function asString(v) {
   if (v == null) return '';
   return String(v);
 }
 
+/**
+ * @param {unknown} raw
+ * @returns {NormalizedFriend}
+ */
 export function normalizeFriendRow(raw) {
   if (!raw || typeof raw !== 'object') {
     return { userId: '', nickname: '', avatar: '🥚', intro: '', sortOrder: 0 };
@@ -27,6 +34,9 @@ export function normalizeFriendRow(raw) {
   };
 }
 
+/**
+ * @returns {Promise<NormalizedFriend[]>}
+ */
 export async function fetchFriendsList() {
   const data = await fetchRpgJsonAuth('/api/friends');
   const rows = Array.isArray(data) ? data : data.friends ?? data.items ?? [];
@@ -35,6 +45,9 @@ export async function fetchFriendsList() {
   return list;
 }
 
+/**
+ * @returns {Promise<FriendRequestRow[]>}
+ */
 export async function fetchIncomingFriendRequests() {
   const data = await fetchRpgJsonAuth('/api/friends/requests/incoming');
   const rows = Array.isArray(data) ? data : data.requests ?? [];
@@ -55,6 +68,9 @@ export async function fetchIncomingFriendRequests() {
     .filter(Boolean);
 }
 
+/**
+ * @param {string} friendCode
+ */
 export async function sendFriendRequestByCode(friendCode) {
   const code = String(friendCode ?? '').trim();
   return fetchRpgJsonAuth('/api/friends/requests', {
@@ -63,6 +79,9 @@ export async function sendFriendRequestByCode(friendCode) {
   });
 }
 
+/**
+ * @param {string} requestId
+ */
 export async function acceptFriendRequest(requestId) {
   return fetchRpgJsonAuth(`/api/friends/requests/${encodeURIComponent(requestId)}/accept`, {
     method: 'POST',
@@ -70,6 +89,9 @@ export async function acceptFriendRequest(requestId) {
   });
 }
 
+/**
+ * @param {string} requestId
+ */
 export async function rejectFriendRequest(requestId) {
   return fetchRpgJsonAuth(`/api/friends/requests/${encodeURIComponent(requestId)}/reject`, {
     method: 'POST',
@@ -77,12 +99,18 @@ export async function rejectFriendRequest(requestId) {
   });
 }
 
+/**
+ * @param {string} friendUserId
+ */
 export async function deleteFriend(friendUserId) {
   return fetchRpgJsonAuth(`/api/friends/${encodeURIComponent(friendUserId)}`, {
     method: 'DELETE',
   });
 }
 
+/**
+ * @param {string[]} orderedUserIds
+ */
 export async function patchFriendsOrder(orderedUserIds) {
   return fetchRpgJsonAuth('/api/friends/order', {
     method: 'PATCH',
@@ -90,6 +118,14 @@ export async function patchFriendsOrder(orderedUserIds) {
   });
 }
 
+/**
+ * 공개 프로필 (친구 상세)
+ * @param {string} userId
+ */
+/**
+ * GET /api/users/:id 응답에서 사용자 객체 추출 (백엔드 래퍼 형태 호환)
+ * @param {unknown} data
+ */
 function extractUserObjectFromUsersResponse(data) {
   if (data == null || typeof data !== 'object') return null;
   const root = /** @type {Record<string, unknown>} */ (data);
@@ -98,15 +134,18 @@ function extractUserObjectFromUsersResponse(data) {
     nested && typeof nested === 'object' && /** @type {Record<string, unknown>} */ (nested).user != null
       ? /** @type {Record<string, unknown>} */ (nested).user
       : null;
-  const candidates = [root.user, root.User, fromNested];
+  const candidates = [
+    root.user,
+    root.User,
+    fromNested,
+    nested && typeof nested === 'object' && !Array.isArray(nested)
+      ? /** @type {Record<string, unknown>} */ (nested)
+      : null,
+  ];
   for (const c of candidates) {
     if (c != null && typeof c === 'object' && !Array.isArray(c)) {
       return /** @type {Record<string, unknown>} */ (c);
     }
-  }
-  if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
-    const n = /** @type {Record<string, unknown>} */ (nested);
-    if (n.id != null || n.userId != null || n.nickname != null) return n;
   }
   if (root.id != null || root.userId != null || root.nickname != null) {
     return root;

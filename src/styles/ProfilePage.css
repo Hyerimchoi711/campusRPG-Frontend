@@ -59,7 +59,7 @@
   flex-shrink: 0;
 }
 
-.profile-win__titlebar {
+/* .profile-win__titlebar {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -68,9 +68,9 @@
   background: linear-gradient(180deg, #e8dcc8 0%, #d4c4a8 100%);
   border-bottom: 2px solid var(--bg-wood);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
-}
+} */
 
-.profile-win__titlebar--pet {
+/* .profile-win__titlebar--pet {
   background: linear-gradient(180deg, #dce8c8 0%, #c4d4a8 100%);
 }
 
@@ -116,9 +116,9 @@
 .profile-win__title-icon {
   font-size: 11px;
   line-height: 1;
-}
+} */
 
-.profile-win__urlfake {
+/* .profile-win__urlfake {
   flex: 1;
   min-width: 0;
   margin-left: auto;
@@ -133,7 +133,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
+} */
 
 .profile-win__body {
   flex: 1;
@@ -148,6 +148,13 @@
   flex-direction: column;
   align-items: stretch;
   gap: 10px;
+}
+
+.profile-unified-details {
+  width: 100%;
+  padding: 10px 0 0;
+  margin-top: 2px;
+  border-top: 2px dashed var(--border2);
 }
 
 .profile-win__body--pet {
@@ -464,6 +471,72 @@
   line-height: 1.5;
 }
 
+.profile-friend-loading {
+  text-align: center;
+  padding: 40px 16px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.profile-friend-code {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 2px dashed var(--border2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-friend-code-label {
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.4px;
+}
+
+.profile-friend-code-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-friend-code-value {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.55);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  word-break: break-all;
+}
+
+.profile-friend-code-copy {
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: var(--bg-card2);
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: 1px 1px 0 var(--border2);
+}
+
+.profile-friend-code-copy:active {
+  transform: translateY(1px);
+}
+
+.profile-friend-code-hint {
+  font-size: 10px;
+  color: var(--accent3);
+}
+
 /* ----- 펫 윈도우 본문 ----- */
 .profile-pet-win-body {
   display: flex;
@@ -559,6 +632,41 @@
 .profile-pet-level--win {
   font-size: 10px;
   padding: 4px 12px;
+}
+
+.profile-pet-lineage-chip {
+  font-family: var(--pixel-font);
+  font-size: 7px;
+  color: var(--text-sub);
+  background: rgba(139, 195, 74, 0.2);
+  border: 1px solid var(--border2);
+  border-radius: 999px;
+  padding: 2px 10px;
+  margin-bottom: 2px;
+}
+
+.profile-pet-evolved-at {
+  font-family: var(--body-font);
+  font-size: 9px;
+  color: var(--text-sub);
+}
+
+.profile-pet-desc {
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.45;
+  color: var(--text-sub);
+  max-width: 220px;
+  text-align: center;
+}
+
+.profile-pet-img--species {
+  width: 72px;
+  height: 72px;
+}
+
+.profile-pet-egg-hitbox--species::before {
+  top: -12px;
 }
 
 /* ----- 프로필 사진 변경 모달 ----- */

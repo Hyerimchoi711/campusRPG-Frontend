@@ -8,6 +8,8 @@ import SettingsModal from './SettingsModal';
 import '../styles/TopBar.css';
 
 const COIN_IMG = '/images/ui/coin.png';
+const SHOP_ICON = '/images/ui/icon_shop.png';
+const SETTINGS_ICON = '/images/ui/icon_settings.png';
 
 const TopBar = () => {
   const navigate = useNavigate();
@@ -38,13 +40,11 @@ const TopBar = () => {
         </div>
       </div>
       <div className="top-bar-right">
-        <button className="top-btn" onClick={() => navigate('/shop')}>
-          <span>🛒</span>
-          <span className="top-btn-text">상점</span>
+        <button type="button" className="top-btn" onClick={() => navigate('/shop')} aria-label="상점">
+          <img className="top-btn-icon" src={SHOP_ICON} alt="" width={20} height={20} decoding="async" />
         </button>
         <button type="button" className="top-btn" onClick={() => setSettingsOpen(true)} aria-label="설정 열기">
-          <span>⚙️</span>
-          <span className="top-btn-text">설정</span>
+          <img className="top-btn-icon" src={SETTINGS_ICON} alt="" width={20} height={20} decoding="async" />
         </button>
       </div>
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />

@@ -36,8 +36,8 @@ function App() {
                   <Route path="quests" element={<QuestsPage />} />
                   <Route path="friends" element={<FriendsPage />} />
                   <Route path="shop" element={<ShopPage />} />
-                  <Route path="profile" element={<ProfilePage />} />
                   <Route path="profile/friend/:id" element={<ProfilePage />} />
+                  <Route path="profile" element={<ProfilePage />} />
                 </Route>
               </Routes>
             </GameUserProvider>

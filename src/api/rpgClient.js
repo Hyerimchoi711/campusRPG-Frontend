@@ -29,7 +29,6 @@ export async function fetchRpgJson(path, options = {}) {
   return data;
 }
 
-/** Bearer JWT가 필요한 API */
 export async function fetchRpgJsonAuth(path, options = {}) {
   const url = path.startsWith('http') ? path : apiUrl(path);
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
