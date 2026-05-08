@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { fetchRpgJson } from '../api/rpgClient';
+import { fetchRpgJsonAuth } from '../api/rpgClient';
 import { useAuth } from './AuthContext';
 
 const STORAGE_KEY = 'campusRpg_demoUserId';
@@ -36,7 +36,7 @@ export const GameUserProvider = ({ children }) => {
 
   const refreshWallet = useCallback(async () => {
     try {
-      const d = await fetchRpgJson(`/api/wallet?userId=${userId}`);
+      const d = await fetchRpgJsonAuth(`/api/wallet?userId=${userId}`);
       setCoins(typeof d.coin === 'number' ? d.coin : null);
     } catch {
       setCoins(null);

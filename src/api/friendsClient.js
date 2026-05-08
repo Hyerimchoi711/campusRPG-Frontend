@@ -1,0 +1,133 @@
+import { fetchRpgJsonAuth } from './rpgClient';
+
+function asString(v) {
+  if (v == null) return '';
+  return String(v);
+}
+
+export function normalizeFriendRow(raw) {
+  if (!raw || typeof raw !== 'object') {
+    return { userId: '', nickname: '', avatar: '🥚', intro: '', sortOrder: 0 };
+  }
+  const o = /** @type {Record<string, unknown>} */ (raw);
+  const userId =
+    o.userId ??
+    o.friendUserId ??
+    o.id ??
+    o.user_id ??
+    o.friend_user_id ??
+    o.toUserId ??
+    o.to_user_id;
+  return {
+    userId: asString(userId),
+    nickname: asString(o.nickname ?? o.realName ?? o.name).trim(),
+    avatar: asString(o.avatar ?? '🥚') || '🥚',
+    intro: asString(o.intro ?? ''),
+    sortOrder: Number(o.sortOrder ?? o.sort_order ?? 0) || 0,
+  };
+}
+
+export async function fetchFriendsList() {
+  const data = await fetchRpgJsonAuth('/api/friends');
+  const rows = Array.isArray(data) ? data : data.friends ?? data.items ?? [];
+  const list = rows.map(normalizeFriendRow).filter((r) => r.userId);
+  list.sort((a, b) => a.sortOrder - b.sortOrder || a.nickname.localeCompare(b.nickname));
+  return list;
+}
+
+export async function fetchIncomingFriendRequests() {
+  const data = await fetchRpgJsonAuth('/api/friends/requests/incoming');
+  const rows = Array.isArray(data) ? data : data.requests ?? [];
+  return rows
+    .map((raw) => {
+      if (!raw || typeof raw !== 'object') return null;
+      const o = /** @type {Record<string, unknown>} */ (raw);
+      const id = o.id ?? o.requestId;
+      if (id == null) return null;
+      return {
+        id: asString(id),
+        fromUserId: o.fromUserId != null ? asString(o.fromUserId) : o.from_user_id != null ? asString(o.from_user_id) : undefined,
+        nickname: asString(o.nickname ?? o.fromNickname ?? '').trim(),
+        intro: asString(o.intro ?? ''),
+        avatar: asString(o.avatar ?? '🥚') || '🥚',
+      };
+    })
+    .filter(Boolean);
+}
+
+export async function sendFriendRequestByCode(friendCode) {
+  const code = String(friendCode ?? '').trim();
+  return fetchRpgJsonAuth('/api/friends/requests', {
+    method: 'POST',
+    body: JSON.stringify({ friendCode: code }),
+  });
+}
+
+export async function acceptFriendRequest(requestId) {
+  return fetchRpgJsonAuth(`/api/friends/requests/${encodeURIComponent(requestId)}/accept`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+}
+
+export async function rejectFriendRequest(requestId) {
+  return fetchRpgJsonAuth(`/api/friends/requests/${encodeURIComponent(requestId)}/reject`, {
+    method: 'POST',
+    body: JSON.stringify({}),
+  });
+}
+
+export async function deleteFriend(friendUserId) {
+  return fetchRpgJsonAuth(`/api/friends/${encodeURIComponent(friendUserId)}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function patchFriendsOrder(orderedUserIds) {
+  return fetchRpgJsonAuth('/api/friends/order', {
+    method: 'PATCH',
+    body: JSON.stringify({ orderedUserIds }),
+  });
+}
+
+function extractUserObjectFromUsersResponse(data) {
+  if (data == null || typeof data !== 'object') return null;
+  const root = /** @type {Record<string, unknown>} */ (data);
+  const nested = root.data;
+  const fromNested =
+    nested && typeof nested === 'object' && /** @type {Record<string, unknown>} */ (nested).user != null
+      ? /** @type {Record<string, unknown>} */ (nested).user
+      : null;
+  const candidates = [root.user, root.User, fromNested];
+  for (const c of candidates) {
+    if (c != null && typeof c === 'object' && !Array.isArray(c)) {
+      return /** @type {Record<string, unknown>} */ (c);
+    }
+  }
+  if (nested && typeof nested === 'object' && !Array.isArray(nested)) {
+    const n = /** @type {Record<string, unknown>} */ (nested);
+    if (n.id != null || n.userId != null || n.nickname != null) return n;
+  }
+  if (root.id != null || root.userId != null || root.nickname != null) {
+    return root;
+  }
+  return null;
+}
+
+export async function fetchUserPublicProfile(userId) {
+  const data = await fetchRpgJsonAuth(`/api/users/${encodeURIComponent(userId)}`);
+  const u = extractUserObjectFromUsersResponse(data);
+  if (!u || typeof u !== 'object') return null;
+  const o = /** @type {Record<string, unknown>} */ (u);
+  return {
+    userId: asString(o.id ?? o.userId ?? userId),
+    nickname: asString(o.nickname ?? o.realName ?? '').trim(),
+    avatar: asString(o.avatar ?? '🥚') || '🥚',
+    intro: asString(o.intro ?? ''),
+    university: asString(o.universityName ?? o.university_name ?? ''),
+    major: asString(o.major ?? ''),
+    schoolYear: asString(o.schoolYear ?? o.school_year ?? ''),
+    age: o.age != null ? asString(o.age) : '',
+    friendCode: o.friendCode != null ? asString(o.friendCode) : o.friend_code != null ? asString(o.friend_code) : '',
+  };
+}

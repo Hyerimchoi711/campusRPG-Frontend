@@ -3,11 +3,12 @@ import react from '@vitejs/plugin-react'
 
 // 개발 시: Vite(예: 5173)만 브라우저에 쓰고, 아래 경로는 프록시됩니다.
 // - /api/quests → LLM 퀘스트 서버(VITE_DEV_QUEST_API_URL, 기본 8787)
-// - /api/auth, /api/me, … → 메인 백엔드(VITE_DEV_BACKEND_URL, 기본 5555)
+// - /api/auth, /api/me, … → 메인 백엔드(VITE_DEV_BACKEND_URL, 미설정 시 기본 8888)
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const backendTarget =
-    env.VITE_DEV_BACKEND_URL || 'http://127.0.0.1:5555'
+    env.VITE_DEV_BACKEND_URL || 'http://127.0.0.1:8888'
+    
   const questTarget =
     env.VITE_DEV_QUEST_API_URL || 'http://127.0.0.1:8787'
 
@@ -40,6 +41,14 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
         },
         '/api/inventory': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/friends': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/users': {
           target: backendTarget,
           changeOrigin: true,
         },

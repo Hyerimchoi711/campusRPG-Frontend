@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react';
 import { TOKEN_KEY } from '../constants/authStorage';
-import { apiUrl } from '../api/apiBase';
+import { fetchRpgJsonAuth } from '../api/rpgClient';
 import { useProfile } from './ProfileContext';
 
 const AuthContext = createContext(null);
@@ -25,22 +25,13 @@ export function AuthProvider({ children }) {
     }
     setLoading(true);
     try {
-      const res = await fetch(apiUrl('/api/me'), {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.status === 401) {
-        localStorage.removeItem(TOKEN_KEY);
-        setMe(null);
-        return null;
-      }
-      if (!res.ok) {
-        setMe(null);
-        return null;
-      }
-      const data = await res.json();
+      const data = await fetchRpgJsonAuth('/api/me');
       setMe(data);
       return data;
-    } catch {
+    } catch (e) {
+      if (e?.status === 401) {
+        localStorage.removeItem(TOKEN_KEY);
+      }
       setMe(null);
       return null;
     } finally {
