@@ -1,126 +1,39 @@
-/* 회원가입 — LoginPage 톤에 맞춘 추가 스타일 */
+/* 회원가입 — 로그인과 동일 배경·패널, 필드만 많아서 스크롤 허용 */
 
-.signup-content {
-  padding-top: 8px;
+.login-page.login-page--scrollable {
+  overflow-x: hidden;
+  overflow-y: auto;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
 }
 
-.signup-back {
-  align-self: flex-start;
-  margin: 0 0 4px 0;
-  padding: 6px 10px;
-  background: transparent;
-  border: none;
-  color: var(--text-sub);
-  font-size: 12px;
-  font-family: var(--body-font);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: color 0.2s, background 0.2s;
+.signup-page .login-page__stack {
+  max-height: none;
+  overflow: visible;
+  flex: 0 0 auto;
+  min-height: min-content;
+  margin-top: clamp(8px, 2vmin, 16px);
+  margin-bottom: clamp(16px, 4vmin, 28px);
 }
 
-.signup-back:hover {
-  color: var(--accent3);
-  background: rgba(255, 255, 255, 0.35);
-}
-
-.signup-hint {
-  margin: 0;
-  width: 100%;
-  font-size: 10px;
-  line-height: 1.45;
-  color: var(--text-dim);
+.signup-page__sub {
+  margin: -8px 0 12px;
   text-align: center;
-}
-
-.signup-field-hint {
-  margin: 0 0 6px 0;
-  font-size: 9px;
-  line-height: 1.35;
-  color: var(--accent3);
-  text-align: center;
+  font-family: var(--pixel-font);
+  font-size: 8px;
+  line-height: 1.5;
+  color: var(--login-wood, #6b4423);
+  opacity: 0.92;
 }
 
 .signup-error {
-  margin: 0 0 4px 0;
+  margin: 0;
   padding: 8px 10px;
-  font-size: 11px;
-  line-height: 1.35;
-  color: #b91c1c;
-  background: rgba(254, 226, 226, 0.85);
-  border: 2px solid #fca5a5;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.signup-kakao-block {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-kakao {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 14px;
-  border: none;
-  border-radius: 8px;
-  background: #fee500;
-  color: #191919;
-  font-family: var(--body-font);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: not-allowed;
-  opacity: 0.72;
-  box-shadow: 2px 2px 0 #c9b400;
-}
-
-.btn-kakao:not(:disabled) {
-  cursor: pointer;
-  opacity: 1;
-}
-
-.btn-kakao:not(:disabled):hover {
-  filter: brightness(1.03);
-}
-
-.btn-kakao-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 4px;
-  background: #191919;
-  color: #fee500;
   font-family: var(--pixel-font);
-  font-size: 9px;
-  font-weight: normal;
-}
-
-.signup-kakao-note {
-  font-size: 10px;
-  color: var(--text-dim);
-}
-
-.signup-divider {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 4px 0 2px;
-  color: var(--text-dim);
-  font-size: 10px;
-}
-
-.signup-divider::before,
-.signup-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border2);
+  font-size: 8px;
+  line-height: 1.45;
+  color: #8b2e1f;
+  background: rgba(196, 92, 74, 0.14);
+  border: 2px solid rgba(139, 46, 31, 0.35);
+  border-radius: 8px;
 }

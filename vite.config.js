@@ -51,6 +51,14 @@ export default defineConfig(({ mode }) => {
           target: backendTarget,
           changeOrigin: true,
         },
+        '/api/announcements': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/events': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
         '/api': {
           target: questTarget,
           changeOrigin: true,

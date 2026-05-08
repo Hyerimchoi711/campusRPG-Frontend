@@ -10,11 +10,11 @@ const ICON_SIZE = 32;
  * icon: null 이면 emoji 문자 사용 (가방 PNG 추가 시 icon 으로 교체 가능)
  */
 const NAV_ITEMS = [
-  { path: '/inventory', label: '보관함', icon: null, emoji: '🎒' },
-  { path: '/todo', label: '일정', icon: '/images/bottom-nav/bottomnav_icon_todo.png' },
-  { path: '/home', label: '홈', icon: '/images/bottom-nav/bottomnav_icon_home.png' },
-  { path: '/quests', label: '퀘스트', icon: '/images/bottom-nav/bottomnav_icon_quest.png' },
-  { path: '/friends', label: '친구', icon: '/images/bottom-nav/bottomnav_icon_friend.png' },
+  { path: '/inventory', label: '보관함', icon: '/images/bottom-nav/bottomnav_icon_inventory.png?v=20260508' },
+  { path: '/todo', label: '일정', icon: '/images/bottom-nav/bottomnav_icon_todo.png?v=20260508' },
+  { path: '/home', label: '홈', icon: '/images/bottom-nav/bottomnav_icon_home.png?v=20260508' },
+  { path: '/quests', label: '퀘스트', icon: '/images/bottom-nav/bottomnav_icon_quest.png?v=20260508' },
+  { path: '/friends', label: '친구', icon: '/images/bottom-nav/bottomnav_icon_friend.png?v=20260508' },
 ];
 
 const BottomNav = () => {

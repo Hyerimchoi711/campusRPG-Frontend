@@ -1,0 +1,61 @@
+.route-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c79a6a;
+  color: #ffffff;
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+
+.route-loading-overlay--shown {
+  opacity: 1;
+}
+
+.route-loading-overlay--fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.route-loading-overlay__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transform: translateY(-4px);
+}
+
+.route-loading-overlay__text {
+  font-family: var(--pixel-font, monospace);
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.route-loading-overlay__spinner {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  animation: routeLoadingSpin 0.9s linear infinite;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes routeLoadingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loading-overlay {
+    transition: none;
+  }
+  .route-loading-overlay__spinner {
+    animation: none;
+  }
+}

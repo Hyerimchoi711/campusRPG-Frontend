@@ -57,7 +57,13 @@ const SettingsModal = ({ open, onClose }) => {
   const handleLogout = () => {
     logout();
     onClose();
-    navigate('/login', { replace: true });
+    navigate('/login', {
+      replace: true,
+      state: {
+        logoutLoadingTransition: true,
+        logoutLoadingStartedAt: Date.now(),
+      },
+    });
   };
 
   if (!open) return null;

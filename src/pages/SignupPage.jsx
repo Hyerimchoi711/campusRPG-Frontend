@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiUrl } from '../api/apiBase';
 import '../styles/LoginPage.css';
 import '../styles/SignupPage.css';
+
+const TITLE_BANNER_SRC = '/images/campus-rpg-title-banner.png';
 
 const initialForm = {
   email: '',
@@ -20,6 +22,13 @@ const SignupPage = () => {
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    document.body.classList.add('login-route-bg');
+    return () => {
+      document.body.classList.remove('login-route-bg');
+    };
+  }, []);
 
   const setField = (key) => (e) => {
     const v = e.target.value;
@@ -69,120 +78,115 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="screen active" id="screenSignup">
-      <div className="login-bg" />
-      <div className="login-content signup-content">
-        <button
-          type="button"
-          className="signup-back"
-          onClick={() => navigate('/login')}
-        >
-          ← 로그인으로
-        </button>
+    <div className="login-page login-page--scrollable signup-page">
+      <div className="login-page__stack">
+        <header className="login-page__hero">
+          <img
+            src={TITLE_BANNER_SRC}
+            alt="캠퍼스 RPG — 매일 성장하는 대학 생활"
+            className="login-page__title-img"
+            decoding="async"
+          />
+        </header>
 
-        <div className="game-logo">
-          <div className="logo-sub">CampusQuest 회원가입</div>
-        </div>
-
-        <div className="signup-divider">
-          <span>이메일로 가입</span>
-        </div>
-
-        <form className="login-form" onSubmit={handleRegister} autoComplete="off">
+        <main className="login-page__main">
+          <section className="login-panel" aria-labelledby="signup-form-title">
+            <h1 id="signup-form-title" className="login-panel__menu-title">
+              새 알 부화하기
+            </h1>
+            <p className="signup-page__sub">회원가입</p>
+            <form className="login-panel__form" onSubmit={handleRegister} autoComplete="off">
           {error ? <p className="signup-error">{error}</p> : null}
-          <p className="signup-field-hint">
-            브라우저가 학번 칸에 비밀번호를 자동으로 넣을 수 있습니다. 학번은 직접 확인해 주세요.
-          </p>
-          <div className="input-group">
-            <span className="input-icon">👤</span>
+          <label className="login-field">
+            <span className="login-field__label">이메일</span>
             <input
               type="email"
               name="email"
-              placeholder="이메일"
-              className="game-input"
+              placeholder="campus@school.ac.kr"
+              className="login-field__input"
               autoComplete="username"
               value={form.email}
               onChange={setField('email')}
               required
             />
-          </div>
-          <div className="input-group">
-            <span className="input-icon">🎓</span>
+          </label>
+          <label className="login-field">
+            <span className="login-field__label">학번</span>
             <input
               type="text"
               name="student_id"
               placeholder="학번"
-              className="game-input"
+              className="login-field__input"
               autoComplete="off"
               value={form.student_id}
               onChange={setField('student_id')}
               required
               maxLength={30}
             />
-          </div>
-          <div className="input-group">
-            <span className="input-icon">🔑</span>
+          </label>
+          <label className="login-field">
+            <span className="login-field__label">비밀번호</span>
             <input
               type="password"
               name="new-password"
-              placeholder="비밀번호 (8자 이상)"
-              className="game-input"
+              placeholder="••••••••"
+              className="login-field__input"
               autoComplete="new-password"
               value={form.password}
               onChange={setField('password')}
               required
               minLength={8}
             />
-          </div>
-          <div className="input-group">
-            <span className="input-icon">✨</span>
+          </label>
+          <label className="login-field">
+            <span className="login-field__label">닉네임</span>
             <input
               type="text"
               name="nickname"
               placeholder="닉네임"
-              className="game-input"
+              className="login-field__input"
               autoComplete="nickname"
               value={form.nickname}
               onChange={setField('nickname')}
               required
               maxLength={50}
             />
-          </div>
-          <div className="input-group">
-            <span className="input-icon">📚</span>
+          </label>
+          <label className="login-field">
+            <span className="login-field__label">학과</span>
             <input
               type="text"
               name="major"
               placeholder="학과"
-              className="game-input"
+              className="login-field__input"
               autoComplete="off"
               value={form.major}
               onChange={setField('major')}
               required
               maxLength={80}
             />
-          </div>
-          <div className="input-group">
-            <span className="input-icon">🏛️</span>
+          </label>
+          <label className="login-field">
+            <span className="login-field__label">대학교</span>
             <input
               type="text"
               name="university_name"
               placeholder="대학교 이름(예시: 00대학교)"
-              className="game-input"
+              className="login-field__input"
               autoComplete="organization"
               value={form.university_name}
               onChange={setField('university_name')}
               required
               maxLength={120}
             />
-          </div>
-          <div className="input-group">
-            <span className="input-icon">📅</span>
+          </label>
+          <label className="login-field">
+            <span className="login-field__label">학년 (1~4)</span>
             <input
               type="number"
               name="school_year"
               placeholder="학년 (1~4)"
-              className="game-input"
+              className="login-field__input"
               autoComplete="off"
               min={1}
               max={6}
@@ -190,14 +194,14 @@ const SignupPage = () => {
               onChange={setField('school_year')}
               required
             />
-          </div>
-          <div className="input-group">
-            <span className="input-icon">🎂</span>
+          </label>
+          <label className="login-field">
+            <span className="login-field__label">나이</span>
             <input
               type="number"
               name="age"
               placeholder="나이"
-              className="game-input"
+              className="login-field__input"
               autoComplete="off"
               min={1}
               max={120}
@@ -205,27 +209,16 @@ const SignupPage = () => {
               onChange={setField('age')}
               required
             />
-          </div>
-          <button type="submit" className="btn-primary" disabled={submitting}>
-            <span>{submitting ? '처리 중…' : '가입 완료'}</span>
-            <div className="btn-shine" />
+          </label>
+          <button type="submit" className="login-btn login-btn--primary" disabled={submitting}>
+            {submitting ? '처리 중…' : '가입하고 알 부화하기'}
           </button>
         </form>
-
-        <p className="signup-hint">
-          카카오 로그인은 앱 승인 후 연결 예정입니다. 아래 정보로 계정을 만듭니다.
-        </p>
-
-        <div className="signup-kakao-block">
-          <button type="button" className="btn-kakao" disabled title="카카오 개발자 앱 승인 후 연결">
-            <span className="btn-kakao-icon" aria-hidden="true">
-              카
-            </span>
-            카카오로 시작하기
-          </button>
-          <span className="signup-kakao-note">준비 중 · 승인 후 활성화</span>
-        </div>
-
+            <button type="button" className="login-btn login-btn--secondary" onClick={() => navigate('/login')}>
+              이미 계정이 있어요 — 로그인
+            </button>
+          </section>
+        </main>
       </div>
     </div>
   );
