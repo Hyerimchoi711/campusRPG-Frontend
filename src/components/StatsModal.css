@@ -1,0 +1,298 @@
+/* 반투명 중성 오버레이 + 유리 패널 (설정 모달 패턴과 유사하되 테마 브라운 배경 없음) */
+
+.stats-modal-root {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: center;
+  /* 화면 중앙보다 약간 우측 */
+  justify-content: flex-end;
+  padding: 16px max(14px, 3.5vw) 16px clamp(20px, 7vw, 72px);
+  pointer-events: none;
+}
+
+.stats-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  background: rgba(12, 12, 14, 0.48);
+  backdrop-filter: blur(4px);
+}
+
+.stats-modal-panel {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+  width: 100%;
+  max-width: min(396px, calc(100vw - 24px));
+  max-height: min(88vh, 620px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 16px;
+  /* 본체도 반투명 + 패널만 살짝 블러 (배경과 자연스럽게 합침) */
+  background: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.stats-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.055);
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.stats-modal-title {
+  margin: 0;
+  font-family: var(--pixel-font), monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: #2c2825;
+}
+
+.stats-modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  color: #4a4540;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+
+.stats-modal-close:hover {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.stats-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 좌측 펫 · 우측 스탯 */
+.stats-modal-body-split {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 10px;
+  min-height: 0;
+  padding: 0 10px 10px;
+  overflow: hidden;
+}
+
+.stats-modal-pet {
+  flex: 0 0 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px;
+  justify-content: flex-start;
+}
+
+.stats-modal-pet-frame {
+  width: 80px;
+  height: 80px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.stats-modal-pet-img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.stats-modal-pet-emoji {
+  font-size: 52px;
+  line-height: 1;
+  display: block;
+}
+
+.stats-modal-pet-name {
+  font-family: var(--pixel-font), monospace;
+  font-size: 9px;
+  color: rgba(44, 40, 37, 0.88);
+  text-align: center;
+  max-width: 88px;
+  word-break: break-word;
+}
+
+.stats-modal-main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stats-modal-chart {
+  width: 100%;
+  height: 172px;
+  flex-shrink: 0;
+  padding: 8px 4px 4px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 360px) {
+  .stats-modal-body-split {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stats-modal-pet {
+    flex-direction: row;
+    flex: 0 0 auto;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 4px 4px;
+  }
+
+  .stats-modal-pet-name {
+    max-width: none;
+    text-align: left;
+    align-self: center;
+  }
+}
+
+/* 목 테마 변수 덜 타게: 줄·박스 중립 톤 */
+.stats-modal-detail-list.stat-detail-list {
+  padding-bottom: 8px;
+}
+
+.stats-modal-detail-list .stat-row {
+  background: rgba(255, 255, 255, 0.52);
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.stats-modal-detail-list .stat-bar-track {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.stats-modal-detail-list .stat-name {
+  font-weight: 700;
+}
+
+/* 스탯별 선명 컬러 (이름·수치 동일 톤) */
+.stats-modal-detail-list .stat-row.stat-variant-health {
+  border-left: 4px solid #059669;
+}
+.stats-modal-detail-list .stat-row.stat-variant-health .stat-name,
+.stats-modal-detail-list .stat-row.stat-variant-health .stat-val {
+  color: #059669;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-social {
+  border-left: 4px solid #db2777;
+}
+.stats-modal-detail-list .stat-row.stat-variant-social .stat-name,
+.stats-modal-detail-list .stat-row.stat-variant-social .stat-val {
+  color: #db2777;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-diligent {
+  border-left: 4px solid #ca8a04;
+}
+.stats-modal-detail-list .stat-row.stat-variant-diligent .stat-name,
+.stats-modal-detail-list .stat-row.stat-variant-diligent .stat-val {
+  color: #ca8a04;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-focus {
+  border-left: 4px solid #0284c7;
+}
+.stats-modal-detail-list .stat-row.stat-variant-focus .stat-name,
+.stats-modal-detail-list .stat-row.stat-variant-focus .stat-val {
+  color: #0284c7;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-creative {
+  border-left: 4px solid #ea580c;
+}
+.stats-modal-detail-list .stat-row.stat-variant-creative .stat-name,
+.stats-modal-detail-list .stat-row.stat-variant-creative .stat-val {
+  color: #ea580c;
+}
+
+/* 스탯 바: 모달 안에서만 더 채도 높은 그라데이션 */
+.stats-modal-detail-list .stat-bar-fill.health {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+.stats-modal-detail-list .stat-bar-fill.social {
+  background: linear-gradient(90deg, #ec4899, #f9a8d4);
+}
+.stats-modal-detail-list .stat-bar-fill.diligent {
+  background: linear-gradient(90deg, #eab308, #fde047);
+}
+.stats-modal-detail-list .stat-bar-fill.focus {
+  background: linear-gradient(90deg, #0ea5e9, #7dd3fc);
+}
+.stats-modal-detail-list .stat-bar-fill.creative {
+  background: linear-gradient(90deg, #f97316, #fdba74);
+}
+
+.stats-modal-fatigue.fatigue-section {
+  margin-top: auto;
+  background: rgba(255, 255, 255, 0.28);
+  border-top: 1px solid rgba(0, 0, 0, 0.055);
+}
+
+.stats-modal-fatigue .fatigue-title {
+  color: #1e1b18;
+  font-weight: 800;
+}
+
+.stats-modal-fatigue .fatigue-val {
+  color: #be123c;
+  font-weight: 700;
+}
+
+.stats-modal-fatigue .fatigue-bar-track {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(190, 18, 60, 0.25);
+}
+
+.stats-modal-fatigue .fatigue-bar-fill {
+  background: linear-gradient(90deg, #fb7185, #e11d48);
+}

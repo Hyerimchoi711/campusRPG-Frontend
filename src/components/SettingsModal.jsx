@@ -2,15 +2,18 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { defaultPreview, useLevelUp } from '../context/LevelUpContext';
 import { SETTINGS_KEYS, getMasterVolume, getBgmEnabled, getSfxEnabled } from '../utils/settingsStorage';
 import './SettingsModal.css';
 import '../styles/RouteLoadingOverlay.css';
+import { isDevMockAuthEnabled } from '../utils/devAuth';
 
 const LOGOUT_LOADING_FADE_MS = 320;
 
 const SettingsModal = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { showLevelUp } = useLevelUp();
   const [masterVolume, setMasterVolume] = useState(80);
   const [bgmOn, setBgmOn] = useState(true);
   const [sfxOn, setSfxOn] = useState(true);
@@ -185,6 +188,25 @@ const SettingsModal = ({ open, onClose }) => {
                 </div>
                 <p className="settings-hint">앱 알림 권한은 브라우저·OS 설정과 함께 적용됩니다.</p>
               </section>
+
+              {isDevMockAuthEnabled() ? (
+                <section className="settings-section" aria-labelledby="settings-dev">
+                  <h3 id="settings-dev" className="settings-section-title">
+                    🧪 개발
+                  </h3>
+                  <p className="settings-hint">로컬 미리보기 전용 (목 로그인과 같은 조건에서만 표시)</p>
+                  <button
+                    type="button"
+                    className="settings-dev-preview-btn"
+                    onClick={() => {
+                      onClose();
+                      window.setTimeout(() => showLevelUp(defaultPreview), 0);
+                    }}
+                  >
+                    레벨업 창 미리보기
+                  </button>
+                </section>
+              ) : null}
 
               <section className="settings-section settings-section-account" aria-labelledby="settings-account">
                 <h3 id="settings-account" className="settings-section-title">

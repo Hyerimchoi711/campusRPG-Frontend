@@ -205,3 +205,25 @@
   transform: translateY(1px);
   box-shadow: 1px 1px 0 rgba(40, 20, 14, 0.4);
 }
+
+.settings-dev-preview-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  color: var(--bg-wood-dark);
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--gold2), var(--gold));
+  border: 3px solid var(--bg-wood-dark);
+  border-radius: 10px;
+  box-shadow: 2px 2px 0 rgba(45, 30, 18, 0.25);
+}
+
+.settings-dev-preview-btn:hover {
+  filter: brightness(1.04);
+}
+
+.settings-dev-preview-btn:active {
+  transform: translateY(1px);
+}

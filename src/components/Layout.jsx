@@ -1,14 +1,8 @@
 import React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import '../styles/Layout.css';
 
-/** 이 경로에서만 중앙 휴대폰 프레임에 떠다니는(deviceFloat) 애니메이션 적용 */
-const PHONE_FLOAT_PATHS = ['/login', '/signup'];
-
 const Layout = () => {
-  const location = useLocation();
-  const phoneAuthFloat = PHONE_FLOAT_PATHS.includes(location.pathname);
-
   return (
     <>
       {/* 좌측 장식 패널 */}
@@ -112,7 +106,7 @@ const Layout = () => {
       {/* 중앙 스마트폰 영역 */}
       <main className="phone-stage">
         <div className="phone-glow"></div>
-        <div className={`phone-frame${phoneAuthFloat ? ' phone-frame--auth-float' : ''}`}>
+        <div className="phone-frame">
           <div className="phone-notch">
             <div className="notch-camera"></div>
             <div className="notch-speaker"></div>
@@ -123,21 +117,6 @@ const Layout = () => {
           </div>
           
           <div className="phone-home-btn"></div>
-        </div>
-
-        {/* 레벨업 오버레이 */}
-        <div className="levelup-overlay" id="levelupOverlay">
-          <div className="levelup-box">
-            <div className="levelup-title">LEVEL UP!</div>
-            <div className="levelup-num">Lv. 8</div>
-            <div className="levelup-char">✨🥚✨</div>
-            <div className="levelup-rewards">
-              <div className="lv-reward">성실함 +5</div>
-              <div className="lv-reward">집중력 +3</div>
-              <div className="lv-reward">💎 +50</div>
-            </div>
-            <button className="btn-primary small" onClick={() => window.closeLevelup()}>계속하기</button>
-          </div>
         </div>
       </main>
     </>
