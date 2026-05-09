@@ -14,6 +14,9 @@ const PROFILE_KEYS = [
   'petLevel',
   'petName',
   'petEmoji',
+  'petLineageType',
+  'petAnimalType',
+  'petLastEvolvedAt',
 ];
 
 /** 게임 프로필 (상단 바·프로필 페이지 공통) */
@@ -26,9 +29,12 @@ const defaultProfile = {
   intro: 'CampusQuest로 캠퍼스 라이프 레벨업!',
   avatar: '🥚',
   petStage: 'egg',
-  petLevel: 0,
-  petName: '알',
+  petLevel: 1,
+  petName: '부화중인 알',
   petEmoji: '🥚',
+  petLineageType: null,
+  petAnimalType: 'egg',
+  petLastEvolvedAt: null,
 };
 
 function normalizePetLevel(v) {
@@ -52,6 +58,17 @@ function pickProfile(merged) {
   next.petLevel = normalizePetLevel(next.petLevel);
   if (typeof next.petName !== 'string') next.petName = defaultProfile.petName;
   if (typeof next.petEmoji !== 'string') next.petEmoji = defaultProfile.petEmoji;
+  const lt = next.petLineageType;
+  next.petLineageType =
+    lt == null || (typeof lt === 'string' && lt.trim() === '') ? null : String(lt).trim();
+  const pat =
+    typeof next.petAnimalType === 'string' && next.petAnimalType.trim()
+      ? next.petAnimalType.trim()
+      : 'egg';
+  next.petAnimalType = pat;
+  const le = next.petLastEvolvedAt;
+  next.petLastEvolvedAt =
+    le == null || (typeof le === 'string' && le.trim() === '') ? null : String(le).trim();
   return next;
 }
 

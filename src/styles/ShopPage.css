@@ -137,6 +137,15 @@
   display: none;
 }
 
+.shop-api-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 12px 10px;
+  font-size: 13px;
+  color: var(--text-muted, #666);
+  text-align: center;
+}
+
 /* 아이템 카드 */
 .shop-item-card {
   background: var(--bg-card);
@@ -224,6 +233,13 @@
 .shop-item-icon-emoji {
   font-size: 18px;
   line-height: 1;
+}
+
+.shop-item-icon img {
+  max-width: 26px;
+  max-height: 26px;
+  object-fit: contain;
+  image-rendering: pixelated;
 }
 
 .shop-item-info {

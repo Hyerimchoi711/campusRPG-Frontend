@@ -3,7 +3,7 @@ import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import TypewriterSpeech from '../components/TypewriterSpeech';
 import { useGameUser } from '../context/GameUserContext';
-import { fetchRpgJson, formatCoin } from '../api/rpgClient';
+import { fetchRpgJson, fetchRpgJsonAuth, formatCoin } from '../api/rpgClient';
 import '../styles/ShopPage.css';
 
 const COIN_IMG = '/images/ui/coin.png';
@@ -54,7 +54,7 @@ const ShopPage = () => {
     setPurchaseMsg(null);
     setPurchasingId(item.id);
     try {
-      const result = await fetchRpgJson('/api/inventory/purchase', {
+      const result = await fetchRpgJsonAuth('/api/inventory/purchase', {
         method: 'POST',
         body: JSON.stringify({ userId, itemId: item.id }),
       });

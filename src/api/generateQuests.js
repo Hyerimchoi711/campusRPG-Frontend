@@ -1,9 +1,10 @@
 /**
- * 로컬 quest API로 LLM 퀘스트 생성 (Vite 프록시 → server/quest-api)
- * 서버 미실행 시 네트워크 에러 — UI에서 안내
+ * LLM 퀘스트 생성. 로컬에서는 Vite 프록시 → quest-api(8787), 배포 시 VITE_QUEST_API_BASE_URL 등 설정.
  */
+import { questApiUrl } from './apiBase';
+
 export async function generateQuestsFromLLM({ major, schoolYear, university, realName }) {
-  const res = await fetch('/api/quests/generate', {
+  const res = await fetch(questApiUrl('/api/quests/generate'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

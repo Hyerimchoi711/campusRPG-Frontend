@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { SETTINGS_KEYS, getMasterVolume, getBgmEnabled, getSfxEnabled } from '../utils/settingsStorage';
 import './SettingsModal.css';
 import '../styles/RouteLoadingOverlay.css';
@@ -9,6 +10,7 @@ const LOGOUT_LOADING_FADE_MS = 320;
 
 const SettingsModal = ({ open, onClose }) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [masterVolume, setMasterVolume] = useState(80);
   const [bgmOn, setBgmOn] = useState(true);
   const [sfxOn, setSfxOn] = useState(true);
@@ -68,6 +70,7 @@ const SettingsModal = ({ open, onClose }) => {
     if (logoutLoadingPhase !== 'hidden') return;
 
     onClose();
+    logout();
     setLogoutLoadingPhase('entering');
     timersRef.current = [
       setTimeout(() => setLogoutLoadingPhase('shown'), 0),

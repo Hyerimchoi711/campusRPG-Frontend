@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import { useGameUser } from '../context/GameUserContext';
-import { fetchRpgJson } from '../api/rpgClient';
+import { fetchRpgJsonAuth } from '../api/rpgClient';
 import '../styles/InventoryPage.css';
 
 const SLOT_COUNT = 20;
@@ -33,7 +33,7 @@ const InventoryPage = () => {
   const load = useCallback(async () => {
     setError(null);
     try {
-      const data = await fetchRpgJson(`/api/inventory?userId=${userId}`);
+      const data = await fetchRpgJsonAuth(`/api/inventory?userId=${userId}`);
       setRows(Array.isArray(data) ? data : []);
     } catch {
       setRows([]);

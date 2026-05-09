@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ProfileProvider } from './context/ProfileContext';
 import { QuestProvider } from './context/QuestContext';
+import { AuthProvider } from './context/AuthContext';
 import { GameUserProvider } from './context/GameUserContext';
 import { RoleProvider } from './context/RoleContext';
 import Layout from './components/Layout';
@@ -24,31 +25,33 @@ function App() {
   return (
     <ProfileProvider>
       <QuestProvider>
-      <Router>
-        <RouteLoadingOverlay />
-        <RoleProvider>
-        <GameUserProvider>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Navigate to="/login" replace />} />
-            <Route path="home" element={<HomePage />} />
-            <Route path="stats" element={<StatsPage />} />
-            <Route path="inventory" element={<InventoryPage />} />
-            <Route path="todo" element={<TodoPage />} />
-            <Route path="quests" element={<QuestsPage />} />
-            <Route path="friends" element={<FriendsPage />} />
-            <Route path="shop" element={<ShopPage />} />
-            <Route path="announcements" element={<AnnouncementsPage />} />
-            <Route path="events" element={<EventsPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="profile/friend/:id" element={<ProfilePage />} />
-          </Route>
-        </Routes>
-        </GameUserProvider>
-        </RoleProvider>
-      </Router>
+        <AuthProvider>
+          <Router>
+            <RoleProvider>
+              <RouteLoadingOverlay />
+              <GameUserProvider>
+                <Routes>
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Navigate to="/login" replace />} />
+                    <Route path="login" element={<LoginPage />} />
+                    <Route path="signup" element={<SignupPage />} />
+                    <Route path="home" element={<HomePage />} />
+                    <Route path="stats" element={<StatsPage />} />
+                    <Route path="inventory" element={<InventoryPage />} />
+                    <Route path="todo" element={<TodoPage />} />
+                    <Route path="quests" element={<QuestsPage />} />
+                    <Route path="friends" element={<FriendsPage />} />
+                    <Route path="shop" element={<ShopPage />} />
+                    <Route path="announcements" element={<AnnouncementsPage />} />
+                    <Route path="events" element={<EventsPage />} />
+                    <Route path="profile/friend/:id" element={<ProfilePage />} />
+                    <Route path="profile" element={<ProfilePage />} />
+                  </Route>
+                </Routes>
+              </GameUserProvider>
+            </RoleProvider>
+          </Router>
+        </AuthProvider>
       </QuestProvider>
     </ProfileProvider>
   );

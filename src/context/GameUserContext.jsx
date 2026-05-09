@@ -6,14 +6,21 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { fetchRpgJson } from '../api/rpgClient';
+import { fetchRpgJsonAuth } from '../api/rpgClient';
+import { useAuth } from './AuthContext';
 
 const STORAGE_KEY = 'campusRpg_demoUserId';
 
 const GameUserContext = createContext(null);
 
 export const GameUserProvider = ({ children }) => {
-  const [userId] = useState(() => {
+  const { me } = useAuth();
+
+  const userId = useMemo(() => {
+    const id = me?.user?.id;
+    if (id != null && Number.isInteger(Number(id)) && Number(id) >= 1) {
+      return Number(id);
+    }
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       const n = Number(raw);
@@ -22,14 +29,14 @@ export const GameUserProvider = ({ children }) => {
       /* ignore */
     }
     return 1;
-  });
+  }, [me?.user?.id]);
 
   const [coins, setCoins] = useState(null);
   const [inventoryBump, setInventoryBump] = useState(0);
 
   const refreshWallet = useCallback(async () => {
     try {
-      const d = await fetchRpgJson(`/api/wallet?userId=${userId}`);
+      const d = await fetchRpgJsonAuth(`/api/wallet?userId=${userId}`);
       setCoins(typeof d.coin === 'number' ? d.coin : null);
     } catch {
       setCoins(null);

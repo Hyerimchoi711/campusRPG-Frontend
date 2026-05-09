@@ -1,18 +1,69 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    proxy: {
-      // /api 보다 먼저 매칭: 백엔드 헬스 (quest-api 꺼져 있어도 동작)
-      '/api/health': { target: 'http://localhost:5000', changeOrigin: true },
-      // MySQL 게임 API (backend/server.js 기본 5000)
-      '/api/wallet': { target: 'http://localhost:5000', changeOrigin: true },
-      '/api/items': { target: 'http://localhost:5000', changeOrigin: true },
-      '/api/inventory': { target: 'http://localhost:5000', changeOrigin: true },
-      '/api': { target: 'http://localhost:8787', changeOrigin: true },
+// 개발 시: Vite만 브라우저에 쓰고 아래 경로는 프록시됩니다.
+// - /api/quests → LLM 퀘스트 서버 (VITE_DEV_QUEST_API_URL, 기본 8787)
+// - 그 외 게임 API → 메인 백엔드 (VITE_DEV_BACKEND_URL, 미설정 시 기본 5000 — campusRPG backend/server.js)
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const backendTarget =
+    env.VITE_DEV_BACKEND_URL || 'http://127.0.0.1:5000'
+  const questTarget =
+    env.VITE_DEV_QUEST_API_URL || 'http://127.0.0.1:8787'
+
+  return {
+    plugins: [react()],
+    server: {
+      proxy: {
+        '/api/quests': {
+          target: questTarget,
+          changeOrigin: true,
+        },
+        '/api/auth': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/me': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/health': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/wallet': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/items': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/inventory': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/friends': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/users': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/announcements': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api/events': {
+          target: backendTarget,
+          changeOrigin: true,
+        },
+        '/api': {
+          target: questTarget,
+          changeOrigin: true,
+        },
+      },
     },
-  },
+  }
 })
