@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Chart as ChartJS,
@@ -16,54 +16,215 @@ import { DEFAULT_EGG_PET_NAME, normalizePet } from '../models/pet';
 import '../styles/StatsPage.css';
 import './StatsModal.css';
 
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
+const TAU = Math.PI * 2;
 
-/** 건강 · 사교 · 성실 · 집중 · 창의 — 레이더 꼭짓점 순서와 동일 (선명 RGB) */
-const RADAR_AXIS_COLORS = {
-  stroke: ['#059669', '#db2777', '#ca8a04', '#0284c7', '#ea580c'],
-  point: ['#10b981', '#f472b6', '#fcd34d', '#38bdf8', '#fb923c'],
-  /** 축 글자 — 리스트·레이더 동일 톤(선명 RGB) */
-  label: ['#059669', '#db2777', '#ca8a04', '#0284c7', '#ea580c'],
-  /** 오각형 내부(원뿔 그라데이션 구간별) — 첫 축 위쪽 정렬 시 -90° 시작 */
-  fill: ['rgba(16,185,129,0.78)', 'rgba(244,114,182,0.74)', 'rgba(250,204,21,0.76)', 'rgba(56,189,248,0.74)', 'rgba(251,146,60,0.76)'],
+/** 건강·사교·성실·집중·창의 — 레이더 꼭짓점·라벨·글로우 동일 순서 */
+const RADAR_AXIS_PALETTE = [
+  {
+    point: '#5eead4',
+    pointBorder: '#0d9488',
+    pointHover: '#99f6e4',
+    glowCore: 'rgba(45, 212, 191, 0.55)',
+    glowEdge: 'rgba(45, 212, 191, 0.08)',
+    label: '#0f766e',
+    labelStroke: 'rgba(255, 252, 248, 0.92)',
+    twinkleStroke: 'rgba(20, 184, 166, 0.85)',
+    twinkleGlow: 'rgba(94, 234, 212, 0.75)',
+    twinkleFill: '#134e4a',
+    twinkleSheen: 'rgba(204, 251, 241, 0.55)',
+  },
+  {
+    point: '#fbcfe8',
+    pointBorder: '#be185d',
+    pointHover: '#fce7f3',
+    glowCore: 'rgba(244, 114, 182, 0.52)',
+    glowEdge: 'rgba(244, 114, 182, 0.1)',
+    label: '#9d174d',
+    labelStroke: 'rgba(255, 252, 248, 0.92)',
+    twinkleStroke: 'rgba(236, 72, 153, 0.85)',
+    twinkleGlow: 'rgba(251, 207, 232, 0.8)',
+    twinkleFill: '#831843',
+    twinkleSheen: 'rgba(252, 231, 243, 0.55)',
+  },
+  {
+    point: '#fde047',
+    pointBorder: '#b45309',
+    pointHover: '#fef08a',
+    glowCore: 'rgba(250, 204, 21, 0.5)',
+    glowEdge: 'rgba(250, 204, 21, 0.1)',
+    label: '#92400e',
+    labelStroke: 'rgba(255, 252, 248, 0.92)',
+    twinkleStroke: 'rgba(217, 119, 6, 0.88)',
+    twinkleGlow: 'rgba(253, 224, 71, 0.78)',
+    twinkleFill: '#713f12',
+    twinkleSheen: 'rgba(254, 249, 195, 0.55)',
+  },
+  {
+    point: '#7dd3fc',
+    pointBorder: '#0369a1',
+    pointHover: '#bae6fd',
+    glowCore: 'rgba(56, 189, 248, 0.5)',
+    glowEdge: 'rgba(56, 189, 248, 0.1)',
+    label: '#075985',
+    labelStroke: 'rgba(255, 252, 248, 0.92)',
+    twinkleStroke: 'rgba(14, 165, 233, 0.85)',
+    twinkleGlow: 'rgba(125, 211, 252, 0.78)',
+    twinkleFill: '#0c4a6e',
+    twinkleSheen: 'rgba(224, 242, 254, 0.55)',
+  },
+  {
+    point: '#fdba74',
+    pointBorder: '#c2410c',
+    pointHover: '#fed7aa',
+    glowCore: 'rgba(251, 146, 60, 0.52)',
+    glowEdge: 'rgba(251, 146, 60, 0.1)',
+    label: '#9a3412',
+    labelStroke: 'rgba(255, 252, 248, 0.92)',
+    twinkleStroke: 'rgba(234, 88, 12, 0.88)',
+    twinkleGlow: 'rgba(253, 186, 116, 0.78)',
+    twinkleFill: '#7c2d12',
+    twinkleSheen: 'rgba(255, 237, 213, 0.55)',
+  },
+];
+
+/** 레이더만: 양피지·브라운 (다각형·그리드) */
+const STATS_RADAR_THEME = {
+  polygonFill: 'rgba(255, 244, 224, 0.42)',
+  polygonStroke: 'rgba(92, 72, 52, 0.82)',
+  grid: 'rgba(101, 78, 55, 0.22)',
+  angle: 'rgba(101, 78, 55, 0.34)',
 };
 
-/**
- * 레이더 중심에 맞춘 원뿔(conic) 그라데이션으로 오각형 면 자체를 스탯별로 채움.
- * 레이더 첫 번째 값은 일반적으로 12시 방향.
- */
-function radarPolygonFillStyle(chart) {
-  const ctx = chart?.ctx;
-  const scale = chart?.scales?.r;
-  if (!ctx || !scale || scale.xCenter == null || scale.yCenter == null) {
-    return 'rgba(16,185,129,0.62)';
-  }
-  const cx = scale.xCenter;
-  const cy = scale.yCenter;
-  const n = RADAR_AXIS_COLORS.fill.length;
-  const fills = RADAR_AXIS_COLORS.fill;
-
-  if (typeof ctx.createConicGradient !== 'function') {
-    const r = typeof scale.drawingArea === 'number' && scale.drawingArea > 0 ? scale.drawingArea : 80;
-    const rg = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    rg.addColorStop(0, 'rgba(56,189,248,0.65)');
-    rg.addColorStop(0.85, fills[Math.floor(n / 2)]);
-    rg.addColorStop(1, fills[n - 1]);
-    return rg;
-  }
-
-  const g = ctx.createConicGradient(-Math.PI / 2, cx, cy);
-  for (let i = 0; i < n; i++) {
-    const t0 = i / n;
-    const t1 = (i + 1) / n - 1e-5;
-    g.addColorStop(t0, fills[i]);
-    if (t1 > t0) {
-      g.addColorStop(Math.max(t0, t1), fills[i]);
-    }
-  }
-  g.addColorStop(1, fills[0]);
-  return g;
+/** Canvas 라벨: 전역과 동일 (--body-font, 캔버스는 var() 전개 필요) */
+function getRadarCanvasFontString() {
+  if (typeof document === 'undefined') return "700 14px 'Jua', sans-serif";
+  let raw = getComputedStyle(document.documentElement).getPropertyValue('--body-font');
+  raw = raw.trim();
+  if (!raw) raw = "'Jua', sans-serif";
+  return `700 14px ${raw}`;
 }
+
+function isStatsRadarGlowEnabled(chart) {
+  return Boolean(chart.options?.plugins?.statsRadarMonoGlow ?? chart.config?.options?.plugins?.statsRadarMonoGlow);
+}
+
+/** 레이더 축 i, 값 v일 때 꼭짓점 좌표 (Chart.js 기본 startAngle -90°와 동일) */
+function radarAxisPoint(scale, index, value) {
+  const chart = scale.chart;
+  const n = chart.data.labels.length || 5;
+  const start = typeof scale.options.startAngle === 'number' ? scale.options.startAngle : -Math.PI / 2;
+  const angle = start + (TAU * index) / n;
+  const max = scale.max > 0 ? scale.max : 100;
+  const r = (Number(value) / max) * scale.drawingArea;
+  return {
+    x: scale.xCenter + Math.cos(angle) * r,
+    y: scale.yCenter + Math.sin(angle) * r,
+  };
+}
+
+/** 축 바깥쪽 라벨 위치 */
+function radarLabelPosition(scale, index, padding = 18) {
+  const chart = scale.chart;
+  const n = chart.data.labels.length || 5;
+  const start = typeof scale.options.startAngle === 'number' ? scale.options.startAngle : -Math.PI / 2;
+  const angle = start + (TAU * index) / n;
+  const r = scale.drawingArea + padding;
+  return {
+    x: scale.xCenter + Math.cos(angle) * r,
+    y: scale.yCenter + Math.sin(angle) * r,
+  };
+}
+
+/**
+ * 단색 발광 레이더 + 최고 스탯 라벨 반짝임 (Canvas).
+ * 기본 pointLabels는 끄고 여기서만 그림.
+ */
+const statsRadarMonoGlowPlugin = {
+  id: 'statsRadarMonoGlow',
+  order: 1000,
+  beforeDatasetsDraw(chart) {
+    if (!isStatsRadarGlowEnabled(chart)) return;
+    const scale = chart.scales.r;
+    const ctx = chart.ctx;
+    if (!scale || !chart.data.datasets[0]) return;
+
+    const raw = chart.data.datasets[0].data.map(Number);
+    ctx.save();
+    raw.forEach((value, i) => {
+      const pos = radarAxisPoint(scale, i, value);
+      const pal = RADAR_AXIS_PALETTE[i % RADAR_AXIS_PALETTE.length];
+      const g = ctx.createRadialGradient(pos.x, pos.y, 0, pos.x, pos.y, 24);
+      g.addColorStop(0, pal.glowCore);
+      g.addColorStop(0.5, pal.glowEdge);
+      g.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 24, 0, TAU);
+      ctx.fill();
+
+      ctx.shadowColor = pal.glowCore;
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 8, 0, TAU);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+    ctx.restore();
+  },
+  afterDraw(chart) {
+    if (!isStatsRadarGlowEnabled(chart)) return;
+    const scale = chart.scales.r;
+    const ctx = chart.ctx;
+    const labels = chart.data.labels;
+    if (!scale || !labels?.length || !chart.data.datasets[0]) return;
+
+    const raw = chart.data.datasets[0].data.map(Number);
+    const maxVal = Math.max(...raw);
+    const t = performance.now() / 1000;
+
+    ctx.save();
+    ctx.font = getRadarCanvasFontString();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 1;
+
+    for (let i = 0; i < labels.length; i++) {
+      let { x, y } = radarLabelPosition(scale, i, 16);
+      /* 12시 건강 라벨 클립 방지 */
+      if (i === 0) {
+        y += 12;
+      }
+      const label = String(labels[i]);
+      const isMax = maxVal > 0 && Number(raw[i]) === maxVal;
+      /* 느린 흰색 반짝 (약 6~7초 주기) */
+      const slow = 0.5 + 0.5 * Math.sin(t * 0.95 + i * 0.45);
+      const gleam = 0.06 + (isMax ? 0.34 : 0.24) * slow;
+
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 1;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.strokeText(label, x, y);
+      ctx.fillStyle = '#070707';
+      ctx.fillText(label, x, y);
+      ctx.fillStyle = `rgba(255, 255, 255, ${gleam})`;
+      ctx.fillText(label, x, y);
+    }
+    ctx.restore();
+  },
+};
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+  statsRadarMonoGlowPlugin
+);
 
 const MAX_FATIGUE = 70;
 
@@ -107,57 +268,98 @@ function StatsModalContent() {
     return () => window.clearTimeout(t);
   }, [stats, fatigue]);
 
-  const chartData = {
-    labels: ['건강', '사교', '성실', '집중', '창의'],
-    datasets: [
-      {
-        label: '내 스탯',
-        data: [stats.health, stats.social, stats.diligent, stats.focus, stats.creative],
-        backgroundColor: (chartCtx) => radarPolygonFillStyle(chartCtx.chart),
-        borderWidth: 0,
-        pointBackgroundColor: RADAR_AXIS_COLORS.point,
-        pointBorderColor: '#ffffff',
-        pointBorderWidth: 2,
-        pointHoverBackgroundColor: '#ffffff',
-        pointHoverBorderWidth: 2,
-        pointHoverBorderColor: RADAR_AXIS_COLORS.point,
-        pointRadius: 5,
-        pointHoverRadius: 6,
-        /* 오각형 각 변마다 다른 색 (Chart.js 4 line segment) */
-        segment: {
-          borderColor: (ctx) => RADAR_AXIS_COLORS.stroke[ctx.p0DataIndex] ?? RADAR_AXIS_COLORS.stroke[0],
-          borderWidth: 3,
-        },
-      },
-    ],
-  };
+  const chartRef = useRef(null);
+  /** 초기 차트 애니메이션 완료 후에만 shimmer용 update('none') */
+  const radarAnimDoneRef = useRef(false);
 
-  const chartOptions = {
-    scales: {
-      r: {
-        angleLines: { display: true, color: 'rgba(0,0,0,0.12)' },
-        grid: { color: 'rgba(0,0,0,0.09)' },
-        suggestedMin: 0,
-        suggestedMax: 100,
-        ticks: { display: false, stepSize: 25 },
-        pointLabels: {
-          font: { size: 11, family: 'var(--pixel-font), monospace', weight: '700' },
-          backdropColor: 'rgba(255,255,255,0.72)',
-          backdropPadding: 4,
-          borderRadius: 6,
-          color: (ctx) => RADAR_AXIS_COLORS.label[ctx?.index ?? 0] ?? RADAR_AXIS_COLORS.label[0],
+  useEffect(() => {
+    radarAnimDoneRef.current = false;
+    const fallback = window.setTimeout(() => {
+      radarAnimDoneRef.current = true;
+    }, 1200);
+    return () => window.clearTimeout(fallback);
+  }, [stats.health, stats.social, stats.diligent, stats.focus, stats.creative]);
+
+  useEffect(() => {
+    let raf;
+    const loop = () => {
+      if (!document.hidden && radarAnimDoneRef.current) {
+        chartRef.current?.update('none');
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const chartData = useMemo(
+    () => ({
+      labels: ['건강', '사교', '성실', '집중', '창의'],
+      datasets: [
+        {
+          label: '내 스탯',
+          data: [stats.health, stats.social, stats.diligent, stats.focus, stats.creative],
+          fill: true,
+          clip: false,
+          backgroundColor: STATS_RADAR_THEME.polygonFill,
+          borderColor: STATS_RADAR_THEME.polygonStroke,
+          borderWidth: 2,
+          pointBackgroundColor: RADAR_AXIS_PALETTE.map((p) => p.point),
+          pointBorderColor: RADAR_AXIS_PALETTE.map((p) => p.pointBorder),
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 6,
+          pointHoverBackgroundColor: RADAR_AXIS_PALETTE.map((p) => p.pointHover),
+          pointHoverBorderColor: RADAR_AXIS_PALETTE.map((p) => p.pointBorder),
+        },
+      ],
+    }),
+    [stats.health, stats.social, stats.diligent, stats.focus, stats.creative]
+  );
+
+  const chartOptions = useMemo(
+    () => ({
+      animation: {
+        duration: 820,
+        easing: 'easeOutQuart',
+        onComplete: () => {
+          radarAnimDoneRef.current = true;
         },
       },
-    },
-    elements: {
-      line: {
-        /* segment가 변 색을 담당 — 기본 선은 안 보이게 */
-        borderWidth: 0,
+      layout: {
+        padding: { top: 34, bottom: 24, left: 14, right: 14 },
       },
-    },
-    plugins: { legend: { display: false } },
-    maintainAspectRatio: false,
-  };
+      scales: {
+        r: {
+          startAngle: -Math.PI / 2,
+          angleLines: {
+            display: true,
+            color: STATS_RADAR_THEME.angle,
+            lineWidth: 1,
+          },
+          grid: {
+            color: STATS_RADAR_THEME.grid,
+            lineWidth: 1,
+          },
+          suggestedMin: 0,
+          suggestedMax: 100,
+          ticks: { display: false, stepSize: 25 },
+          pointLabels: {
+            display: false,
+            backdropColor: 'transparent',
+          },
+        },
+      },
+      elements: {
+        line: {
+          borderJoinStyle: 'round',
+        },
+      },
+      plugins: { legend: { display: false }, statsRadarMonoGlow: true },
+      maintainAspectRatio: false,
+    }),
+    []
+  );
 
   const petAnimalType = pet?.animalType ?? 'egg';
   const petNameLabel = pet?.name?.trim() || DEFAULT_EGG_PET_NAME;
@@ -178,7 +380,7 @@ function StatsModalContent() {
 
       <div className="stats-modal-main-col">
       <div className="stats-modal-chart">
-        <Radar data={chartData} options={chartOptions} />
+        <Radar ref={chartRef} data={chartData} options={chartOptions} />
       </div>
 
       <div className="stat-detail-list stats-modal-detail-list">

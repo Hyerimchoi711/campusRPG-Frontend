@@ -95,7 +95,7 @@
 .stat-bar-fill.health   { background: linear-gradient(90deg, var(--mint), #88d4a0); }
 
 .stat-val {
-  font-family: var(--pixel-font);
+  font-family: var(--body-font);
   font-size: 9px;
   color: var(--text-main);
   min-width: 50px; /* Increased to fit current/max and percentage */
@@ -124,7 +124,7 @@
 }
 
 .fatigue-val {
-  font-family: var(--pixel-font);
+  font-family: var(--body-font);
   font-size: 10px;
   color: var(--text-sub);
 }
