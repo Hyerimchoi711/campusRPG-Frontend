@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import AvatarDisplay from '../components/AvatarDisplay';
 import { useProfile } from '../context/ProfileContext';
 import {
   acceptFriendRequest,
@@ -231,7 +232,11 @@ const FriendsPage = () => {
         <section className="friends-self-card" aria-label="내 프로필 미리보기">
           <button type="button" className="friends-self-card-inner" onClick={() => navigate('/profile')}>
             <div className="friends-self-avatar" aria-hidden>
-              {profile.avatar || '🥚'}
+              <AvatarDisplay
+                value={profile.avatar}
+                className="friends-self-avatar-emoji"
+                imgClassName="friends-self-avatar-img"
+              />
             </div>
             <div className="friends-self-text">
               <span className="friends-self-label">내 프로필</span>
@@ -304,7 +309,13 @@ const FriendsPage = () => {
                         {friend.intro?.trim() ? friend.intro : '한줄 소개가 없습니다.'}
                       </p>
                     </div>
-                    <div className={`fc-avatar ${manageMode ? 'fc-avatar--dim' : ''}`}>{friend.avatar || '🥚'}</div>
+                    <div className={`fc-avatar ${manageMode ? 'fc-avatar--dim' : ''}`} aria-hidden>
+                      <AvatarDisplay
+                        value={friend.avatar}
+                        className="fc-avatar-emoji"
+                        imgClassName="fc-avatar-img"
+                      />
+                    </div>
                   </button>
                   {manageMode ? (
                     <div className="friend-card-reorder">
@@ -360,7 +371,11 @@ const FriendsPage = () => {
                   {incomingRequests.map((req) => (
                     <li key={req.id} className="friends-request-item">
                       <div className="friends-request-avatar" aria-hidden>
-                        {req.avatar || '🥚'}
+                        <AvatarDisplay
+                          value={req.avatar}
+                          className="friends-request-avatar-emoji"
+                          imgClassName="friends-request-avatar-img"
+                        />
                       </div>
                       <div className="friends-request-meta">
                         <span className="friends-request-name">{req.nickname || '닉네임'}</span>

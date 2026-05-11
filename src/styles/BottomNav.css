@@ -137,6 +137,12 @@
   height: 70px;
 }
 
+/* 일정·퀘스트 — 기본 39px보다 크게 (+5px씩 두 단계) */
+.nav-item-icon-img--todo-quest {
+  width: 49px;
+  height: 49px;
+}
+
 .nav-item-icon-fallback {
   width: 32px;
   height: 32px;

@@ -1,8 +1,14 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import '../styles/Layout.css';
 
 const Layout = () => {
+  const navigate = useNavigate();
+
+  const goHome = () => {
+    navigate('/home');
+  };
+
   return (
     <>
       {/* 좌측 장식 패널 */}
@@ -116,7 +122,12 @@ const Layout = () => {
             <Outlet />
           </div>
           
-          <div className="phone-home-btn"></div>
+          <button
+            type="button"
+            className="phone-home-btn"
+            onClick={goHome}
+            aria-label="홈 화면으로 이동"
+          />
         </div>
       </main>
     </>

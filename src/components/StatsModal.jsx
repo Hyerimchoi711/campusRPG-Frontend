@@ -284,7 +284,12 @@ function StatsModalContent() {
     let raf;
     const loop = () => {
       if (!document.hidden && radarAnimDoneRef.current) {
-        chartRef.current?.update('none');
+        const chart = chartRef.current;
+        /* 호버·툴팁 표시 중에는 캔버스를 매 프레임 갱신하지 않음 — 툴팁 페이드와 겹쳐 흐릿해지는 현상 방지 */
+        const active = chart?.getActiveElements?.() ?? [];
+        if (active.length === 0) {
+          chart?.update('none');
+        }
       }
       raf = requestAnimationFrame(loop);
     };
@@ -326,6 +331,14 @@ function StatsModalContent() {
           radarAnimDoneRef.current = true;
         },
       },
+      /* 데이터 포인트 호버 시 색/크기 트랜지션 — 레이더 라벨 툴팁과 겹치면 잔상·번짐처럼 보일 수 있음 */
+      transitions: {
+        active: {
+          animation: {
+            duration: 0,
+          },
+        },
+      },
       layout: {
         padding: { top: 34, bottom: 24, left: 14, right: 14 },
       },
@@ -355,7 +368,15 @@ function StatsModalContent() {
           borderJoinStyle: 'round',
         },
       },
-      plugins: { legend: { display: false }, statsRadarMonoGlow: true },
+      plugins: {
+        legend: { display: false },
+        statsRadarMonoGlow: true,
+        tooltip: {
+          animation: {
+            duration: 0,
+          },
+        },
+      },
       maintainAspectRatio: false,
     }),
     []
