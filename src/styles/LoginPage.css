@@ -1,6 +1,7 @@
 /* 전체 화면 로그인 — 캠퍼스 RPG 타이틀 배너 + 레트로 메뉴 패널 */
 
 .login-page {
+  /* 타이틀 PNG 하단 투명 여백이 크면 %를 키워서 잘라내기 (너무 잘리면 2~3%로 줄이기) */
   --login-title-trim-bottom: 5%;
   --login-grass: #4db848;
   --login-cream: #f7f0e4;
@@ -10,32 +11,39 @@
   --login-peach: #f4b88a;
   --login-brown-text: #3d2a1c;
 
-  position: relative;
-  inset: auto;
-  z-index: 1;
+  position: fixed;
+  inset: 0;
+  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* 타이틀+로그인 덩어리를 뷰포트 정중앙에 */
   justify-content: center;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   padding-top: env(safe-area-inset-top, 0);
   padding-left: env(safe-area-inset-left, 0);
   padding-right: env(safe-area-inset-right, 0);
   padding-bottom: env(safe-area-inset-bottom, 0);
   font-family: var(--pixel-font), monospace;
   color: var(--login-brown-text);
-  background: transparent;
+  /* 캠퍼스 픽셀아트 배경 (public/images/login-campus-pixel-bg.png) */
+  background-color: #4a7a5c;
+  background-image: url('/images/login-campus-pixel-bg.png');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
 }
 
+/* 타이틀은 넓게, 로그인 패널은 가운데 고정 폭 */
 .login-page__stack {
   --login-stack-max: min(720px, 96vw);
   --login-panel-max: 480px;
+
   width: 100%;
   max-width: var(--login-stack-max);
   flex: 0 1 auto;
@@ -53,6 +61,7 @@
 }
 
 .login-page__hero {
+  /* flex:1 제거 — 히어로가 뷰포트를 잡아먹지 않음(이미지·투명 PNG 여백만큼만 높이) */
   flex: 0 0 auto;
   min-height: 0;
   width: 100%;
@@ -72,6 +81,7 @@
   margin: 0;
   object-fit: contain;
   object-position: top center;
+  /* 에셋 하단 투명·여백이 img 박스에 포함돼 간격처럼 보이는 문제 완화 */
   clip-path: inset(0 0 var(--login-title-trim-bottom) 0);
   border: none;
   border-radius: 0;
@@ -152,19 +162,9 @@
 
 .login-field__input:focus {
   border-color: var(--login-grass);
-  box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.04), 3px 3px 0 #2d6b2a;
-}
-
-.login-error {
-  margin: 0;
-  padding: 8px 10px;
-  font-size: 11px;
-  line-height: 1.35;
-  color: #8b2e1f;
-  background: rgba(196, 92, 74, 0.14);
-  border: 2px solid rgba(139, 46, 31, 0.35);
-  border-radius: 8px;
-  text-align: center;
+  box-shadow:
+    inset 0 2px 0 rgba(0, 0, 0, 0.04),
+    3px 3px 0 #2d6b2a;
 }
 
 .login-btn {
@@ -184,13 +184,17 @@
   margin-top: 8px;
   color: var(--login-wood-dark);
   background: linear-gradient(180deg, var(--login-yellow) 0%, #e8bc20 100%);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), 0 4px 0 var(--login-wood-dark);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    0 4px 0 var(--login-wood-dark);
   text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .login-btn--primary:hover {
   transform: translateY(1px);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.45), 0 3px 0 var(--login-wood-dark);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    0 3px 0 var(--login-wood-dark);
 }
 
 .login-btn--primary:active {
@@ -202,14 +206,18 @@
   margin-top: 12px;
   color: var(--login-wood);
   background: linear-gradient(180deg, #fff 0%, #f0e8dc 100%);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.8), 0 3px 0 var(--login-wood-dark);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.8),
+    0 3px 0 var(--login-wood-dark);
 }
 
 .login-btn--secondary:hover {
   border-color: var(--login-peach);
   color: var(--login-wood-dark);
   transform: translateY(1px);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.8), 0 2px 0 var(--login-wood-dark);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.8),
+    0 2px 0 var(--login-wood-dark);
 }
 
 .login-btn--secondary:active {
@@ -217,3 +225,19 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
+.login-btn--dev {
+  margin-top: 10px;
+  font-size: 10px;
+  opacity: 0.92;
+  color: rgba(61, 42, 28, 0.75);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(235, 228, 216, 0.95) 100%);
+  border-style: dashed;
+}
+
+.login-dev-hint {
+  margin: 10px 0 0;
+  font-size: 9px;
+  line-height: 1.35;
+  color: rgba(61, 42, 28, 0.55);
+  text-align: center;
+}

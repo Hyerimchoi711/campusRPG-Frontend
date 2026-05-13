@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #c79a6a;
+  background: #c79a6a; /* 밝은 갈색 */
   color: #ffffff;
   opacity: 0;
   transition: opacity 320ms ease;
@@ -13,6 +13,10 @@
 
 .route-loading-overlay--shown {
   opacity: 1;
+}
+
+.route-loading-overlay--entering {
+  opacity: 0;
 }
 
 .route-loading-overlay--fading {

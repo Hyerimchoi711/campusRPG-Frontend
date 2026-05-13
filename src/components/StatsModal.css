@@ -1,0 +1,355 @@
+/* 스탯 모달: 따뜻한 베이지·갈색 팔레트, 주요 스탯 고채도 / 보조 텍스트 저채도 */
+
+.stats-modal-root {
+  --stats-parchment: rgba(255, 251, 242, 0.94);
+  --stats-parchment-deep: rgba(236, 224, 206, 0.92);
+  --stats-ink: #3a3229;
+  --stats-ink-muted: #7a7166;
+  --stats-wood-border: rgba(101, 78, 55, 0.38);
+  --stats-bar-track: rgba(120, 99, 76, 0.16);
+  --stats-bar-track-border: rgba(74, 58, 42, 0.22);
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: none;
+}
+
+.stats-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  background: rgba(48, 36, 28, 0.52);
+  backdrop-filter: blur(5px);
+}
+
+.stats-modal-panel {
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+  width: 100%;
+  max-width: min(480px, calc(100vw - 28px));
+  max-height: min(92vh, 760px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(168deg, var(--stats-parchment) 0%, var(--stats-parchment-deep) 100%);
+  border: 1px solid var(--stats-wood-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 10px 36px rgba(42, 30, 22, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.stats-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(101, 78, 55, 0.18);
+  background: linear-gradient(180deg, rgba(255, 252, 246, 0.75), rgba(245, 235, 218, 0.45));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.stats-modal-title {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--stats-ink);
+}
+
+.stats-modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  color: #5c5349;
+  background: rgba(101, 78, 55, 0.08);
+  border: 1px solid rgba(101, 78, 55, 0.2);
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+
+.stats-modal-close:hover {
+  background: rgba(101, 78, 55, 0.14);
+}
+
+.stats-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 좌측 펫 · 우측 스탯 */
+.stats-modal-body-split {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 10px;
+  min-height: 0;
+  padding: 0 10px 10px;
+  overflow: hidden;
+}
+
+.stats-modal-pet {
+  flex: 0 0 104px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 4px;
+  justify-content: flex-start;
+}
+
+.stats-modal-pet-frame {
+  width: 88px;
+  height: 88px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(255, 252, 246, 0.9), rgba(228, 214, 194, 0.55));
+  border: 1px solid rgba(101, 78, 55, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.stats-modal-pet-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.stats-modal-pet-emoji {
+  font-size: 56px;
+  line-height: 1;
+  display: block;
+}
+
+.stats-modal-pet-name {
+  font-size: 10px;
+  color: var(--stats-ink-muted);
+  text-align: center;
+  max-width: 100px;
+  word-break: break-word;
+}
+
+.stats-modal-main-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stats-modal-chart {
+  width: 100%;
+  min-height: 260px;
+  height: 260px;
+  flex-shrink: 0;
+  padding: 12px 10px 14px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(ellipse 92% 82% at 50% 42%, rgba(255, 252, 246, 0.98) 0%, rgba(238, 224, 204, 0.94) 52%, rgba(218, 198, 172, 0.9) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(101, 78, 55, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 0 28px rgba(255, 248, 235, 0.35),
+    0 2px 10px rgba(62, 48, 38, 0.1);
+}
+
+@media (max-width: 360px) {
+  .stats-modal-body-split {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stats-modal-pet {
+    flex-direction: row;
+    flex: 0 0 auto;
+    justify-content: center;
+    gap: 12px;
+    padding: 8px 4px 4px;
+  }
+
+  .stats-modal-pet-name {
+    max-width: none;
+    text-align: left;
+    align-self: center;
+  }
+}
+
+/* 목록·진행 바: 동일 트랙/테두리 체계, 스탯명·바만 고채도 */
+.stats-modal-detail-list.stat-detail-list {
+  padding-bottom: 8px;
+}
+
+.stats-modal-detail-list .stat-row {
+  background: rgba(255, 252, 246, 0.55);
+  border-width: 2px;
+  border-style: solid;
+  border-color: rgba(101, 78, 55, 0.12);
+}
+
+.stats-modal-detail-list .stat-bar-track {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--stats-bar-track);
+  border: 2px solid var(--stats-bar-track-border);
+}
+
+.stats-modal-detail-list .stat-name {
+  font-weight: 800;
+}
+
+/* 아이콘: 라벨 톤과 맞는 연한 틴트 배경 */
+.stats-modal-detail-list .stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  line-height: 1;
+  border-radius: 8px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-health .stat-icon {
+  background: rgba(4, 120, 87, 0.12);
+  border: 1px solid rgba(4, 120, 87, 0.22);
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-social .stat-icon {
+  background: rgba(190, 24, 93, 0.11);
+  border: 1px solid rgba(190, 24, 93, 0.22);
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-diligent .stat-icon {
+  background: rgba(180, 83, 9, 0.12);
+  border: 1px solid rgba(180, 83, 9, 0.24);
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-focus .stat-icon {
+  background: rgba(2, 132, 199, 0.11);
+  border: 1px solid rgba(2, 132, 199, 0.22);
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-creative .stat-icon {
+  background: rgba(194, 65, 12, 0.11);
+  border: 1px solid rgba(194, 65, 12, 0.22);
+}
+
+/* 스탯명·강조선만 스탯색(주요) — 수치는 아래 공통 저채도 */
+.stats-modal-detail-list .stat-row.stat-variant-health {
+  border-left: 4px solid #059669;
+}
+.stats-modal-detail-list .stat-row.stat-variant-health .stat-name {
+  color: #047857;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-social {
+  border-left: 4px solid #db2777;
+}
+.stats-modal-detail-list .stat-row.stat-variant-social .stat-name {
+  color: #be185d;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-diligent {
+  border-left: 4px solid #d97706;
+}
+.stats-modal-detail-list .stat-row.stat-variant-diligent .stat-name {
+  color: #b45309;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-focus {
+  border-left: 4px solid #0284c7;
+}
+.stats-modal-detail-list .stat-row.stat-variant-focus .stat-name {
+  color: #0369a1;
+}
+
+.stats-modal-detail-list .stat-row.stat-variant-creative {
+  border-left: 4px solid #ea580c;
+}
+.stats-modal-detail-list .stat-row.stat-variant-creative .stat-name {
+  color: #c2410c;
+}
+
+/* 보조: 현재/목표·% */
+.stats-modal-detail-list .stat-val {
+  color: var(--stats-ink-muted);
+  font-weight: 600;
+}
+
+/* 스탯 바: 동일 90deg 그라데이션 언어 + 고채도 끝색 */
+.stats-modal-detail-list .stat-bar-fill.health {
+  background: linear-gradient(90deg, #059669, #34d399);
+}
+.stats-modal-detail-list .stat-bar-fill.social {
+  background: linear-gradient(90deg, #db2777, #f472b6);
+}
+.stats-modal-detail-list .stat-bar-fill.diligent {
+  background: linear-gradient(90deg, #ca8a04, #fde047);
+}
+.stats-modal-detail-list .stat-bar-fill.focus {
+  background: linear-gradient(90deg, #0284c7, #38bdf8);
+}
+.stats-modal-detail-list .stat-bar-fill.creative {
+  background: linear-gradient(90deg, #ea580c, #fdba74);
+}
+
+.stats-modal-fatigue.fatigue-section {
+  margin-top: auto;
+  background: linear-gradient(180deg, rgba(255, 252, 246, 0.4), rgba(237, 224, 206, 0.35));
+  border-top: 1px solid rgba(101, 78, 55, 0.16);
+}
+
+.stats-modal-fatigue .fatigue-title {
+  color: var(--stats-ink-muted);
+  font-weight: 800;
+}
+
+.stats-modal-fatigue .fatigue-val {
+  color: #9f1239;
+  font-weight: 800;
+}
+
+.stats-modal-fatigue .fatigue-bar-track {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--stats-bar-track);
+  border: 2px solid var(--stats-bar-track-border);
+}
+
+.stats-modal-fatigue .fatigue-bar-fill {
+  border-radius: 3px;
+  background: linear-gradient(90deg, #be123c, #fb7185);
+}

@@ -12,6 +12,7 @@ import {
   getPetSpeciesLabel,
   isPetEgg,
 } from '../models/pet';
+import { useStatsModal } from '../context/StatsModalContext';
 import '../styles/HomePage.css';
 
 function petSubtitle(pet) {
@@ -24,6 +25,7 @@ function petSubtitle(pet) {
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const { openStats } = useStatsModal();
   const { me, loading, refreshMe } = useAuth();
 
   useEffect(() => {
@@ -67,7 +69,7 @@ const HomePage = () => {
             <button
               type="button"
               className="home-hud-btn"
-              onClick={() => navigate('/stats')}
+              onClick={() => openStats()}
               aria-label="스탯 보기"
             >
               <img

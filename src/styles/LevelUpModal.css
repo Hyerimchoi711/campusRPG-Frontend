@@ -1,0 +1,264 @@
+/* Cozy wood / parchment — 폰 화면(#phoneScreen) 안에만 표시 */
+
+.levelup-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  animation: levelupModalFadeIn 0.28s ease-out;
+}
+
+@keyframes levelupModalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.levelup-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  background: rgba(42, 28, 18, 0.78);
+  backdrop-filter: blur(5px);
+}
+
+.levelup-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 300px;
+  padding: 20px 18px 18px;
+  text-align: center;
+  background: linear-gradient(165deg, #fffdf8 0%, var(--bg-card2, #efe6d8) 48%, var(--bg-card, #e5d9ca) 100%);
+  border: 4px solid var(--bg-wood, #6b4423);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 250, 242, 0.75),
+    inset 0 -2px 0 rgba(61, 38, 21, 0.06),
+    4px 5px 0 var(--bg-wood-dark, #3d2615),
+    0 12px 40px rgba(42, 26, 16, 0.35);
+  animation: levelupPanelPop 0.45s cubic-bezier(0.34, 1.45, 0.64, 1);
+}
+
+@keyframes levelupPanelPop {
+  0% {
+    transform: scale(0.82) translateY(12px);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.levelup-modal__ribbon {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(200px, 70%);
+  height: 28px;
+  background: linear-gradient(180deg, var(--gold2, #f0d060) 0%, var(--gold, #e8b84a) 45%, #c9a43c 100%);
+  border: 2px solid var(--bg-wood-dark, #3d2615);
+  border-radius: 0 0 10px 10px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 3px 0 rgba(45, 30, 18, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.levelup-modal__ribbon-inner {
+  font-size: 11px;
+  color: var(--bg-wood-dark, #3d2615);
+  text-shadow: 0 1px 0 rgba(255, 248, 230, 0.5);
+}
+
+.levelup-modal__title {
+  margin: 18px 0 6px;
+  font-family: var(--pixel-font), monospace;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+  color: var(--accent, #8b6914);
+  text-shadow: 1px 1px 0 rgba(255, 248, 240, 0.9);
+}
+
+.levelup-modal__sub {
+  margin: 0 0 14px;
+  font-size: 9px;
+  color: var(--text-sub, #5c4838);
+  line-height: 1.4;
+}
+
+.levelup-modal__lvl-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.levelup-modal__lvl-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  padding: 6px 12px;
+  font-family: var(--pixel-font), monospace;
+  font-size: 11px;
+  color: var(--text-main, #2a1a10);
+  background: rgba(255, 248, 240, 0.75);
+  border: 2px solid var(--border2, rgba(74, 48, 28, 0.22));
+  border-radius: 999px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.levelup-modal__lvl-pill--next {
+  border-color: var(--accent2, #c9a43c);
+  background: linear-gradient(180deg, rgba(255, 250, 235, 0.95) 0%, rgba(245, 220, 160, 0.35) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 0 0 1px rgba(232, 184, 74, 0.35);
+}
+
+.levelup-modal__lvl-num {
+  font-size: 18px;
+  font-weight: normal;
+  color: var(--text-main, #2a1a10);
+}
+
+.levelup-modal__lvl-pill--next .levelup-modal__lvl-num {
+  color: var(--accent, #8b6914);
+}
+
+.levelup-modal__arrow {
+  font-family: var(--pixel-font), monospace;
+  font-size: 14px;
+  color: var(--gold, #e8b84a);
+  text-shadow: 1px 1px 0 var(--bg-wood-dark, #3d2615);
+  opacity: 0.95;
+}
+
+.levelup-modal__mascot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 4px 0 14px;
+  min-height: 48px;
+}
+
+.levelup-modal__emoji {
+  font-size: 42px;
+  line-height: 1;
+  filter: drop-shadow(2px 2px 0 rgba(107, 68, 35, 0.45));
+  animation: levelupMascotHop 1.1s ease-in-out infinite;
+}
+
+@keyframes levelupMascotHop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.levelup-modal__spark {
+  font-size: 16px;
+  opacity: 0.85;
+  animation: levelupSpark 1.2s ease-in-out infinite;
+}
+
+.levelup-modal__spark:last-child {
+  animation-delay: 0.15s;
+}
+
+@keyframes levelupSpark {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.levelup-modal__rewards {
+  margin-bottom: 16px;
+  padding: 10px 8px;
+  background: rgba(107, 68, 35, 0.06);
+  border-radius: 12px;
+  border: 2px dashed var(--border2, rgba(74, 48, 28, 0.22));
+}
+
+.levelup-modal__rewards-label {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: var(--text-dim, #8a7868);
+  margin-bottom: 8px;
+}
+
+.levelup-modal__reward-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+.levelup-modal__reward-chip {
+  font-family: var(--pixel-font), monospace;
+  font-size: 9px;
+  padding: 5px 10px;
+  color: var(--text-main, #2a1a10);
+  background: linear-gradient(165deg, #faf6f0 0%, #e8ddd0 100%);
+  border: 2px solid var(--bg-wood-dark, #3d2615);
+  border-radius: 8px;
+  box-shadow: 1px 2px 0 rgba(45, 30, 18, 0.18);
+}
+
+.levelup-modal__btn {
+  width: 100%;
+  margin: 0;
+  padding: 12px 16px;
+  font-family: var(--pixel-font), monospace;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  color: var(--bg-wood-dark, #3d2615);
+  background: linear-gradient(180deg, var(--gold2, #f0d060) 0%, var(--gold, #e8b84a) 55%, #d4a032 100%);
+  border: 3px solid var(--bg-wood-dark, #3d2615);
+  border-radius: 12px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    2px 3px 0 var(--bg-wood-dark, #3d2615);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.levelup-modal__btn:hover {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    1px 2px 0 var(--bg-wood-dark, #3d2615);
+}
+
+.levelup-modal__btn:active {
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.12);
+}
