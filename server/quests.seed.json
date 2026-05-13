@@ -1,0 +1,23 @@
+[
+  { "id": 101, "title": "기상 챌린지", "type": "DAILY", "reward_exp": 40, "reward_stat_type": "health", "reward_stat_amount": 2 },
+  { "id": 102, "title": "캠퍼스 러닝 20분", "type": "DAILY", "reward_exp": 55, "reward_stat_type": "health", "reward_stat_amount": 3 },
+  { "id": 103, "title": "출석 체크", "type": "DAILY", "reward_exp": 50, "reward_stat_type": "diligence", "reward_stat_amount": 2 },
+  { "id": 104, "title": "과제 우선 제출", "type": "DAILY", "reward_exp": 70, "reward_stat_type": "diligence", "reward_stat_amount": 3 },
+  { "id": 105, "title": "도서관 집중 1시간", "type": "DAILY", "reward_exp": 60, "reward_stat_type": "focus", "reward_stat_amount": 2 },
+  { "id": 106, "title": "랩실 프로젝트 정리", "type": "DAILY", "reward_exp": 75, "reward_stat_type": "focus", "reward_stat_amount": 3 },
+  { "id": 107, "title": "동아리 모임 참여", "type": "DAILY", "reward_exp": 45, "reward_stat_type": "social", "reward_stat_amount": 2 },
+  { "id": 108, "title": "스터디 카페 소통", "type": "DAILY", "reward_exp": 50, "reward_stat_type": "social", "reward_stat_amount": 3 },
+  { "id": 109, "title": "아이디어 스케치", "type": "DAILY", "reward_exp": 55, "reward_stat_type": "creativity", "reward_stat_amount": 2 },
+  { "id": 110, "title": "팀 브레인스토밍", "type": "DAILY", "reward_exp": 65, "reward_stat_type": "creativity", "reward_stat_amount": 3 },
+
+  { "id": 201, "title": "주말 등산", "type": "WEEKLY", "reward_exp": 200, "reward_stat_type": "health", "reward_stat_amount": 8 },
+  { "id": 202, "title": "헬스 3회", "type": "WEEKLY", "reward_exp": 220, "reward_stat_type": "health", "reward_stat_amount": 10 },
+  { "id": 203, "title": "중간고사 범위 정리", "type": "WEEKLY", "reward_exp": 280, "reward_stat_type": "diligence", "reward_stat_amount": 10 },
+  { "id": 204, "title": "논문 요약 5페이지", "type": "WEEKLY", "reward_exp": 300, "reward_stat_type": "diligence", "reward_stat_amount": 12 },
+  { "id": 205, "title": "심화 과제 완수", "type": "WEEKLY", "reward_exp": 260, "reward_stat_type": "focus", "reward_stat_amount": 10 },
+  { "id": 206, "title": "코딩 테스트 2회", "type": "WEEKLY", "reward_exp": 290, "reward_stat_type": "focus", "reward_stat_amount": 11 },
+  { "id": 207, "title": "멘토링 미팅", "type": "WEEKLY", "reward_exp": 240, "reward_stat_type": "social", "reward_stat_amount": 9 },
+  { "id": 208, "title": "네트워킹 행사", "type": "WEEKLY", "reward_exp": 250, "reward_stat_type": "social", "reward_stat_amount": 10 },
+  { "id": 209, "title": "UI 시안 제작", "type": "WEEKLY", "reward_exp": 270, "reward_stat_type": "creativity", "reward_stat_amount": 10 },
+  { "id": 210, "title": "공모전 아이디어 제출", "type": "WEEKLY", "reward_exp": 310, "reward_stat_type": "creativity", "reward_stat_amount": 12 }
+]

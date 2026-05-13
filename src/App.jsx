@@ -25,8 +25,8 @@ import './index.css';
 function App() {
   return (
     <ProfileProvider>
-      <QuestProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <QuestProvider>
           <Router>
             <RoleProvider>
               <RouteLoadingOverlay />
@@ -58,8 +58,8 @@ function App() {
               </GameUserProvider>
             </RoleProvider>
           </Router>
-        </AuthProvider>
-      </QuestProvider>
+        </QuestProvider>
+      </AuthProvider>
     </ProfileProvider>
   );
 }

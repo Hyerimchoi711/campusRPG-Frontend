@@ -1,4 +1,9 @@
-import React, { createContext, useCallback, useContext, useMemo, useState, useEffect } from 'react';
+import React, { createContext, useCallback, useContext, useMemo, useState, useEffect, useRef } from 'react';
+import { TOKEN_KEY, DEV_MOCK_TOKEN, DEV_MOCK_GAME_KEY } from '../constants/authStorage';
+import { isDevMockAuthEnabled } from '../utils/devAuth';
+import { fetchCurrentQuestSet, patchDailyQuestSlot, patchWeeklyQuestSlot } from '../api/questsClient';
+import { mapServerQuestRow } from '../utils/questFormat';
+import { useAuth } from './AuthContext';
 
 const STORAGE_KEY = 'campusRpg_quests';
 
@@ -6,31 +11,31 @@ function makeId(prefix) {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
-/** 데모용 기본 퀘스트 (LLM 생성 전) */
+/** 비로그인·API 실패 시 폴백 */
 export function getDefaultQuestState() {
   const daily = [
-    { id: makeId('d'), title: '아침 9시 전 기상', reward: '+50 코인 · 성실함 +1', done: true },
-    { id: makeId('d'), title: '강의 출석 완료', reward: '+80 코인 · 성실함 +2', done: true },
-    { id: makeId('d'), title: '도서관 2시간 공부', reward: '+120 코인 · 집중력 +2', done: true },
-    { id: makeId('d'), title: '과제 제출하기', reward: '+150 코인 · 성실함 +3', done: false },
-    { id: makeId('d'), title: '동아리 활동 참여', reward: '+100 코인 · 사교성 +2', done: false },
+    { id: makeId('d'), title: '아침 9시 전 기상', reward: '+50 EXP · 성실 +1', done: true },
+    { id: makeId('d'), title: '강의 출석 완료', reward: '+80 EXP · 성실 +2', done: true },
+    { id: makeId('d'), title: '도서관 2시간 공부', reward: '+120 EXP · 집중 +2', done: true },
+    { id: makeId('d'), title: '과제 제출하기', reward: '+150 EXP · 성실 +3', done: false },
+    { id: makeId('d'), title: '동아리 활동 참여', reward: '+100 EXP · 사교 +2', done: false },
   ];
   const weekly = [
-    { id: makeId('w'), title: '전공 서적 1권 읽기', reward: '+500 코인 · 지능 +5', done: false },
-    { id: makeId('w'), title: '운동 3회 이상 하기', reward: '+300 코인 · 건강 +5', done: false },
-    { id: makeId('w'), title: '새로운 친구 1명 사귀기', reward: '+400 코인 · 사교성 +5', done: false },
+    { id: makeId('w'), title: '전공 서적 1권 읽기', reward: '+500 EXP · 집중 +5', done: false },
+    { id: makeId('w'), title: '운동 3회 이상 하기', reward: '+300 EXP · 건강 +5', done: false },
+    { id: makeId('w'), title: '새로운 친구 1명 사귀기', reward: '+400 EXP · 사교 +5', done: false },
   ];
-  return { daily, weekly, source: 'default', generatedAt: null };
+  return { daily, weekly, source: 'default_local', generatedAt: null, rollDate: null, rollWeek: null };
 }
 
-function normalizeQuestItem(raw, prefix, index) {
+function normalizeQuestItem(raw, prefix) {
   const title = typeof raw.title === 'string' ? raw.title.trim() : '';
-  const reward = typeof raw.reward === 'string' ? raw.reward.trim() : '+50 코인';
+  const reward = typeof raw.reward === 'string' ? raw.reward.trim() : '+50 EXP';
   if (!title) return null;
   return {
     id: raw.id && String(raw.id).length ? String(raw.id) : makeId(prefix),
     title: title.slice(0, 120),
-    reward: reward.slice(0, 80),
+    reward: reward.slice(0, 120),
     done: Boolean(raw.done),
   };
 }
@@ -39,18 +44,18 @@ function applyGeneratedPayload(payload) {
   const dailyIn = Array.isArray(payload.daily) ? payload.daily : [];
   const weeklyIn = Array.isArray(payload.weekly) ? payload.weekly : [];
   const daily = dailyIn
-    .map((q, i) => normalizeQuestItem(q, 'd', i))
+    .map((q) => normalizeQuestItem(q, 'd'))
     .filter(Boolean)
     .slice(0, 8);
   const weekly = weeklyIn
-    .map((q, i) => normalizeQuestItem(q, 'w', i))
+    .map((q) => normalizeQuestItem(q, 'w'))
     .filter(Boolean)
     .slice(0, 6);
   while (daily.length < 3) {
     daily.push({
       id: makeId('d'),
       title: '캠퍼스 산책 20분',
-      reward: '+40 코인',
+      reward: '+40 EXP',
       done: false,
     });
   }
@@ -58,7 +63,7 @@ function applyGeneratedPayload(payload) {
     weekly.push({
       id: makeId('w'),
       title: '이번 주 독서 기록 남기기',
-      reward: '+200 코인',
+      reward: '+200 EXP',
       done: false,
     });
   }
@@ -67,79 +72,195 @@ function applyGeneratedPayload(payload) {
     weekly,
     source: 'llm',
     generatedAt: new Date().toISOString(),
+    rollDate: null,
+    rollWeek: null,
+  };
+}
+
+function persistLlmState(next) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
+function mapServerPayloadToState(data) {
+  const daily = data.daily.map((r, i) => mapServerQuestRow('daily', { ...r, slot: r.slot ?? i }));
+  const weekly = data.weekly.map((r, i) => mapServerQuestRow('weekly', { ...r, slot: r.slot ?? i }));
+  return {
+    daily,
+    weekly,
+    source: 'server',
+    generatedAt: null,
+    rollDate: data.rollDate ?? null,
+    rollWeek: data.rollWeek ?? null,
   };
 }
 
 const QuestContext = createContext(null);
 
 export const QuestProvider = ({ children }) => {
+  const { refreshMe } = useAuth();
   const [state, setState] = useState(() => getDefaultQuestState());
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const [serverSyncLoading, setServerSyncLoading] = useState(false);
+  const [serverSyncError, setServerSyncError] = useState('');
+
+  const mergeUserFromServerResponse = useCallback(
+    async (data) => {
+      if (data?.user) {
+        try {
+          if (isDevMockAuthEnabled() && localStorage.getItem(TOKEN_KEY) === DEV_MOCK_TOKEN) {
+            localStorage.setItem(DEV_MOCK_GAME_KEY, JSON.stringify(data.user));
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+      await refreshMe?.();
+    },
+    [refreshMe]
+  );
+
+  const loadServerQuests = useCallback(async () => {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+    if (!token) {
+      setServerSyncError('');
+      setState(getDefaultQuestState());
+      return false;
+    }
+    setServerSyncLoading(true);
+    setServerSyncError('');
+    try {
+      const data = await fetchCurrentQuestSet();
+      setState(mapServerPayloadToState(data));
+      await mergeUserFromServerResponse(data);
+      return true;
+    } catch (e) {
+      setServerSyncError(e.message || '서버 퀘스트를 불러오지 못했어요.');
+      setState(getDefaultQuestState());
+      return false;
+    } finally {
+      setServerSyncLoading(false);
+    }
+  }, [mergeUserFromServerResponse]);
 
   useEffect(() => {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+    let loadedLlm = false;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (!parsed?.daily || !parsed?.weekly) return;
-      setState({
-        daily: parsed.daily,
-        weekly: parsed.weekly,
-        source: parsed.source || 'default',
-        generatedAt: parsed.generatedAt || null,
-      });
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.source === 'llm' && Array.isArray(parsed.daily) && Array.isArray(parsed.weekly)) {
+          setState({
+            daily: parsed.daily,
+            weekly: parsed.weekly,
+            source: 'llm',
+            generatedAt: parsed.generatedAt || null,
+            rollDate: null,
+            rollWeek: null,
+          });
+          loadedLlm = true;
+        }
+      }
     } catch {
       /* ignore */
     }
-  }, []);
-
-  const persist = useCallback((next) => {
-    setState(next);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-    } catch {
-      /* ignore */
+    if (!loadedLlm && token) {
+      loadServerQuests();
     }
-  }, []);
+  }, [loadServerQuests]);
 
   const setQuestsFromLLM = useCallback((payload) => {
     const next = applyGeneratedPayload(payload);
-    persist(next);
-  }, [persist]);
+    setState(next);
+    persistLlmState(next);
+  }, []);
 
-  const resetToDefault = useCallback(() => {
-    persist(getDefaultQuestState());
-  }, [persist]);
+  const resetToDefault = useCallback(async () => {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+    if (token) {
+      await loadServerQuests();
+      return;
+    }
+    const next = getDefaultQuestState();
+    setState(next);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, [loadServerQuests]);
 
-  const commit = useCallback((updater) => {
+  const commitLocal = useCallback((updater) => {
     setState((prev) => {
       const next = typeof updater === 'function' ? updater(prev) : updater;
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        /* ignore */
+      if (next.source === 'llm') {
+        persistLlmState(next);
       }
       return next;
     });
   }, []);
 
-  const toggleDaily = useCallback(
-    (id) => {
-      commit((prev) => ({
-        ...prev,
-        daily: prev.daily.map((q) => (q.id === id ? { ...q, done: !q.done } : q)),
-      }));
+  const applyPatchResponse = useCallback(
+    async (data) => {
+      if (data?.daily && data?.weekly) {
+        setState(mapServerPayloadToState(data));
+      }
+      await mergeUserFromServerResponse(data);
     },
-    [commit]
+    [mergeUserFromServerResponse]
+  );
+
+  const toggleDaily = useCallback(
+    async (id) => {
+      const prev = stateRef.current;
+      if (prev.source !== 'server') {
+        commitLocal((p) => ({
+          ...p,
+          daily: p.daily.map((q) => (q.id === id ? { ...q, done: !q.done } : q)),
+        }));
+        return;
+      }
+      const row = prev.daily.find((q) => q.id === id);
+      if (row == null || row.serverSlot == null) return;
+      const nextDone = !row.done;
+      setServerSyncError('');
+      try {
+        const data = await patchDailyQuestSlot(row.serverSlot, nextDone);
+        await applyPatchResponse(data);
+      } catch (e) {
+        setServerSyncError(e.message || '상태를 저장하지 못했어요.');
+      }
+    },
+    [commitLocal, applyPatchResponse]
   );
 
   const toggleWeekly = useCallback(
-    (id) => {
-      commit((prev) => ({
-        ...prev,
-        weekly: prev.weekly.map((q) => (q.id === id ? { ...q, done: !q.done } : q)),
-      }));
+    async (id) => {
+      const prev = stateRef.current;
+      if (prev.source !== 'server') {
+        commitLocal((p) => ({
+          ...p,
+          weekly: p.weekly.map((q) => (q.id === id ? { ...q, done: !q.done } : q)),
+        }));
+        return;
+      }
+      const row = prev.weekly.find((q) => q.id === id);
+      if (row == null || row.serverSlot == null) return;
+      const nextDone = !row.done;
+      setServerSyncError('');
+      try {
+        const data = await patchWeeklyQuestSlot(row.serverSlot, nextDone);
+        await applyPatchResponse(data);
+      } catch (e) {
+        setServerSyncError(e.message || '상태를 저장하지 못했어요.');
+      }
     },
-    [commit]
+    [commitLocal, applyPatchResponse]
   );
 
   const value = useMemo(
@@ -148,12 +269,26 @@ export const QuestProvider = ({ children }) => {
       weeklyQuests: state.weekly,
       questSource: state.source,
       questGeneratedAt: state.generatedAt,
+      rollDate: state.rollDate,
+      rollWeek: state.rollWeek,
       setQuestsFromLLM,
       resetToDefault,
       toggleDaily,
       toggleWeekly,
+      reloadServerQuests: loadServerQuests,
+      serverSyncLoading,
+      serverSyncError,
     }),
-    [state, setQuestsFromLLM, resetToDefault, toggleDaily, toggleWeekly]
+    [
+      state,
+      setQuestsFromLLM,
+      resetToDefault,
+      toggleDaily,
+      toggleWeekly,
+      loadServerQuests,
+      serverSyncLoading,
+      serverSyncError,
+    ]
   );
 
   return <QuestContext.Provider value={value}>{children}</QuestContext.Provider>;

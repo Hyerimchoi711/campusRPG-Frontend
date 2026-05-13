@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { DEV_MOCK_TOKEN, TOKEN_KEY } from '../constants/authStorage';
+import { DEV_MOCK_TOKEN, TOKEN_KEY, DEV_MOCK_GAME_KEY } from '../constants/authStorage';
 import { fetchRpgJsonAuth } from '../api/rpgClient';
 import { isDevMockAuthEnabled } from '../utils/devAuth';
 import { useProfile } from './ProfileContext';
@@ -37,6 +37,14 @@ function buildDevMockMe() {
       major: '컴퓨터공학과',
       schoolYear: 2,
       age: 21,
+      exp: 0,
+      stats: {
+        health: 10,
+        diligence: 10,
+        focus: 10,
+        social: 10,
+        creativity: 10,
+      },
     },
     pet: normalizePet(petRaw),
   };
@@ -55,6 +63,20 @@ export function AuthProvider({ children }) {
     }
     if (isDevMockAuthEnabled() && token === DEV_MOCK_TOKEN) {
       const data = buildDevMockMe();
+      try {
+        const raw = localStorage.getItem(DEV_MOCK_GAME_KEY);
+        if (raw) {
+          const g = JSON.parse(raw);
+          if (g && typeof g === 'object') {
+            if (g.exp != null && Number.isFinite(Number(g.exp))) data.user.exp = Math.floor(Number(g.exp));
+            if (g.stats && typeof g.stats === 'object') {
+              data.user.stats = { ...data.user.stats, ...g.stats };
+            }
+          }
+        }
+      } catch {
+        /* ignore */
+      }
       setMe(data);
       return data;
     }

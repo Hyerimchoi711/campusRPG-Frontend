@@ -36,7 +36,7 @@ const LoginPage = () => {
 
     const id = loginId.trim();
     if (!id || !password) {
-      setError('이메일(또는 학번)과 비밀번호를 입력해 주세요.');
+      setError('이메일(또는 학번) 혹은 비밀번호를 입력해 주세요.');
       return;
     }
 
@@ -134,7 +134,7 @@ const LoginPage = () => {
                   <input
                     type="text"
                     name="username"
-                    placeholder="campus@school.ac.kr"
+                    // placeholder="campus@school.ac.kr"
                     className="login-field__input"
                     autoComplete="username"
                     value={loginId}
@@ -146,7 +146,7 @@ const LoginPage = () => {
                   <input
                     type="password"
                     name="password"
-                    placeholder="••••••••"
+                    // placeholder="••••••••"
                     className="login-field__input"
                     autoComplete="current-password"
                     value={password}

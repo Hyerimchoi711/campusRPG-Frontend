@@ -1,4 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import TypewriterSpeech from '../components/TypewriterSpeech';
@@ -22,16 +23,29 @@ const QuestsPage = () => {
     weeklyQuests,
     questSource,
     questGeneratedAt,
+    rollDate,
+    rollWeek,
     setQuestsFromLLM,
     resetToDefault,
     toggleDaily,
     toggleWeekly,
+    reloadServerQuests,
+    serverSyncLoading,
+    serverSyncError,
   } = useQuests();
 
+  const location = useLocation();
   const [isDailyOpen, setIsDailyOpen] = useState(true);
   const [isWeeklyOpen, setIsWeeklyOpen] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname === '/quests' || location.pathname.endsWith('/quests')) {
+      reloadServerQuests?.();
+    }
+  }, [location.pathname, reloadServerQuests]);
 
   const majorOk = Boolean(profile.major?.toString().trim());
   const yearOk = Boolean(profile.schoolYear?.toString().trim());
@@ -68,6 +82,20 @@ const QuestsPage = () => {
       setLoading(false);
     }
   };
+
+  const handleResetDefault = async () => {
+    setError('');
+    setResetLoading(true);
+    try {
+      await resetToDefault();
+    } catch (e) {
+      setError(e.message || '기본 퀘스트로 돌리지 못했어요.');
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const busy = loading || resetLoading || serverSyncLoading;
 
   const formatGenAt = () => {
     if (!questGeneratedAt) return null;
@@ -106,20 +134,32 @@ const QuestsPage = () => {
                 type="button"
                 className="quest-npc-btn"
                 onClick={handleGenerate}
-                disabled={loading}
+                disabled={busy}
               >
                 {loading ? '생성 중…' : '맞춤 퀘스트 받기'}
               </button>
-              <button type="button" className="quest-npc-btn quest-npc-btn--ghost" onClick={() => resetToDefault()} disabled={loading}>
-                기본 퀘스트로
+              <button
+                type="button"
+                className="quest-npc-btn quest-npc-btn--ghost"
+                onClick={handleResetDefault}
+                disabled={busy}
+              >
+                {resetLoading || serverSyncLoading ? '불러오는 중…' : '기본 퀘스트로'}
               </button>
             </div>
             {!canGenerate && (
               <p className="quest-npc-warn">⚠️ 내 프로필 → 상세 정보에서 <strong>학과</strong>와 <strong>학년</strong>을 적어 주세요.</p>
             )}
             {error && <p className="quest-npc-error">{error}</p>}
+            {serverSyncError && <p className="quest-npc-error">{serverSyncError}</p>}
             {questSource === 'llm' && questGeneratedAt && (
               <p className="quest-npc-meta">AI 생성 · {formatGenAt()}</p>
+            )}
+            {questSource === 'server' && rollDate && (
+              <p className="quest-npc-meta">
+                서버 날짜 {rollDate}
+                {rollWeek ? ` · 주간 주차 ${rollWeek}` : ''}
+              </p>
             )}
           </div>
         </div>

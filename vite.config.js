@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import { questDevApiPlugin } from './vite.quest-api-plugin.mjs'
 
 // 개발 시: Vite(예: 5173)만 브라우저에 쓰고, 아래 경로는 프록시됩니다.
 // - /api/quests → LLM 퀘스트 서버(VITE_DEV_QUEST_API_URL, 기본 8787)
@@ -12,11 +13,15 @@ export default defineConfig(({ mode }) => {
     env.VITE_DEV_QUEST_API_URL || 'http://127.0.0.1:8787'
 
   return {
-    plugins: [react()],
+    plugins: [react(), questDevApiPlugin()],
     server: {
       proxy: {
         '/api/quests': {
           target: questTarget,
+          changeOrigin: true,
+        },
+        '/api/me/quests': {
+          target: backendTarget,
           changeOrigin: true,
         },
         '/api/auth': {
