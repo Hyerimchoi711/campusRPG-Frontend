@@ -2,7 +2,7 @@ import React, { createContext, useCallback, useContext, useMemo, useState, useEf
 import { TOKEN_KEY, DEV_MOCK_TOKEN, DEV_MOCK_GAME_KEY } from '../constants/authStorage';
 import { isDevMockAuthEnabled } from '../utils/devAuth';
 import { fetchCurrentQuestSet, patchDailyQuestSlot, patchWeeklyQuestSlot } from '../api/questsClient';
-import { mapServerQuestRow } from '../utils/questFormat';
+import { mapServerQuestRow, formatPatchRewardsToast } from '../utils/questFormat';
 import { useAuth } from './AuthContext';
 
 const STORAGE_KEY = 'campusRpg_quests';
@@ -14,9 +14,9 @@ function makeId(prefix) {
 /** 비로그인·API 실패 시 폴백 */
 export function getDefaultQuestState() {
   const daily = [
-    { id: makeId('d'), title: '아침 9시 전 기상', reward: '+50 EXP · 성실 +1', done: true },
-    { id: makeId('d'), title: '강의 출석 완료', reward: '+80 EXP · 성실 +2', done: true },
-    { id: makeId('d'), title: '도서관 2시간 공부', reward: '+120 EXP · 집중 +2', done: true },
+    { id: makeId('d'), title: '아침 9시 전 기상', reward: '+50 EXP · 성실 +1', done: false },
+    { id: makeId('d'), title: '강의 출석 완료', reward: '+80 EXP · 성실 +2', done: false },
+    { id: makeId('d'), title: '도서관 2시간 공부', reward: '+120 EXP · 집중 +2', done: false },
     { id: makeId('d'), title: '과제 제출하기', reward: '+150 EXP · 성실 +3', done: false },
     { id: makeId('d'), title: '동아리 활동 참여', reward: '+100 EXP · 사교 +2', done: false },
   ];
@@ -25,7 +25,15 @@ export function getDefaultQuestState() {
     { id: makeId('w'), title: '운동 3회 이상 하기', reward: '+300 EXP · 건강 +5', done: false },
     { id: makeId('w'), title: '새로운 친구 1명 사귀기', reward: '+400 EXP · 사교 +5', done: false },
   ];
-  return { daily, weekly, source: 'default_local', generatedAt: null, rollDate: null, rollWeek: null };
+  return {
+    daily,
+    weekly,
+    source: 'default_local',
+    generatedAt: null,
+    rollDate: null,
+    rollWeek: null,
+    weekId: null,
+  };
 }
 
 function normalizeQuestItem(raw, prefix) {
@@ -37,6 +45,10 @@ function normalizeQuestItem(raw, prefix) {
     title: title.slice(0, 120),
     reward: reward.slice(0, 120),
     done: Boolean(raw.done),
+    questSource:
+      typeof raw.questSource === 'string' && raw.questSource.trim()
+        ? raw.questSource.trim()
+        : 'llm',
   };
 }
 
@@ -74,6 +86,7 @@ function applyGeneratedPayload(payload) {
     generatedAt: new Date().toISOString(),
     rollDate: null,
     rollWeek: null,
+    weekId: null,
   };
 }
 
@@ -86,6 +99,7 @@ function persistLlmState(next) {
 }
 
 function mapServerPayloadToState(data) {
+  const weekId = data.weekId ?? data.rollWeek ?? null;
   const daily = data.daily.map((r, i) => mapServerQuestRow('daily', { ...r, slot: r.slot ?? i }));
   const weekly = data.weekly.map((r, i) => mapServerQuestRow('weekly', { ...r, slot: r.slot ?? i }));
   return {
@@ -94,34 +108,54 @@ function mapServerPayloadToState(data) {
     source: 'server',
     generatedAt: null,
     rollDate: data.rollDate ?? null,
-    rollWeek: data.rollWeek ?? null,
+    rollWeek: weekId,
+    weekId,
   };
 }
 
 const QuestContext = createContext(null);
 
 export const QuestProvider = ({ children }) => {
-  const { refreshMe } = useAuth();
+  const { refreshMe, mergeQuestGameSnapshotIntoMe } = useAuth();
   const [state, setState] = useState(() => getDefaultQuestState());
   const stateRef = useRef(state);
   stateRef.current = state;
   const [serverSyncLoading, setServerSyncLoading] = useState(false);
   const [serverSyncError, setServerSyncError] = useState('');
+  const [patchRewardToast, setPatchRewardToast] = useState('');
 
   const mergeUserFromServerResponse = useCallback(
     async (data) => {
       if (data?.user) {
         try {
           if (isDevMockAuthEnabled() && localStorage.getItem(TOKEN_KEY) === DEV_MOCK_TOKEN) {
-            localStorage.setItem(DEV_MOCK_GAME_KEY, JSON.stringify(data.user));
+            let prev = null;
+            try {
+              const rawPrev = localStorage.getItem(DEV_MOCK_GAME_KEY);
+              if (rawPrev) prev = JSON.parse(rawPrev);
+            } catch {
+              /* ignore */
+            }
+            const game = {
+              v: 1,
+              level: data.user.level,
+              exp: data.user.exp,
+              coin: data.user.coin,
+              stats: data.user.stats,
+              pet: data.pet != null ? data.pet : prev?.v === 1 ? prev.pet : null,
+            };
+            localStorage.setItem(DEV_MOCK_GAME_KEY, JSON.stringify(game));
           }
         } catch {
           /* ignore */
         }
       }
       await refreshMe?.();
+      if (data?.user) {
+        mergeQuestGameSnapshotIntoMe?.(data);
+      }
     },
-    [refreshMe]
+    [refreshMe, mergeQuestGameSnapshotIntoMe]
   );
 
   const loadServerQuests = useCallback(async () => {
@@ -162,6 +196,7 @@ export const QuestProvider = ({ children }) => {
             generatedAt: parsed.generatedAt || null,
             rollDate: null,
             rollWeek: null,
+            weekId: null,
           });
           loadedLlm = true;
         }
@@ -205,12 +240,32 @@ export const QuestProvider = ({ children }) => {
     });
   }, []);
 
+  const clearPatchRewardToast = useCallback(() => {
+    setPatchRewardToast('');
+  }, []);
+
   const applyPatchResponse = useCallback(
     async (data) => {
+      let mergePayload = data;
       if (data?.daily && data?.weekly) {
         setState(mapServerPayloadToState(data));
+      } else if (
+        data != null &&
+        (data.ok === true || Object.prototype.hasOwnProperty.call(data, 'rewards'))
+      ) {
+        try {
+          const fresh = await fetchCurrentQuestSet();
+          setState(mapServerPayloadToState(fresh));
+          mergePayload = fresh;
+        } catch (e) {
+          setServerSyncError(e.message || '퀘스트를 다시 불러오지 못했어요.');
+        }
+        if (data.rewards != null && typeof data.rewards === 'object') {
+          const msg = formatPatchRewardsToast(data.rewards);
+          if (msg) setPatchRewardToast(msg);
+        }
       }
-      await mergeUserFromServerResponse(data);
+      await mergeUserFromServerResponse(mergePayload);
     },
     [mergeUserFromServerResponse]
   );
@@ -271,6 +326,9 @@ export const QuestProvider = ({ children }) => {
       questGeneratedAt: state.generatedAt,
       rollDate: state.rollDate,
       rollWeek: state.rollWeek,
+      weekId: state.weekId,
+      patchRewardToast,
+      clearPatchRewardToast,
       setQuestsFromLLM,
       resetToDefault,
       toggleDaily,
@@ -288,6 +346,8 @@ export const QuestProvider = ({ children }) => {
       loadServerQuests,
       serverSyncLoading,
       serverSyncError,
+      patchRewardToast,
+      clearPatchRewardToast,
     ]
   );
 

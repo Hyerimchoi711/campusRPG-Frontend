@@ -2,6 +2,15 @@
 
 export const STAT_TYPES = ['health', 'diligence', 'focus', 'social', 'creativity'];
 
+export const EXP_PER_LEVEL = 1000;
+export const DAILY_STAT_GAIN_CAP = 70;
+
+/** Lv1~5→100, 6~10→200, … */
+export function maxStatForUserLevel(level) {
+  const lv = Math.max(1, Math.floor(Number(level) || 1));
+  return 100 + 100 * Math.floor((lv - 1) / 5);
+}
+
 /** KST 달력 기준 YYYY-MM-DD */
 export function kstYmd(now = new Date()) {
   const parts = new Intl.DateTimeFormat('en-CA', {
@@ -159,19 +168,31 @@ function hashSeed(s) {
   return h >>> 0;
 }
 
-export function applyRewardToUser(user, templateRow) {
-  const next = {
-    exp: Number(user.exp) || 0,
-    stats: { ...defaultStats(), ...(user.stats || {}) },
+const JUVENILE_BY_STAT = {
+  health: '파이루',
+  diligence: '워티',
+  focus: '스푸티',
+  social: '클루',
+  creativity: '라니',
+};
+
+const ADULT_BY_STAT = {
+  health: '파이로소어',
+  diligence: '워터북',
+  focus: '스프라우트랫',
+  social: '클라우드 윙',
+  creativity: '라이트닝 혼',
+};
+
+export function defaultPetState() {
+  return {
+    name: '부화중인 알',
+    level: 1,
+    evolutionStage: 0,
+    animalType: 'egg',
+    lineageType: null,
+    lastEvolvedAt: null,
   };
-  const addExp = Number(templateRow.reward_exp) || 0;
-  next.exp += addExp;
-  const st = templateRow.reward_stat_type;
-  const amt = Number(templateRow.reward_stat_amount) || 0;
-  if (st && STAT_TYPES.includes(st) && amt) {
-    next.stats[st] = (Number(next.stats[st]) || 0) + amt;
-  }
-  return next;
 }
 
 export function defaultStats() {
@@ -181,5 +202,116 @@ export function defaultStats() {
     focus: 10,
     social: 10,
     creativity: 10,
+    dailyFatigue: 0,
+    lastUpdatedDate: null,
   };
+}
+
+function resetDailyStatsIfNeeded(stats) {
+  const today = kstYmd();
+  const s = { ...defaultStats(), ...stats };
+  if (s.lastUpdatedDate !== today) {
+    s.dailyFatigue = 0;
+    s.lastUpdatedDate = today;
+  }
+  return s;
+}
+
+/**
+ * @param {object} pet
+ * @param {{ level: number, stats: Record<string, number> }} userSlice
+ */
+export function evolvePetAfterRewards(pet, userSlice) {
+  const p = { ...defaultPetState(), ...pet };
+  const lv = userSlice.level;
+  const stats = userSlice.stats;
+  const eggish = !p.animalType || p.animalType === 'egg';
+  const stage = Number(p.evolutionStage) || 0;
+
+  if (stage === 0 && eggish) {
+    if (lv >= 6 && STAT_TYPES.some((st) => (Number(stats[st]) || 0) >= 100)) {
+      const pick = STAT_TYPES.find((st) => (Number(stats[st]) || 0) >= 100) || 'health';
+      return {
+        ...p,
+        lineageType: pick,
+        animalType: JUVENILE_BY_STAT[pick],
+        evolutionStage: 1,
+        lastEvolvedAt: new Date().toISOString(),
+      };
+    }
+  } else if (stage === 1 && p.lineageType && STAT_TYPES.includes(p.lineageType)) {
+    const st = p.lineageType;
+    if (lv >= 11 && (Number(stats[st]) || 0) >= 200) {
+      return {
+        ...p,
+        animalType: ADULT_BY_STAT[st],
+        evolutionStage: 2,
+        lastEvolvedAt: new Date().toISOString(),
+      };
+    }
+  }
+  return p;
+}
+
+/**
+ * 퀘스트 한 줄 보상 적용(스텁·참조 백엔드와 동일 규칙).
+ * EXP: 레벨당 1000 초과 시 레벨업·잔여 carry.
+ * 스탯: 일일 누적 70·구간별 상한 클램프.
+ * @param {{ user?: object, pet?: object }} snapshot
+ * @param {{ reward_exp?: number, reward_stat_type?: string|null, reward_stat_amount?: number }} templateRow
+ */
+export function applyQuestRewardToGameState(snapshot, templateRow) {
+  const userIn = snapshot.user || {};
+  let level = Math.max(1, Math.floor(Number(userIn.level) || 1));
+  let exp = Math.max(0, Math.floor(Number(userIn.exp) || 0));
+  let stats = resetDailyStatsIfNeeded(userIn.stats || {});
+  const petIn = { ...defaultPetState(), ...(snapshot.pet || {}) };
+
+  const addExp = Math.max(0, Math.floor(Number(templateRow.reward_exp) || 0));
+  exp += addExp;
+  while (exp >= EXP_PER_LEVEL) {
+    exp -= EXP_PER_LEVEL;
+    level += 1;
+  }
+
+  const st = templateRow.reward_stat_type;
+  const rawAmt = Math.max(0, Math.floor(Number(templateRow.reward_stat_amount) || 0));
+  let appliedStatAmount = 0;
+  if (st && STAT_TYPES.includes(st) && rawAmt > 0) {
+    const maxStat = maxStatForUserLevel(level);
+    const cur = Number(stats[st]) || 0;
+    const fatigue = Number(stats.dailyFatigue) || 0;
+    const roomDay = Math.max(0, DAILY_STAT_GAIN_CAP - fatigue);
+    const roomStat = Math.max(0, maxStat - cur);
+    appliedStatAmount = Math.min(rawAmt, roomDay, roomStat);
+    if (appliedStatAmount > 0) {
+      stats = {
+        ...stats,
+        [st]: cur + appliedStatAmount,
+        dailyFatigue: fatigue + appliedStatAmount,
+        lastUpdatedDate: stats.lastUpdatedDate || kstYmd(),
+      };
+    }
+  }
+
+  const pet = evolvePetAfterRewards(petIn, { level, stats });
+  return {
+    user: {
+      ...userIn,
+      level,
+      exp,
+      coin: Number(userIn.coin) || 0,
+      stats,
+    },
+    pet,
+    appliedStatAmount,
+  };
+}
+
+/**
+ * @deprecated 퀘스트 스텁은 {@link applyQuestRewardToGameState} 사용
+ */
+export function applyRewardToUser(user, templateRow) {
+  const out = applyQuestRewardToGameState({ user, pet: user.pet }, templateRow);
+  return { exp: out.user.exp, stats: out.user.stats, level: out.user.level, pet: out.pet };
 }

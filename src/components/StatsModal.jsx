@@ -13,6 +13,12 @@ import { Radar } from 'react-chartjs-2';
 import PetPortrait from './PetPortrait';
 import { useAuth } from '../context/AuthContext';
 import { DEFAULT_EGG_PET_NAME, normalizePet } from '../models/pet';
+import {
+  mapServerStatsToUi,
+  getDailyFatigueFromStats,
+  resolveMaxStatPerLine,
+  ME_DAILY_STAT_GAIN_CAP,
+} from '../utils/statsUi';
 import '../styles/StatsPage.css';
 import './StatsModal.css';
 
@@ -226,24 +232,33 @@ ChartJS.register(
   statsRadarMonoGlowPlugin
 );
 
-const MAX_FATIGUE = 70;
-
-function getTargetValue(currentValue) {
-  return Math.ceil(currentValue / 100) * 100 || 100;
-}
+const FALLBACK_STATS = {
+  health: 45,
+  social: 55,
+  diligent: 72,
+  focus: 80,
+  creative: 63,
+};
+const DEFAULT_FATIGUE = 30;
 
 function StatsModalContent() {
   const { me } = useAuth();
   const pet = normalizePet(me?.pet);
 
-  const [stats] = useState({
-    health: 45,
-    social: 55,
-    diligent: 72,
-    focus: 80,
-    creative: 63,
-  });
-  const [fatigue] = useState(30);
+  const statCap = useMemo(() => resolveMaxStatPerLine(me?.user), [me]);
+
+  const stats = useMemo(() => {
+    if (!me?.user?.stats) return FALLBACK_STATS;
+    const m = mapServerStatsToUi(me.user.stats);
+    return m ? { ...FALLBACK_STATS, ...m } : FALLBACK_STATS;
+  }, [me]);
+
+  const fatigue = useMemo(() => {
+    const s = me?.user?.stats;
+    if (!s || typeof s !== 'object') return DEFAULT_FATIGUE;
+    if (!('dailyFatigue' in s) && !('daily_fatigue' in s)) return DEFAULT_FATIGUE;
+    return getDailyFatigueFromStats(s);
+  }, [me]);
 
   const [animatedWidths, setAnimatedWidths] = useState({
     health: 0,
@@ -256,17 +271,18 @@ function StatsModalContent() {
 
   useEffect(() => {
     const t = window.setTimeout(() => {
+      const cap = Math.max(1, statCap);
       setAnimatedWidths({
-        health: (stats.health / getTargetValue(stats.health)) * 100,
-        social: (stats.social / getTargetValue(stats.social)) * 100,
-        diligent: (stats.diligent / getTargetValue(stats.diligent)) * 100,
-        focus: (stats.focus / getTargetValue(stats.focus)) * 100,
-        creative: (stats.creative / getTargetValue(stats.creative)) * 100,
-        fatigue: (fatigue / MAX_FATIGUE) * 100,
+        health: (stats.health / cap) * 100,
+        social: (stats.social / cap) * 100,
+        diligent: (stats.diligent / cap) * 100,
+        focus: (stats.focus / cap) * 100,
+        creative: (stats.creative / cap) * 100,
+        fatigue: (fatigue / ME_DAILY_STAT_GAIN_CAP) * 100,
       });
     }, 80);
     return () => window.clearTimeout(t);
-  }, [stats, fatigue]);
+  }, [stats, fatigue, statCap]);
 
   const chartRef = useRef(null);
   /** 초기 차트 애니메이션 완료 후에만 shimmer용 update('none') */
@@ -355,7 +371,7 @@ function StatsModalContent() {
             lineWidth: 1,
           },
           suggestedMin: 0,
-          suggestedMax: 100,
+          suggestedMax: statCap,
           ticks: { display: false, stepSize: 25 },
           pointLabels: {
             display: false,
@@ -379,7 +395,7 @@ function StatsModalContent() {
       },
       maintainAspectRatio: false,
     }),
-    []
+    [statCap]
   );
 
   const petAnimalType = pet?.animalType ?? 'egg';
@@ -414,8 +430,7 @@ function StatsModalContent() {
             </div>
           </div>
           <span className="stat-val">
-            {stats.health}/{getTargetValue(stats.health)} (
-            {Math.floor((stats.health / getTargetValue(stats.health)) * 100)}%)
+            {stats.health}/{statCap} ({Math.floor((stats.health / statCap) * 100)}%)
           </span>
         </div>
         <div className="stat-row stat-variant-social">
@@ -427,8 +442,7 @@ function StatsModalContent() {
             </div>
           </div>
           <span className="stat-val">
-            {stats.social}/{getTargetValue(stats.social)} (
-            {Math.floor((stats.social / getTargetValue(stats.social)) * 100)}%)
+            {stats.social}/{statCap} ({Math.floor((stats.social / statCap) * 100)}%)
           </span>
         </div>
         <div className="stat-row stat-variant-diligent">
@@ -440,8 +454,7 @@ function StatsModalContent() {
             </div>
           </div>
           <span className="stat-val">
-            {stats.diligent}/{getTargetValue(stats.diligent)} (
-            {Math.floor((stats.diligent / getTargetValue(stats.diligent)) * 100)}%)
+            {stats.diligent}/{statCap} ({Math.floor((stats.diligent / statCap) * 100)}%)
           </span>
         </div>
         <div className="stat-row stat-variant-focus">
@@ -453,7 +466,7 @@ function StatsModalContent() {
             </div>
           </div>
           <span className="stat-val">
-            {stats.focus}/{getTargetValue(stats.focus)} ({Math.floor((stats.focus / getTargetValue(stats.focus)) * 100)}%)
+            {stats.focus}/{statCap} ({Math.floor((stats.focus / statCap) * 100)}%)
           </span>
         </div>
         <div className="stat-row stat-variant-creative">
@@ -465,8 +478,7 @@ function StatsModalContent() {
             </div>
           </div>
           <span className="stat-val">
-            {stats.creative}/{getTargetValue(stats.creative)} (
-            {Math.floor((stats.creative / getTargetValue(stats.creative)) * 100)}%)
+            {stats.creative}/{statCap} ({Math.floor((stats.creative / statCap) * 100)}%)
           </span>
         </div>
       </div>
@@ -475,7 +487,7 @@ function StatsModalContent() {
         <div className="fatigue-header">
           <span className="fatigue-title">오늘의 피로도</span>
           <span className="fatigue-val">
-            {fatigue} / {MAX_FATIGUE}
+            {fatigue} / {ME_DAILY_STAT_GAIN_CAP}
           </span>
         </div>
         <div className="fatigue-bar-track">

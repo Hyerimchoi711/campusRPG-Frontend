@@ -25,6 +25,9 @@ const QuestsPage = () => {
     questGeneratedAt,
     rollDate,
     rollWeek,
+    weekId,
+    patchRewardToast,
+    clearPatchRewardToast,
     setQuestsFromLLM,
     resetToDefault,
     toggleDaily,
@@ -46,6 +49,12 @@ const QuestsPage = () => {
       reloadServerQuests?.();
     }
   }, [location.pathname, reloadServerQuests]);
+
+  useEffect(() => {
+    if (!patchRewardToast) return undefined;
+    const t = window.setTimeout(() => clearPatchRewardToast?.(), 4200);
+    return () => window.clearTimeout(t);
+  }, [patchRewardToast, clearPatchRewardToast]);
 
   const majorOk = Boolean(profile.major?.toString().trim());
   const yearOk = Boolean(profile.schoolYear?.toString().trim());
@@ -111,6 +120,12 @@ const QuestsPage = () => {
     <div className="screen active" id="screenQuests">
       <TopBar />
 
+      {patchRewardToast ? (
+        <div className="quest-patch-toast" role="status" aria-live="polite">
+          {patchRewardToast}
+        </div>
+      ) : null}
+
       <div className="quests-content-wrapper">
         {/* 퀘스트 NPC: 일러스트 전체 배경 + 그 위 말풍선·버튼 (상점 헤더와 동일 패턴) */}
         <div className="quest-npc-header" role="region" aria-label="퀘스트 안내 NPC">
@@ -158,7 +173,7 @@ const QuestsPage = () => {
             {questSource === 'server' && rollDate && (
               <p className="quest-npc-meta">
                 서버 날짜 {rollDate}
-                {rollWeek ? ` · 주간 주차 ${rollWeek}` : ''}
+                {(weekId || rollWeek) ? ` · 주간 기준일(KST 월) ${weekId || rollWeek}` : ''}
               </p>
             )}
           </div>
@@ -182,7 +197,14 @@ const QuestsPage = () => {
               >
                 <div className="quest-check">{q.done ? '✓' : '○'}</div>
                 <div className="quest-info">
-                  <div className="quest-name">{q.title}</div>
+                  <div className="quest-name">
+                    {q.title}
+                    {q.questSource && q.questSource !== 'default' ? (
+                      <span className="quest-source-pill" title="퀘스트 출처">
+                        {q.questSource === 'llm' ? 'LLM' : q.questSource}
+                      </span>
+                    ) : null}
+                  </div>
                   <div className="quest-reward">{q.reward}</div>
                 </div>
                 <div className={`quest-xp ${q.done ? 'done-badge' : ''}`}>{q.done ? '완료' : '탭하여 완료'}</div>
@@ -209,7 +231,14 @@ const QuestsPage = () => {
               >
                 <div className="quest-check">{q.done ? '✓' : '○'}</div>
                 <div className="quest-info">
-                  <div className="quest-name">{q.title}</div>
+                  <div className="quest-name">
+                    {q.title}
+                    {q.questSource && q.questSource !== 'default' ? (
+                      <span className="quest-source-pill" title="퀘스트 출처">
+                        {q.questSource === 'llm' ? 'LLM' : q.questSource}
+                      </span>
+                    ) : null}
+                  </div>
                   <div className="quest-reward">{q.reward}</div>
                 </div>
                 <div className={`quest-xp ${q.done ? 'done-badge' : ''}`}>{q.done ? '완료' : '탭하여 완료'}</div>

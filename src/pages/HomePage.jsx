@@ -4,7 +4,6 @@ import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
 import { useAuth } from '../context/AuthContext';
 import { TOKEN_KEY } from '../constants/authStorage';
-import homeForestBg from '../assets/images/home-forest-nest.png';
 import PetPortrait from '../components/PetPortrait';
 import {
   DEFAULT_EGG_PET_NAME,
@@ -13,6 +12,8 @@ import {
   isPetEgg,
 } from '../models/pet';
 import { useStatsModal } from '../context/StatsModalContext';
+import { ME_EXP_PER_LEVEL } from '../api/meContract';
+import { getHomeBackgroundUrlForPet } from '../config/homePetVisuals';
 import '../styles/HomePage.css';
 
 function petSubtitle(pet) {
@@ -41,10 +42,14 @@ const HomePage = () => {
 
   const user = me?.user;
   const pet = me?.pet;
-  const level = pet != null && Number.isFinite(Number(pet.level)) ? Math.max(0, Math.floor(pet.level)) : pet == null ? null : 1;
+  const userLevel =
+    user != null && Number.isFinite(Number(user.level))
+      ? Math.max(1, Math.floor(Number(user.level)))
+      : 1;
   const exp = user?.exp ?? 0;
-  const expCeil = Math.max(500, Math.max(1, (level != null ? level : 1) || 1) * 400);
+  const expCeil = ME_EXP_PER_LEVEL;
   const pct = Math.min(100, Math.round((exp / expCeil) * 1000) / 10);
+  const homeBgUrl = getHomeBackgroundUrlForPet(pet);
 
   const petName = pet?.name ?? DEFAULT_EGG_PET_NAME;
   const titleLine = petSubtitle(pet);
@@ -56,7 +61,7 @@ const HomePage = () => {
     <div className="screen active" id="screenHome">
       <div
         className="home-immersive"
-        style={{ '--home-bg-image': `url(${homeForestBg})` }}
+        style={{ '--home-bg-image': `url(${homeBgUrl})` }}
       >
         <TopBar />
         <div className="home-container">
@@ -65,7 +70,7 @@ const HomePage = () => {
           ) : null}
 
           <div className="home-level-stats-row">
-            <div className="home-level-box">Lv. {level != null ? level : '—'}</div>
+            <div className="home-level-box">Lv. {userLevel}</div>
             <button
               type="button"
               className="home-hud-btn"

@@ -1,4 +1,5 @@
 import { QuestRuntimeStore } from './questStore.mjs';
+import { kstYmd } from './questEngine.mjs';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -83,9 +84,11 @@ export async function handleQuestApiRequest({ method, pathname, rawBody, authHea
     }
   }
 
+  /** 참조 백엔드(`server/reference-backend.mjs`) 등 Node에서 직접 호출할 때. 브라우저는 실제 GET /api/me + 퀘스트 페이로드 병합. */
   if (method === 'GET' && pathname === '/api/me') {
     store.ensureUser(userId);
     const u = store.users.get(userId);
+    const s = u.stats || {};
     return {
       status: 200,
       json: true,
@@ -93,14 +96,34 @@ export async function handleQuestApiRequest({ method, pathname, rawBody, authHea
         user: {
           id: userId,
           nickname: '퀘스트테스트',
-          exp: u.exp,
-          stats: { ...u.stats },
+          level: u.level ?? 1,
+          exp: u.exp ?? 0,
+          coin: Number(u.coin) || 0,
+          stats: {
+            health: Number(s.health) || 0,
+            diligence: Number(s.diligence) || 0,
+            focus: Number(s.focus) || 0,
+            social: Number(s.social) || 0,
+            creativity: Number(s.creativity) || 0,
+            dailyFatigue: Number(s.dailyFatigue) || 0,
+            lastUpdatedDate: s.lastUpdatedDate ?? kstYmd(),
+          },
           universityName: '',
           major: '',
           schoolYear: 1,
           age: 20,
         },
-        pet: null,
+        pet: u.pet
+          ? {
+              id: 1,
+              name: u.pet.name ?? '부화중인 알',
+              level: u.pet.level ?? 1,
+              evolutionStage: u.pet.evolutionStage ?? 0,
+              animalType: u.pet.animalType ?? 'egg',
+              lineageType: u.pet.lineageType ?? null,
+              lastEvolvedAt: u.pet.lastEvolvedAt ?? null,
+            }
+          : null,
       },
     };
   }

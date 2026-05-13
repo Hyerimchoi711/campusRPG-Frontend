@@ -431,3 +431,34 @@ button.quest-item.quest-item--btn {
   -webkit-appearance: none;
 }
 
+.quest-patch-toast {
+  position: fixed;
+  bottom: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  max-width: min(92vw, 360px);
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(30, 28, 22, 0.92);
+  color: #fff8e7;
+  font-size: 11px;
+  line-height: 1.35;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  border: 2px solid rgba(255, 220, 160, 0.35);
+  pointer-events: none;
+}
+
+.quest-source-pill {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-size: 8px;
+  line-height: 1.4;
+  vertical-align: middle;
+  border-radius: 4px;
+  background: rgba(120, 90, 60, 0.35);
+  color: #ffe9b8;
+  border: 1px solid rgba(255, 230, 180, 0.25);
+}
+

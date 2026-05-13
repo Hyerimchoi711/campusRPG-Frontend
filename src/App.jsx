@@ -20,6 +20,7 @@ import ShopPage from './pages/ShopPage';
 import ProfilePage from './pages/ProfilePage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import EventsPage from './pages/EventsPage';
+import DevQuestStubPage from './pages/DevQuestStubPage';
 import './index.css';
 
 function App() {
@@ -49,6 +50,9 @@ function App() {
                     <Route path="shop" element={<ShopPage />} />
                     <Route path="announcements" element={<AnnouncementsPage />} />
                     <Route path="events" element={<EventsPage />} />
+                    {import.meta.env.DEV ? (
+                      <Route path="dev/quest-stub" element={<DevQuestStubPage />} />
+                    ) : null}
                     <Route path="profile/friend/:id" element={<ProfilePage />} />
                     <Route path="profile" element={<ProfilePage />} />
                   </Route>
