@@ -4,13 +4,14 @@ import { ProfileProvider } from './context/ProfileContext';
 import { QuestProvider } from './context/QuestContext';
 import { AuthProvider } from './context/AuthContext';
 import { GameUserProvider } from './context/GameUserContext';
+import { LevelUpProvider } from './context/LevelUpContext';
+import { StatsModalProvider } from './context/StatsModalContext';
 import { RoleProvider } from './context/RoleContext';
 import Layout from './components/Layout';
 import RouteLoadingOverlay from './components/RouteLoadingOverlay';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import HomePage from './pages/HomePage';
-import StatsPage from './pages/StatsPage';
 import InventoryPage from './pages/InventoryPage';
 import TodoPage from './pages/TodoPage';
 import QuestsPage from './pages/QuestsPage';
@@ -30,13 +31,17 @@ function App() {
             <RoleProvider>
               <RouteLoadingOverlay />
               <GameUserProvider>
+                <LevelUpProvider>
+                <StatsModalProvider>
                 <Routes>
-                  <Route path="/" element={<Layout />}>
-                    <Route index element={<Navigate to="/login" replace />} />
-                    <Route path="login" element={<LoginPage />} />
-                    <Route path="signup" element={<SignupPage />} />
+                  {/* 루트는 휴대폰 프레임 없이 로그인으로 */}
+                  <Route path="/" element={<Navigate to="/login" replace />} />
+                  {/* 로그인·회원가입: 전체 화면 (Layout·phone-frame 밖) */}
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
+                  {/* 게임 화면만 중앙 휴대폰 프레임 */}
+                  <Route element={<Layout />}>
                     <Route path="home" element={<HomePage />} />
-                    <Route path="stats" element={<StatsPage />} />
                     <Route path="inventory" element={<InventoryPage />} />
                     <Route path="todo" element={<TodoPage />} />
                     <Route path="quests" element={<QuestsPage />} />
@@ -48,6 +53,8 @@ function App() {
                     <Route path="profile" element={<ProfilePage />} />
                   </Route>
                 </Routes>
+                </StatsModalProvider>
+                </LevelUpProvider>
               </GameUserProvider>
             </RoleProvider>
           </Router>

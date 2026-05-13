@@ -1,0 +1,9 @@
+.avatar-display-img {
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  flex-shrink: 0;
+  pointer-events: none;
+}

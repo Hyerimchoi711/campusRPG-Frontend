@@ -16,6 +16,7 @@ const formatDate = (iso) => {
   }
 };
 
+/** boardKey: 'announcements' | 'events' */
 const BulletinBoard = ({ boardKey, heading, emoji = '📌' }) => {
   const { isAdmin } = useRole();
   const [items, setItems] = useState(() => loadBoard(boardKey));

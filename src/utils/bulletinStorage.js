@@ -1,3 +1,6 @@
+/**
+ * 공지·이벤트 로컬 저장 (DB 연동 시 API 호출로 대체)
+ */
 const KEYS = {
   announcements: 'campusRpg_board_announcements',
   events: 'campusRpg_board_events',
@@ -34,7 +37,7 @@ export function saveBoard(boardKey, items) {
   try {
     localStorage.setItem(KEYS[boardKey], JSON.stringify(items));
   } catch {
-    // ignore quota errors
+    /* ignore quota */
   }
 }
 

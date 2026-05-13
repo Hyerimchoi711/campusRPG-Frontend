@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TOKEN_KEY } from '../constants/authStorage';
+import { DEV_MOCK_TOKEN, TOKEN_KEY } from '../constants/authStorage';
+import { isDevMockAuthEnabled } from '../utils/devAuth';
 import { apiUrl } from '../api/apiBase';
 import { useAuth } from '../context/AuthContext';
 import '../styles/LoginPage.css';
@@ -78,6 +79,27 @@ const LoginPage = () => {
     }
   };
 
+  const handleDevMockLogin = async () => {
+    if (!isDevMockAuthEnabled() || loading || loadingPhase !== 'hidden') return;
+    setError('');
+    setLoadingPhase('entering');
+    localStorage.setItem(TOKEN_KEY, DEV_MOCK_TOKEN);
+    await refreshMe();
+    timersRef.current = [
+      setTimeout(() => setLoadingPhase('shown'), 0),
+      setTimeout(
+        () =>
+          navigate('/home', {
+            state: {
+              loginLoadingTransition: true,
+              loginLoadingStartedAt: Date.now(),
+            },
+          }),
+        LOGIN_LOADING_FADE_MS
+      ),
+    ];
+  };
+
   const loadingClassName = [
     'route-loading-overlay',
     loadingPhase === 'entering' ? 'route-loading-overlay--entering' : '',
@@ -143,6 +165,19 @@ const LoginPage = () => {
               <button type="button" className="login-btn login-btn--secondary" onClick={() => navigate('/signup')}>
                 새 알 부화하기
               </button>
+              {isDevMockAuthEnabled() ? (
+                <>
+                  <p className="login-dev-hint">백엔드·DB 없이 UI만 볼 때</p>
+                  <button
+                    type="button"
+                    className="login-btn login-btn--dev"
+                    onClick={() => void handleDevMockLogin()}
+                    disabled={loading || loadingPhase !== 'hidden'}
+                  >
+                    개발용 바로 입장
+                  </button>
+                </>
+              ) : null}
             </section>
           </main>
         </div>

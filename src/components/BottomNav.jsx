@@ -5,16 +5,21 @@ import '../styles/BottomNav.css';
 /** 프레임 안에 들어가는 아이콘 (1:1, 픽셀 아트) */
 const ICON_SIZE = 32;
 
+/** 일정·퀘스트 아이콘 교체 시 브라우저 캐시 무효화 */
+const NAV_ICON_TODO = '/images/bottom-nav/bottomnav_icon_todo.png?v=20260511';
+const NAV_ICON_QUEST = '/images/bottom-nav/bottomnav_icon_quest.png?v=20260511';
+const NAV_ICON_FRIEND = '/images/bottom-nav/bottomnav_icon_friend.png?v=20260512';
+
 /**
  * path 순서 = 바에 표시 순서 (보관함 · 일정 · 홈 · 퀘스트 · 친구)
  * icon: null 이면 emoji 문자 사용 (가방 PNG 추가 시 icon 으로 교체 가능)
  */
 const NAV_ITEMS = [
-  { path: '/inventory', label: '보관함', icon: '/images/bottom-nav/bottomnav_icon_inventory.png?v=20260508' },
-  { path: '/todo', label: '일정', icon: '/images/bottom-nav/bottomnav_icon_todo.png?v=20260508' },
-  { path: '/home', label: '홈', icon: '/images/bottom-nav/bottomnav_icon_home.png?v=20260508' },
-  { path: '/quests', label: '퀘스트', icon: '/images/bottom-nav/bottomnav_icon_quest.png?v=20260508' },
-  { path: '/friends', label: '친구', icon: '/images/bottom-nav/bottomnav_icon_friend.png?v=20260508' },
+  { path: '/inventory', label: '보관함', icon: '/images/bottom-nav/bottomnav_icon_inventory.png' },
+  { path: '/todo', label: '일정', icon: NAV_ICON_TODO },
+  { path: '/home', label: '홈', icon: '/images/bottom-nav/bottomnav_icon_home.png' },
+  { path: '/quests', label: '퀘스트', icon: NAV_ICON_QUEST },
+  { path: '/friends', label: '친구', icon: NAV_ICON_FRIEND },
 ];
 
 const BottomNav = () => {
@@ -38,11 +43,13 @@ const BottomNav = () => {
               <span className="nav-item-icon-inner">
                 {icon ? (
                   <img
-                    className="nav-item-icon-img"
+                    className={`nav-item-icon-img${path === '/inventory' ? ' nav-item-icon-img--inventory' : ''}${
+                      path === '/todo' || path === '/quests' ? ' nav-item-icon-img--todo-quest' : ''
+                    }`}
                     src={icon}
                     alt=""
-                    width={ICON_SIZE}
-                    height={ICON_SIZE}
+                    width={path === '/todo' || path === '/quests' ? 49 : ICON_SIZE}
+                    height={path === '/todo' || path === '/quests' ? 49 : ICON_SIZE}
                     decoding="async"
                   />
                 ) : (

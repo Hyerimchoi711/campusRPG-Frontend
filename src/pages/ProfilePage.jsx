@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TopBar from '../components/TopBar';
+import AvatarDisplay from '../components/AvatarDisplay';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import { fetchUserPublicProfile } from '../api/friendsClient';
+import { AVATAR_OPTIONS } from '../data/avatarOptions';
 import '../styles/ProfilePage.css';
-
-const AVATAR_OPTIONS = ['🥚', '🧑‍🎓', '👩‍🎓', '🦉', '📚', '🌱', '⭐', '🎮'];
 
 const MAX_LEN = {
   intro: 160,
@@ -350,9 +350,11 @@ const ProfilePage = () => {
             <div className="profile-win__body profile-win__body--about profile-win__body--unified">
               <div className="profile-about-avatar-wrap">
                 <div className="profile-simple-avatar-ring profile-simple-avatar-ring--hero profile-about-avatar-ring">
-                  <span className="profile-simple-avatar profile-simple-avatar--hero" aria-hidden>
-                    {displayProfile?.avatar || '🥚'}
-                  </span>
+                  <AvatarDisplay
+                    value={displayProfile?.avatar}
+                    className="profile-simple-avatar profile-simple-avatar--hero"
+                    imgClassName="profile-simple-avatar profile-simple-avatar--hero profile-simple-avatar--hero-img"
+                  />
                 </div>
                 {!isFriendView && (
                   <button type="button" className="profile-simple-avatar-btn profile-about-avatar-btn" onClick={openAvatarModal}>
@@ -412,7 +414,7 @@ const ProfilePage = () => {
                   className={`avatar-modal-item ${pendingAvatar === em ? 'is-picked' : ''}`}
                   onClick={() => setPendingAvatar(em)}
                 >
-                  {em}
+                  <AvatarDisplay value={em} className="avatar-modal-emoji" imgClassName="avatar-modal-thumb" />
                 </button>
               ))}
             </div>

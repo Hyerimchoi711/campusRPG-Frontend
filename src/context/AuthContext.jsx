@@ -6,8 +6,14 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+<<<<<<< HEAD
 import { TOKEN_KEY } from '../constants/authStorage';
 import { fetchRpgJsonAuth } from '../api/rpgClient';
+=======
+import { DEV_MOCK_TOKEN, TOKEN_KEY } from '../constants/authStorage';
+import { fetchRpgJsonAuth } from '../api/rpgClient';
+import { isDevMockAuthEnabled } from '../utils/devAuth';
+>>>>>>> origin/whjang
 import { useProfile } from './ProfileContext';
 import {
   DEFAULT_EGG_PET_NAME,
@@ -18,6 +24,32 @@ import {
 
 const AuthContext = createContext(null);
 
+<<<<<<< HEAD
+=======
+/** 백엔드 /api/me 없이 로컬 UI만 돌릴 때 사용 */
+function buildDevMockMe() {
+  const petRaw = {
+    name: '부화중인 알',
+    level: 1,
+    evolutionStage: 0,
+    animalType: 'egg',
+    lineageType: null,
+    lastEvolvedAt: null,
+  };
+  return {
+    user: {
+      id: 1,
+      nickname: '개발캐릭터',
+      universityName: '캠퍼스대학교',
+      major: '컴퓨터공학과',
+      schoolYear: 2,
+      age: 21,
+    },
+    pet: normalizePet(petRaw),
+  };
+}
+
+>>>>>>> origin/whjang
 export function AuthProvider({ children }) {
   const { setProfile } = useProfile();
   const [me, setMe] = useState(null);
@@ -29,6 +61,14 @@ export function AuthProvider({ children }) {
       setMe(null);
       return null;
     }
+<<<<<<< HEAD
+=======
+    if (isDevMockAuthEnabled() && token === DEV_MOCK_TOKEN) {
+      const data = buildDevMockMe();
+      setMe(data);
+      return data;
+    }
+>>>>>>> origin/whjang
     setLoading(true);
     try {
       const data = await fetchRpgJsonAuth('/api/me');

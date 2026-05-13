@@ -6,6 +6,10 @@ import { useProfile } from '../context/ProfileContext';
 import { useGameUser } from '../context/GameUserContext';
 import { formatCoin } from '../api/rpgClient';
 import SettingsModal from './SettingsModal';
+<<<<<<< HEAD
+=======
+import AvatarDisplay from './AvatarDisplay';
+>>>>>>> origin/whjang
 import '../styles/TopBar.css';
 
 const COIN_IMG = '/images/ui/coin.png?v=20260508';
@@ -80,7 +84,17 @@ const TopBar = () => {
             onClick={() => navigate('/profile')}
             aria-label="프로필 열기"
           >
+<<<<<<< HEAD
             <div className="top-profile-icon">{profile.avatar || '🥚'}</div>
+=======
+            <div className="top-profile-icon">
+              <AvatarDisplay
+                value={profile.avatar}
+                className="top-profile-emoji"
+                imgClassName="top-profile-avatar-img"
+              />
+            </div>
+>>>>>>> origin/whjang
             <div className="top-nickname">{displayNick}</div>
           </button>
           <span className="top-bar-sep" aria-hidden>|</span>

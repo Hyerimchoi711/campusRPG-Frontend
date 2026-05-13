@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useMemo, useState, useEffect } from 'react';
+import { DEFAULT_AVATAR } from '../data/avatarOptions';
 
 const STORAGE_KEY = 'campusRpg_userProfile';
 
@@ -27,7 +28,7 @@ const defaultProfile = {
   schoolYear: '2',
   age: '21',
   intro: 'CampusQuest로 캠퍼스 라이프 레벨업!',
-  avatar: '🥚',
+  avatar: DEFAULT_AVATAR,
   petStage: 'egg',
   petLevel: 1,
   petName: '부화중인 알',

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
-import BulletinBoard from '../components/BulletinBoard';
 import { fetchRpgJson } from '../api/rpgClient';
 import '../styles/AnnouncementsPage.css';
 
@@ -37,7 +36,7 @@ const AnnouncementsPage = () => {
       } catch {
         if (!alive) return;
         setItems([]);
-        setError('공지사항 API 연결에 실패하여 로컬 게시판 모드로 표시합니다.');
+        setError('공지사항을 불러오지 못했습니다. 서버/DB 연결을 확인해 주세요.');
       } finally {
         if (alive) setLoading(false);
       }
@@ -60,34 +59,33 @@ const AnnouncementsPage = () => {
   return (
     <div className="screen active" id="screenAnnouncements">
       <TopBar />
-      {error ? (
-        <main className="bulletin-page__scroll">
-          <BulletinBoard boardKey="announcements" heading="공지사항" emoji="📢" />
-        </main>
-      ) : (
-        <main className="announcements-page">
-          <h1 className="announcements-page__title">📢 공지사항</h1>
-          {loading ? <p className="announcements-page__state">불러오는 중...</p> : null}
-          {!loading && (
-            <ul className="announcements-list" aria-label="공지사항 목록">
-              {items.length === 0 ? (
-                <li className="announcements-page__state">등록된 공지사항이 없습니다.</li>
-              ) : (
-                items.map((item) => (
-                  <li key={item.id}>
-                    <button type="button" className="announcement-row" onClick={() => openDetail(item.id)}>
-                      <div className="announcement-row__title">{item.title}</div>
-                      <time className="announcement-row__time" dateTime={item.createdAt}>
-                        {formatDate(item.createdAt)}
-                      </time>
-                    </button>
-                  </li>
-                ))
-              )}
-            </ul>
-          )}
-        </main>
-      )}
+      <main className="announcements-page">
+        <h1 className="announcements-page__title">📢 공지사항</h1>
+        {loading ? <p className="announcements-page__state">불러오는 중...</p> : null}
+        {error ? (
+          <p className="announcements-page__state announcements-page__state--error" role="alert">
+            {error}
+          </p>
+        ) : null}
+        {!loading && !error && (
+          <ul className="announcements-list" aria-label="공지사항 목록">
+            {items.length === 0 ? (
+              <li className="announcements-page__state">등록된 공지사항이 없습니다.</li>
+            ) : (
+              items.map((item) => (
+                <li key={item.id}>
+                  <button type="button" className="announcement-row" onClick={() => openDetail(item.id)}>
+                    <div className="announcement-row__title">{item.title}</div>
+                    <time className="announcement-row__time" dateTime={item.createdAt}>
+                      {formatDate(item.createdAt)}
+                    </time>
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+        )}
+      </main>
 
       {selected && (
         <div className="announcement-modal-backdrop" role="presentation" onClick={() => setSelected(null)}>
