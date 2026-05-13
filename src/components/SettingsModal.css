@@ -205,8 +205,6 @@
   transform: translateY(1px);
   box-shadow: 1px 1px 0 rgba(40, 20, 14, 0.4);
 }
-<<<<<<< HEAD
-=======
 
 .settings-dev-preview-btn {
   width: 100%;
@@ -229,4 +227,3 @@
 .settings-dev-preview-btn:active {
   transform: translateY(1px);
 }
->>>>>>> origin/whjang
