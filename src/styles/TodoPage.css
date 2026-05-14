@@ -1,0 +1,56 @@
+.todo-reward-hint {
+  margin: 0 12px 8px;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--text-sub);
+  background: var(--bg-card2);
+  border: 2px dashed var(--border2);
+  border-radius: 8px;
+}
+
+.todo-toast-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: none;
+  max-width: min(92vw, 360px);
+}
+
+.todo-toast {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border2);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  animation: todo-toast-in 0.2s ease-out;
+}
+
+.todo-toast.success {
+  background: linear-gradient(180deg, #e8fff0, #c8f5d8);
+  color: #0d4d2a;
+}
+
+.todo-toast.error {
+  background: linear-gradient(180deg, #fff0f0, #ffd6d6);
+  color: #6b1a1a;
+}
+
+.todo-toast.info {
+  background: linear-gradient(180deg, #f5f5ff, #e2e6ff);
+  color: #2a2d6b;
+}
+
+@keyframes todo-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,7 +1,7 @@
 import { handleQuestApiRequest } from './server/questHttp.mjs';
 
 /**
- * 개발 서버: /api/me/quests/* 인메모리 스텁(런타임 off 가능) + /__dev/quest-stub 제어.
+ * 개발 서버: /api/me/quests/* 인메모리 스텁 + POST /api/me/todo-completion-reward + GET /api/wallet(동일 스토어 코인).
  * GET /api/me는 가로채지 않음. `embeddedQuestStub`은 vite.config에서 `loadEnv` 결과로 넘김.
  *
  * @param {{ embeddedQuestStub?: boolean }} [options] — false면 스텁 미가로채기(envLocked)
@@ -15,7 +15,9 @@ export function questDevApiPlugin(options = {}) {
     apply: 'serve',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        const url = (req.originalUrl || req.url || '').split('?')[0];
+        const rawUrl = req.originalUrl || req.url || '';
+        const u = new URL(rawUrl, 'http://127.0.0.1');
+        const pathname = u.pathname;
 
         const readBodyOnce = () =>
           new Promise((resolve, reject) => {
@@ -25,7 +27,7 @@ export function questDevApiPlugin(options = {}) {
             req.on('error', reject);
           });
 
-        if (url === '/__dev/quest-stub' && req.method === 'GET') {
+        if (pathname === '/__dev/quest-stub' && req.method === 'GET') {
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
           res.statusCode = 200;
           res.end(
@@ -37,7 +39,7 @@ export function questDevApiPlugin(options = {}) {
           return;
         }
 
-        if (url === '/__dev/quest-stub' && req.method === 'POST') {
+        if (pathname === '/__dev/quest-stub' && req.method === 'POST') {
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
           if (!ENV_STUB_ENABLED) {
             res.statusCode = 200;
@@ -65,11 +67,14 @@ export function questDevApiPlugin(options = {}) {
 
         if (!questStubRuntimeEnabled) return next();
 
-        if (
-          url !== '/api/me/quests/current' &&
-          url !== '/api/me/quests/daily' &&
-          url !== '/api/me/quests/weekly'
-        ) {
+        const stubbed =
+          pathname === '/api/me/quests/current' ||
+          pathname === '/api/me/quests/daily' ||
+          pathname === '/api/me/quests/weekly' ||
+          (pathname === '/api/me/todo-completion-reward' && req.method === 'POST') ||
+          (pathname === '/api/wallet' && req.method === 'GET');
+
+        if (!stubbed) {
           return next();
         }
 
@@ -84,7 +89,8 @@ export function questDevApiPlugin(options = {}) {
             req.method === 'PATCH' || req.method === 'POST' ? await readBodyOnce() : '';
           const out = await handleQuestApiRequest({
             method: req.method || 'GET',
-            pathname: url,
+            pathname,
+            searchParams: u.searchParams,
             rawBody,
             authHeader: req.headers.authorization,
           });

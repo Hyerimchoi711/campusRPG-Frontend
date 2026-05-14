@@ -25,7 +25,7 @@ const server = http.createServer(async (req, res) => {
 
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, PATCH, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, OPTIONS');
   if (method === 'OPTIONS') {
     res.writeHead(204);
     res.end();
@@ -37,6 +37,7 @@ const server = http.createServer(async (req, res) => {
     const out = await handleQuestApiRequest({
       method,
       pathname,
+      searchParams: url.searchParams,
       rawBody,
       authHeader: req.headers.authorization,
     });
@@ -51,5 +52,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`[reference-backend] http://127.0.0.1:${PORT}  (GET /api/me/quests/current, PATCH daily|weekly, GET /api/me)`);
+  console.log(
+    `[reference-backend] http://127.0.0.1:${PORT}  (GET /api/me/quests/current, PATCH daily|weekly, GET /api/me, GET /api/wallet, POST /api/me/todo-completion-reward)`
+  );
 });

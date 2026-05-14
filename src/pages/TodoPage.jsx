@@ -1,7 +1,13 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import { useAuth } from '../context/AuthContext';
+import { useGameUser } from '../context/GameUserContext';
+import { TOKEN_KEY } from '../constants/authStorage';
+import { claimTodoCompletionBonus } from '../api/todoRewardClient';
 import '../styles/TodoPage.css';
+
+const TODO_STORAGE_KEY = 'campusRpg_todoByDate';
 
 const toDateKey = (date) => {
   const year = date.getFullYear();
@@ -15,6 +21,33 @@ const formatDateLabel = (date) => {
   return `${year}.${month}.${day}`;
 };
 
+function normalizeTodoByDate(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+  const out = {};
+  for (const [dateKey, list] of Object.entries(raw)) {
+    if (!Array.isArray(list)) continue;
+    out[dateKey] = list.map((t) => {
+      if (!t || typeof t !== 'object') return t;
+      return {
+        ...t,
+        completionBonusClaimed: Boolean(t.completionBonusClaimed),
+      };
+    });
+  }
+  return out;
+}
+
+function loadTodoByDateFromStorage() {
+  try {
+    const raw = localStorage.getItem(TODO_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return normalizeTodoByDate(parsed);
+  } catch {
+    return {};
+  }
+}
+
 // 특정 날짜가 속한 달의 몇 주차인지 계산하는 함수
 const getWeekOfMonth = (date) => {
   const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -24,39 +57,61 @@ const getWeekOfMonth = (date) => {
 };
 
 const TodoPage = () => {
+  const { refreshMe } = useAuth();
+  const { refreshWallet } = useGameUser();
+
   const [selectedDate, setSelectedDate] = useState(() => toDateKey(new Date()));
   // 주간 뷰의 기준이 되는 날짜 (해당 날짜가 속한 주를 보여줌)
   const [currentWeekDate, setCurrentWeekDate] = useState(() => new Date());
-  
+
   const [newTodo, setNewTodo] = useState('');
-  const [todoByDate, setTodoByDate] = useState({
-    '2026-03-24': [
-      { id: 1, text: '운영체제 과제 제출', done: true, category: '학업', source: 'manual' },
-      { id: 2, text: '스터디 모임 참석', done: false, category: '동아리', source: 'manual' },
-    ],
-    '2026-03-25': [
-      { id: 3, text: '중간고사 시간표 확인', done: false, category: '학사일정', source: 'academic' },
-      { id: 4, text: '헬스장 1시간', done: false, category: '건강', source: 'manual' },
-    ],
-    '2026-04-01': [
-      { id: 5, text: '만우절 이벤트 참여', done: false, category: '이벤트', source: 'manual' },
-    ]
-  });
+  const [todoByDate, setTodoByDate] = useState(() => loadTodoByDateFromStorage());
+
+  const [toast, setToast] = useState(null);
+
+  const todoByDateRef = useRef(todoByDate);
+  const selectedDateRef = useRef(selectedDate);
+
+  useEffect(() => {
+    todoByDateRef.current = todoByDate;
+  }, [todoByDate]);
+
+  useEffect(() => {
+    selectedDateRef.current = selectedDate;
+  }, [selectedDate]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(TODO_STORAGE_KEY, JSON.stringify(todoByDate));
+    } catch {
+      /* ignore */
+    }
+  }, [todoByDate]);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3200);
+    return () => clearTimeout(t);
+  }, [toast]);
+
+  const showToast = useCallback((message, variant = 'info') => {
+    setToast({ message, variant });
+  }, []);
 
   const calendarMeta = useMemo(() => {
     const year = currentWeekDate.getFullYear();
     const monthIndex = currentWeekDate.getMonth();
     const weekNumber = getWeekOfMonth(currentWeekDate);
-    
+
     // 현재 기준일의 요일 (0: 일요일 ~ 6: 토요일)
     const dayOfWeek = currentWeekDate.getDay();
-    
+
     // 이번 주의 일요일 날짜 계산
     const sunday = new Date(currentWeekDate);
     sunday.setDate(currentWeekDate.getDate() - dayOfWeek);
-    
+
     const cells = [];
-    
+
     // 일요일부터 토요일까지 7일간의 날짜 생성
     for (let i = 0; i < 7; i++) {
       const date = new Date(sunday);
@@ -72,8 +127,10 @@ const TodoPage = () => {
     };
   }, [currentWeekDate]);
 
+  const todayKey = toDateKey(new Date());
+
   const handlePrevWeek = () => {
-    setCurrentWeekDate(prev => {
+    setCurrentWeekDate((prev) => {
       const newDate = new Date(prev);
       newDate.setDate(prev.getDate() - 7);
       return newDate;
@@ -81,7 +138,7 @@ const TodoPage = () => {
   };
 
   const handleNextWeek = () => {
-    setCurrentWeekDate(prev => {
+    setCurrentWeekDate((prev) => {
       const newDate = new Date(prev);
       newDate.setDate(prev.getDate() + 7);
       return newDate;
@@ -89,10 +146,6 @@ const TodoPage = () => {
   };
 
   const selectedTodos = useMemo(() => todoByDate[selectedDate] ?? [], [todoByDate, selectedDate]);
-  const completedCount = useMemo(
-    () => selectedTodos.filter((todo) => todo.done).length,
-    [selectedTodos],
-  );
 
   const handleAddTodo = () => {
     const value = newTodo.trim();
@@ -104,23 +157,72 @@ const TodoPage = () => {
         ...prev,
         [selectedDate]: [
           ...currentTodos,
-          { id: Date.now(), text: value, done: false, category: '개인', source: 'manual' },
+          {
+            id: Date.now(),
+            text: value,
+            done: false,
+            category: '개인',
+            source: 'manual',
+            completionBonusClaimed: false,
+          },
         ],
       };
     });
     setNewTodo('');
   };
 
-  const handleToggleTodo = (id) => {
+  const setTodoDoneForDate = useCallback((dateKey, id, patch) => {
     setTodoByDate((prev) => {
-      const currentTodos = prev[selectedDate] ?? [];
+      const currentTodos = prev[dateKey] ?? [];
       return {
         ...prev,
-        [selectedDate]: currentTodos.map((todo) =>
-          todo.id === id ? { ...todo, done: !todo.done } : todo,
-        ),
+        [dateKey]: currentTodos.map((todo) => (todo.id === id ? { ...todo, ...patch } : todo)),
       };
     });
+  }, []);
+
+  const handleToggleTodo = async (id) => {
+    const dateKey = selectedDateRef.current;
+    const prev = todoByDateRef.current;
+    const currentTodos = prev[dateKey] ?? [];
+    const todo = currentTodos.find((t) => t.id === id);
+    if (!todo) return;
+
+    const nextDone = !todo.done;
+
+    if (!nextDone) {
+      setTodoDoneForDate(dateKey, id, { done: false });
+      return;
+    }
+
+    const isToday = dateKey === toDateKey(new Date());
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+
+    if (!isToday || todo.completionBonusClaimed) {
+      setTodoDoneForDate(dateKey, id, { done: true });
+      return;
+    }
+
+    if (!token) {
+      setTodoDoneForDate(dateKey, id, { done: true });
+      showToast('로그인하면 오늘 일정 완료 시 코인을 받을 수 있어요.', 'info');
+      return;
+    }
+
+    try {
+      const res = await claimTodoCompletionBonus({ dateKey, clientTodoId: id });
+      setTodoDoneForDate(dateKey, id, { done: true, completionBonusClaimed: true });
+      await refreshWallet();
+      await refreshMe();
+      if (res.awarded) {
+        showToast('일정 완료! 코인 +100', 'success');
+      } else {
+        showToast('이미 지급된 보상이에요.', 'info');
+      }
+    } catch {
+      setTodoDoneForDate(dateKey, id, { done: true });
+      showToast('코인 지급에 실패했어요. 나중에 다시 완료해 보세요.', 'error');
+    }
   };
 
   const handleDeleteTodo = (id) => {
@@ -133,9 +235,19 @@ const TodoPage = () => {
     });
   };
 
+  const showRewardHint =
+    selectedDate === todayKey &&
+    selectedTodos.some((t) => !t.done && !t.completionBonusClaimed);
+
   return (
     <div className="screen active" id="screenTodo">
       <TopBar />
+
+      {toast && (
+        <div className="todo-toast-wrap" role="status" aria-live="polite">
+          <div className={`todo-toast ${toast.variant}`}>{toast.message}</div>
+        </div>
+      )}
 
       <div style={{ padding: '12px 12px 8px' }}>
         <div
@@ -158,7 +270,8 @@ const TodoPage = () => {
               fontSize: 12,
             }}
           >
-            <button 
+            <button
+              type="button"
               onClick={handlePrevWeek}
               style={{
                 background: 'transparent',
@@ -166,13 +279,14 @@ const TodoPage = () => {
                 cursor: 'pointer',
                 fontSize: '16px',
                 color: 'var(--text-main)',
-                padding: '0 8px'
+                padding: '0 8px',
               }}
             >
               ◀
             </button>
             <span>📆 {calendarMeta.title}</span>
-            <button 
+            <button
+              type="button"
               onClick={handleNextWeek}
               style={{
                 background: 'transparent',
@@ -180,7 +294,7 @@ const TodoPage = () => {
                 cursor: 'pointer',
                 fontSize: '16px',
                 color: 'var(--text-main)',
-                padding: '0 8px'
+                padding: '0 8px',
               }}
             >
               ▶
@@ -199,7 +313,9 @@ const TodoPage = () => {
             }}
           >
             {['일', '월', '화', '수', '목', '금', '토'].map((day) => (
-              <div key={day} style={{ padding: '4px 0' }}>{day}</div>
+              <div key={day} style={{ padding: '4px 0' }}>
+                {day}
+              </div>
             ))}
           </div>
 
@@ -256,6 +372,10 @@ const TodoPage = () => {
         <span>{formatDateLabel(selectedDate)} 일정</span>
       </div>
 
+      {showRewardHint && (
+        <div className="todo-reward-hint">오늘 일정을 처음 완료하면 코인 +100 (항목당 1회)</div>
+      )}
+
       <div className="quest-list" style={{ paddingBottom: 12 }}>
         {selectedTodos.length === 0 ? (
           <div style={{ textAlign: 'center', color: 'var(--text-sub)', padding: '20px 0' }}>
@@ -266,11 +386,11 @@ const TodoPage = () => {
             <div
               key={todo.id}
               className={`quest-item ${todo.done ? 'done' : ''}`}
-              onClick={() => handleToggleTodo(todo.id)}
+              onClick={() => void handleToggleTodo(todo.id)}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') handleToggleTodo(todo.id);
+                if (e.key === 'Enter' || e.key === ' ') void handleToggleTodo(todo.id);
               }}
             >
               <div className={`quest-check ${todo.done ? '' : 'empty'}`}>{todo.done ? '✓' : '○'}</div>

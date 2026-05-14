@@ -37,13 +37,33 @@ export function parseUserIdFromAuthHeader(authHeader) {
 }
 
 /**
+ * @param {{ method: string, pathname: string, rawBody?: string, authHeader?: string, searchParams?: URLSearchParams }} input
  * @returns {Promise<{ status: number, body: object, json: boolean }>}
  */
-export async function handleQuestApiRequest({ method, pathname, rawBody, authHeader }) {
+export async function handleQuestApiRequest({
+  method,
+  pathname,
+  rawBody,
+  authHeader,
+  searchParams = new URLSearchParams(),
+}) {
   const store = getQuestStore();
   const userId = parseUserIdFromAuthHeader(authHeader);
   if (!userId) {
     return { status: 401, json: true, body: { error: 'UNAUTHORIZED' } };
+  }
+
+  if (method === 'GET' && pathname === '/api/wallet') {
+    const qUid = Number(searchParams.get('userId'));
+    const walletUserId =
+      Number.isFinite(qUid) && qUid >= 1 ? Math.floor(qUid) : userId;
+    store.ensureUser(walletUserId);
+    const u = store.users.get(walletUserId);
+    return {
+      status: 200,
+      json: true,
+      body: { coin: Number(u.coin) || 0 },
+    };
   }
 
   if (method === 'GET' && pathname === '/api/me/quests/current') {
@@ -126,6 +146,34 @@ export async function handleQuestApiRequest({ method, pathname, rawBody, authHea
           : null,
       },
     };
+  }
+
+  if (method === 'POST' && pathname === '/api/me/todo-completion-reward') {
+    let body = {};
+    try {
+      body = rawBody ? JSON.parse(rawBody) : {};
+    } catch {
+      return { status: 400, json: true, body: { error: 'INVALID_JSON' } };
+    }
+    const dateKey = typeof body.dateKey === 'string' ? body.dateKey : '';
+    const clientTodoId = body.clientTodoId;
+    try {
+      const out = store.claimTodoCompletionBonus(userId, dateKey, clientTodoId);
+      return { status: 200, json: true, body: out };
+    } catch (e) {
+      const code = e?.code;
+      if (e?.status === 400 && code === 'NOT_TODAY') {
+        return {
+          status: 400,
+          json: true,
+          body: { code: 'NOT_TODAY', error: String(e.message || e) },
+        };
+      }
+      if (e?.status === 400) {
+        return { status: 400, json: true, body: { error: String(e.message || e) } };
+      }
+      return { status: 500, json: true, body: { error: String(e?.message || e) } };
+    }
   }
 
   return { status: 404, json: true, body: { error: 'NOT_FOUND' } };

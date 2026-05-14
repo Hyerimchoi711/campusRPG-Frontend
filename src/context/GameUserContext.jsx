@@ -36,12 +36,12 @@ export const GameUserProvider = ({ children }) => {
 
   const refreshWallet = useCallback(async () => {
     try {
-      const d = await fetchRpgJsonAuth(`/api/wallet?userId=${userId}`);
+      const d = await fetchRpgJsonAuth('/api/wallet');
       setCoins(typeof d.coin === 'number' ? d.coin : null);
     } catch {
       setCoins(null);
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     refreshWallet();

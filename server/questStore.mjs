@@ -8,6 +8,16 @@ import {
   defaultPetState,
 } from './questEngine.mjs';
 
+const TODO_BONUS_AMOUNT = 100;
+
+/** Node 프로세스 로컬 타임존 기준 YYYY-MM-DD (개발 스텁에서 브라우저 `toDateKey`와 맞추기) */
+function localCalendarYmd(d = new Date()) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export class QuestRuntimeStore {
   /** @param {import('./questEngine.mjs').QuestTemplate[]} templates */
   constructor(templates) {
@@ -18,6 +28,8 @@ export class QuestRuntimeStore {
     this.dailyRolls = new Map();
     /** @type {Map<string, ReturnType<typeof rollWeeklyThree>>} */
     this.weeklyRolls = new Map();
+    /** @type {Set<string>} — `${userId}:${dateKey}:${clientTodoId}` KST dateKey, 멱등 */
+    this.todoCompletionBonusKeys = new Set();
   }
 
   ensureUser(userId) {
@@ -161,5 +173,39 @@ export class QuestRuntimeStore {
       };
     }
     return { ok: true, rewards };
+  }
+
+  /**
+   * 일정 완료 보너스(스텁·참조 백엔드). dateKey는 KST 오늘과 일치할 때만 지급.
+   * @param {number} userId
+   * @param {string} dateKey YYYY-MM-DD
+   * @param {string|number} clientTodoId
+   * @returns {{ awarded: boolean, coin: number, amount?: number }}
+   */
+  claimTodoCompletionBonus(userId, dateKey, clientTodoId) {
+    this.ensureUser(userId);
+    const todayKst = kstYmd();
+    const todayLocal = localCalendarYmd();
+    if (typeof dateKey !== 'string' || (dateKey !== todayKst && dateKey !== todayLocal)) {
+      const err = new Error('NOT_TODAY');
+      err.status = 400;
+      err.code = 'NOT_TODAY';
+      throw err;
+    }
+    const idPart = String(clientTodoId ?? '').trim();
+    if (!idPart) {
+      const err = new Error('INVALID_CLIENT_TODO_ID');
+      err.status = 400;
+      throw err;
+    }
+    const key = `${userId}:${dateKey}:${idPart}`;
+    const u = this.users.get(userId);
+    const coin0 = Number(u.coin) || 0;
+    if (this.todoCompletionBonusKeys.has(key)) {
+      return { awarded: false, coin: coin0 };
+    }
+    this.todoCompletionBonusKeys.add(key);
+    u.coin = coin0 + TODO_BONUS_AMOUNT;
+    return { awarded: true, coin: u.coin, amount: TODO_BONUS_AMOUNT };
   }
 }
