@@ -1,0 +1,75 @@
+.brief-msg-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  pointer-events: none;
+}
+
+.brief-msg-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(30, 20, 14, 0.42);
+  animation: brief-msg-fade-in 0.15s ease-out;
+}
+
+.brief-msg-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 280px;
+  padding: 16px 18px;
+  text-align: center;
+  border: 3px solid var(--bg-wood);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 0 2px var(--bg-wood-light),
+    4px 4px 0 var(--bg-wood-dark),
+    0 12px 32px rgba(0, 0, 0, 0.28);
+  animation: brief-msg-pop-in 0.2s ease-out;
+}
+
+.brief-msg-modal__panel--success {
+  background: linear-gradient(180deg, #fffdf5 0%, #f5ecd8 100%);
+}
+
+.brief-msg-modal__panel--error {
+  background: linear-gradient(180deg, #fff5f2 0%, #f8ddd6 100%);
+  border-color: #c45c4a;
+}
+
+.brief-msg-modal__text {
+  margin: 0;
+  font-family: var(--body-font);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+.brief-msg-modal__panel--error .brief-msg-modal__text {
+  color: #5c2a22;
+}
+
+@keyframes brief-msg-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes brief-msg-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

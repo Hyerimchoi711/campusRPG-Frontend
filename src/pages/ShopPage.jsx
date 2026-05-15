@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
+import BriefMessageModal from '../components/BriefMessageModal';
 import TypewriterSpeech from '../components/TypewriterSpeech';
 import { useGameUser } from '../context/GameUserContext';
 import { fetchRpgJson, fetchRpgJsonAuth, formatCoin } from '../api/rpgClient';
@@ -29,11 +30,12 @@ function ShopItemIcon({ imageUrl, iconEmoji }) {
 }
 
 const ShopPage = () => {
-  const { userId, coins, applyPurchaseResult } = useGameUser();
+  const { coins, applyPurchaseResult } = useGameUser();
   const [items, setItems] = useState([]);
   const [loadError, setLoadError] = useState(null);
   const [purchasingId, setPurchasingId] = useState(null);
   const [purchaseMsg, setPurchaseMsg] = useState(null);
+  const [purchaseMsgError, setPurchaseMsgError] = useState(false);
 
   const loadItems = useCallback(async () => {
     setLoadError(null);
@@ -52,15 +54,18 @@ const ShopPage = () => {
 
   const onPurchase = async (item) => {
     setPurchaseMsg(null);
+    setPurchaseMsgError(false);
     setPurchasingId(item.id);
     try {
       const result = await fetchRpgJsonAuth('/api/inventory/purchase', {
         method: 'POST',
-        body: JSON.stringify({ userId, itemId: item.id }),
+        body: JSON.stringify({ itemId: item.id }),
       });
       applyPurchaseResult(result);
+      setPurchaseMsgError(false);
       setPurchaseMsg(`「${item.name}」을(를) 구매했습니다.`);
     } catch (e) {
+      setPurchaseMsgError(true);
       if (e.status === 402) {
         setPurchaseMsg('코인이 부족합니다.');
       } else {
@@ -70,6 +75,11 @@ const ShopPage = () => {
       setPurchasingId(null);
     }
   };
+
+  const clearPurchaseMsg = useCallback(() => {
+    setPurchaseMsg(null);
+    setPurchaseMsgError(false);
+  }, []);
 
   const canAfford = (price) => typeof coins === 'number' && coins >= price;
 
@@ -99,11 +109,6 @@ const ShopPage = () => {
           </div>
         </div>
 
-        {purchaseMsg ? (
-          <div className="shop-toast" role="status">
-            {purchaseMsg}
-          </div>
-        ) : null}
         {loadError ? (
           <div className="shop-toast shop-toast--error" role="alert">
             {loadError}
@@ -144,6 +149,12 @@ const ShopPage = () => {
       </div>
 
       <BottomNav />
+
+      <BriefMessageModal
+        message={purchaseMsg}
+        variant={purchaseMsgError ? 'error' : 'success'}
+        onClose={clearPurchaseMsg}
+      />
     </div>
   );
 };
