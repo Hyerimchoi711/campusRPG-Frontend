@@ -462,3 +462,46 @@ button.quest-item.quest-item--btn {
   border: 1px solid rgba(255, 230, 180, 0.25);
 }
 
+.quest-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 8px;
+  padding: 0 4px;
+}
+
+.quest-tab {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 2px solid var(--border2);
+  background: var(--bg-card2);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.quest-tab:hover {
+  color: var(--text-main);
+}
+
+.quest-tab--active {
+  background: linear-gradient(180deg, #e8c88a 0%, #c9a060 100%);
+  color: var(--text-main);
+  border-color: var(--bg-wood);
+  box-shadow: 2px 2px 0 var(--bg-wood-dark);
+}
+
+.quest-list-empty {
+  margin: 8px 12px 16px;
+  padding: 14px 12px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  text-align: center;
+  background: var(--bg-card2);
+  border-radius: 8px;
+  border: 2px dashed var(--border2);
+}
+

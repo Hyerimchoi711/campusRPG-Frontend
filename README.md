@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-브라우저는 보통 `http://localhost:5173` 입니다. 로컬에서 API를 쓰려면 백엔드(기본 5555)와, 퀘스트 LLM을 쓰려면 `server`(기본 8787)를 띄운 뒤 `vite.config.js` 프록시 설정을 맞춥니다.
+브라우저는 보통 `http://localhost:5173` 입니다. 로컬에서 API를 쓰려면 메인 백엔드(기본 `http://127.0.0.1:8888`, `VITE_DEV_BACKEND_URL`)를 띄운 뒤 `npm run dev`로 Vite 프록시를 사용합니다. 맞춤 퀘스트 생성(`POST /api/quests/generate`)도 동일 백엔드로 프록시됩니다.
 
 ## 환경 변수
 

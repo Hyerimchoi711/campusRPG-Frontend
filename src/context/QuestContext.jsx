@@ -2,99 +2,59 @@ import React, { createContext, useCallback, useContext, useMemo, useState, useEf
 import { TOKEN_KEY, DEV_MOCK_TOKEN, DEV_MOCK_GAME_KEY } from '../constants/authStorage';
 import { isDevMockAuthEnabled } from '../utils/devAuth';
 import { fetchCurrentQuestSet, patchDailyQuestSlot, patchWeeklyQuestSlot } from '../api/questsClient';
-import { mapServerQuestRow, formatPatchRewardsToast } from '../utils/questFormat';
+import { fetchAllCustomQuests, completeCustomQuest, questCompleteErrorMessage } from '../api/customQuestsClient';
+import {
+  mapServerQuestRow,
+  formatPatchRewardsToast,
+  formatLlmPatchRewardsToast,
+  sanitizeLlmQuestUiRow,
+} from '../utils/questFormat';
 import { useAuth } from './AuthContext';
 
-const STORAGE_KEY = 'campusRpg_quests';
+const CUSTOM_STORAGE_KEY = 'campusRpg_custom_quests';
 
-function makeId(prefix) {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
+const emptyServer = {
+  daily: [],
+  weekly: [],
+  rollDate: null,
+  rollWeek: null,
+  weekId: null,
+};
 
-/** 비로그인·API 실패 시 폴백 */
-export function getDefaultQuestState() {
-  const daily = [
-    { id: makeId('d'), title: '아침 9시 전 기상', reward: '+50 EXP · 성실 +1', done: false },
-    { id: makeId('d'), title: '강의 출석 완료', reward: '+80 EXP · 성실 +2', done: false },
-    { id: makeId('d'), title: '도서관 2시간 공부', reward: '+120 EXP · 집중 +2', done: false },
-    { id: makeId('d'), title: '과제 제출하기', reward: '+150 EXP · 성실 +3', done: false },
-    { id: makeId('d'), title: '동아리 활동 참여', reward: '+100 EXP · 사교 +2', done: false },
-  ];
-  const weekly = [
-    { id: makeId('w'), title: '전공 서적 1권 읽기', reward: '+500 EXP · 집중 +5', done: false },
-    { id: makeId('w'), title: '운동 3회 이상 하기', reward: '+300 EXP · 건강 +5', done: false },
-    { id: makeId('w'), title: '새로운 친구 1명 사귀기', reward: '+400 EXP · 사교 +5', done: false },
-  ];
-  return {
-    daily,
-    weekly,
-    source: 'default_local',
-    generatedAt: null,
-    rollDate: null,
-    rollWeek: null,
-    weekId: null,
-  };
-}
+const emptyCustom = {
+  daily: [],
+  weekly: [],
+  generatedAt: null,
+};
 
-function normalizeQuestItem(raw, prefix) {
-  const title = typeof raw.title === 'string' ? raw.title.trim() : '';
-  const reward = typeof raw.reward === 'string' ? raw.reward.trim() : '+50 EXP';
-  if (!title) return null;
-  return {
-    id: raw.id && String(raw.id).length ? String(raw.id) : makeId(prefix),
-    title: title.slice(0, 120),
-    reward: reward.slice(0, 120),
-    done: Boolean(raw.done),
-    questSource:
-      typeof raw.questSource === 'string' && raw.questSource.trim()
-        ? raw.questSource.trim()
-        : 'llm',
-  };
-}
-
-function applyGeneratedPayload(payload) {
-  const dailyIn = Array.isArray(payload.daily) ? payload.daily : [];
-  const weeklyIn = Array.isArray(payload.weekly) ? payload.weekly : [];
-  const daily = dailyIn
-    .map((q) => normalizeQuestItem(q, 'd'))
-    .filter(Boolean)
-    .slice(0, 8);
-  const weekly = weeklyIn
-    .map((q) => normalizeQuestItem(q, 'w'))
-    .filter(Boolean)
-    .slice(0, 6);
-  while (daily.length < 3) {
-    daily.push({
-      id: makeId('d'),
-      title: '캠퍼스 산책 20분',
-      reward: '+40 EXP',
-      done: false,
-    });
-  }
-  while (weekly.length < 2) {
-    weekly.push({
-      id: makeId('w'),
-      title: '이번 주 독서 기록 남기기',
-      reward: '+200 EXP',
-      done: false,
-    });
-  }
-  return {
-    daily,
-    weekly,
-    source: 'llm',
-    generatedAt: new Date().toISOString(),
-    rollDate: null,
-    rollWeek: null,
-    weekId: null,
-  };
-}
-
-function persistLlmState(next) {
+function persistCustomCache(custom) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(
+      CUSTOM_STORAGE_KEY,
+      JSON.stringify({
+        daily: custom.daily,
+        weekly: custom.weekly,
+        generatedAt: custom.generatedAt,
+      })
+    );
   } catch {
     /* ignore */
+  }
+}
+
+function loadCustomCache() {
+  try {
+    const raw = localStorage.getItem(CUSTOM_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed.daily) || !Array.isArray(parsed.weekly)) return null;
+    return {
+      daily: parsed.daily.map(sanitizeLlmQuestUiRow),
+      weekly: parsed.weekly.map(sanitizeLlmQuestUiRow),
+      generatedAt: parsed.generatedAt || null,
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -105,8 +65,6 @@ function mapServerPayloadToState(data) {
   return {
     daily,
     weekly,
-    source: 'server',
-    generatedAt: null,
     rollDate: data.rollDate ?? null,
     rollWeek: weekId,
     weekId,
@@ -117,11 +75,18 @@ const QuestContext = createContext(null);
 
 export const QuestProvider = ({ children }) => {
   const { refreshMe, mergeQuestGameSnapshotIntoMe } = useAuth();
-  const [state, setState] = useState(() => getDefaultQuestState());
-  const stateRef = useRef(state);
-  stateRef.current = state;
+  const [activeTab, setActiveTab] = useState('server');
+  const [serverState, setServerState] = useState(emptyServer);
+  const [customState, setCustomState] = useState(emptyCustom);
+  const serverRef = useRef(serverState);
+  const customRef = useRef(customState);
+  serverRef.current = serverState;
+  customRef.current = customState;
+
   const [serverSyncLoading, setServerSyncLoading] = useState(false);
+  const [customSyncLoading, setCustomSyncLoading] = useState(false);
   const [serverSyncError, setServerSyncError] = useState('');
+  const [customSyncError, setCustomSyncError] = useState('');
   const [patchRewardToast, setPatchRewardToast] = useState('');
 
   const mergeUserFromServerResponse = useCallback(
@@ -162,83 +127,88 @@ export const QuestProvider = ({ children }) => {
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
     if (!token) {
       setServerSyncError('');
-      setState(getDefaultQuestState());
+      setServerState(emptyServer);
       return false;
     }
     setServerSyncLoading(true);
     setServerSyncError('');
     try {
       const data = await fetchCurrentQuestSet();
-      setState(mapServerPayloadToState(data));
+      setServerState(mapServerPayloadToState(data));
       await mergeUserFromServerResponse(data);
       return true;
     } catch (e) {
-      setServerSyncError(e.message || '서버 퀘스트를 불러오지 못했어요.');
-      setState(getDefaultQuestState());
+      setServerSyncError(e.message || '기본 퀘스트를 불러오지 못했어요.');
+      setServerState(emptyServer);
       return false;
     } finally {
       setServerSyncLoading(false);
     }
   }, [mergeUserFromServerResponse]);
 
+  const loadCustomQuests = useCallback(async () => {
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
+    if (!token) {
+      setCustomSyncError('');
+      setCustomState(emptyCustom);
+      return false;
+    }
+    setCustomSyncLoading(true);
+    setCustomSyncError('');
+    try {
+      const { daily, weekly } = await fetchAllCustomQuests();
+      const next = {
+        daily: daily.map(sanitizeLlmQuestUiRow),
+        weekly: weekly.map(sanitizeLlmQuestUiRow),
+        generatedAt: customRef.current.generatedAt,
+      };
+      setCustomState(next);
+      persistCustomCache(next);
+      return true;
+    } catch (e) {
+      const cached = loadCustomCache();
+      if (cached) {
+        setCustomState(cached);
+        setCustomSyncError('');
+        return true;
+      }
+      setCustomSyncError(e.message || '맞춤 퀘스트를 불러오지 못했어요.');
+      return false;
+    } finally {
+      setCustomSyncLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
-    let loadedLlm = false;
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed?.source === 'llm' && Array.isArray(parsed.daily) && Array.isArray(parsed.weekly)) {
-          setState({
-            daily: parsed.daily,
-            weekly: parsed.weekly,
-            source: 'llm',
-            generatedAt: parsed.generatedAt || null,
-            rollDate: null,
-            rollWeek: null,
-            weekId: null,
-          });
-          loadedLlm = true;
-        }
-      }
-    } catch {
-      /* ignore */
-    }
-    if (!loadedLlm && token) {
-      loadServerQuests();
-    }
-  }, [loadServerQuests]);
+    if (!token) return;
+    loadServerQuests();
+    loadCustomQuests();
+  }, [loadServerQuests, loadCustomQuests]);
 
-  const setQuestsFromLLM = useCallback((payload) => {
-    const next = applyGeneratedPayload(payload);
-    setState(next);
-    persistLlmState(next);
+  const setQuestsFromGenerateResponse = useCallback((payload) => {
+    const dailyIn = Array.isArray(payload?.daily) ? payload.daily : [];
+    const weeklyIn = Array.isArray(payload?.weekly) ? payload.weekly : [];
+    const daily = dailyIn.filter((q) => q?.title).map(sanitizeLlmQuestUiRow);
+    const weekly = weeklyIn.filter((q) => q?.title).map(sanitizeLlmQuestUiRow);
+    const next = {
+      daily,
+      weekly,
+      generatedAt: new Date().toISOString(),
+    };
+    setCustomState(next);
+    persistCustomCache(next);
+    setActiveTab('custom');
   }, []);
 
   const resetToDefault = useCallback(async () => {
+    setActiveTab('server');
+    setServerSyncError('');
     const token = typeof localStorage !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null;
     if (token) {
       await loadServerQuests();
-      return;
-    }
-    const next = getDefaultQuestState();
-    setState(next);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      /* ignore */
     }
   }, [loadServerQuests]);
-
-  const commitLocal = useCallback((updater) => {
-    setState((prev) => {
-      const next = typeof updater === 'function' ? updater(prev) : updater;
-      if (next.source === 'llm') {
-        persistLlmState(next);
-      }
-      return next;
-    });
-  }, []);
 
   const clearPatchRewardToast = useCallback(() => {
     setPatchRewardToast('');
@@ -248,14 +218,14 @@ export const QuestProvider = ({ children }) => {
     async (data) => {
       let mergePayload = data;
       if (data?.daily && data?.weekly) {
-        setState(mapServerPayloadToState(data));
+        setServerState(mapServerPayloadToState(data));
       } else if (
         data != null &&
         (data.ok === true || Object.prototype.hasOwnProperty.call(data, 'rewards'))
       ) {
         try {
           const fresh = await fetchCurrentQuestSet();
-          setState(mapServerPayloadToState(fresh));
+          setServerState(mapServerPayloadToState(fresh));
           mergePayload = fresh;
         } catch (e) {
           setServerSyncError(e.message || '퀘스트를 다시 불러오지 못했어요.');
@@ -270,16 +240,9 @@ export const QuestProvider = ({ children }) => {
     [mergeUserFromServerResponse]
   );
 
-  const toggleDaily = useCallback(
+  const toggleServerDaily = useCallback(
     async (id) => {
-      const prev = stateRef.current;
-      if (prev.source !== 'server') {
-        commitLocal((p) => ({
-          ...p,
-          daily: p.daily.map((q) => (q.id === id ? { ...q, done: !q.done } : q)),
-        }));
-        return;
-      }
+      const prev = serverRef.current;
       const row = prev.daily.find((q) => q.id === id);
       if (row == null || row.serverSlot == null) return;
       const nextDone = !row.done;
@@ -291,19 +254,12 @@ export const QuestProvider = ({ children }) => {
         setServerSyncError(e.message || '상태를 저장하지 못했어요.');
       }
     },
-    [commitLocal, applyPatchResponse]
+    [applyPatchResponse]
   );
 
-  const toggleWeekly = useCallback(
+  const toggleServerWeekly = useCallback(
     async (id) => {
-      const prev = stateRef.current;
-      if (prev.source !== 'server') {
-        commitLocal((p) => ({
-          ...p,
-          weekly: p.weekly.map((q) => (q.id === id ? { ...q, done: !q.done } : q)),
-        }));
-        return;
-      }
+      const prev = serverRef.current;
       const row = prev.weekly.find((q) => q.id === id);
       if (row == null || row.serverSlot == null) return;
       const nextDone = !row.done;
@@ -315,39 +271,111 @@ export const QuestProvider = ({ children }) => {
         setServerSyncError(e.message || '상태를 저장하지 못했어요.');
       }
     },
-    [commitLocal, applyPatchResponse]
+    [applyPatchResponse]
+  );
+
+  const markCustomDone = useCallback((kind, uiId) => {
+    setCustomState((c) => {
+      const key = kind === 'daily' ? 'daily' : 'weekly';
+      const next = {
+        ...c,
+        [key]: c[key].map((q) => (q.id === uiId ? { ...q, done: true } : q)),
+      };
+      persistCustomCache(next);
+      return next;
+    });
+  }, []);
+
+  const completeCustomQuestById = useCallback(
+    async (kind, uiId) => {
+      const prev = customRef.current;
+      const list = kind === 'daily' ? prev.daily : prev.weekly;
+      const row = list.find((q) => q.id === uiId);
+      if (!row || row.done || row.questId == null) return;
+
+      setCustomSyncError('');
+      try {
+        const data = await completeCustomQuest(row.questId);
+        markCustomDone(kind, uiId);
+        if (data?.rewards != null && typeof data.rewards === 'object') {
+          const msg = formatLlmPatchRewardsToast(data.rewards);
+          if (msg) setPatchRewardToast(msg);
+        }
+        await refreshMe?.();
+      } catch (e) {
+        if (e.status === 409) {
+          markCustomDone(kind, uiId);
+          setPatchRewardToast(questCompleteErrorMessage(e));
+          await refreshMe?.();
+          return;
+        }
+        setCustomSyncError(questCompleteErrorMessage(e));
+      }
+    },
+    [markCustomDone, refreshMe]
+  );
+
+  const completeCustomDaily = useCallback(
+    (id) => completeCustomQuestById('daily', id),
+    [completeCustomQuestById]
+  );
+
+  const completeCustomWeekly = useCallback(
+    (id) => completeCustomQuestById('weekly', id),
+    [completeCustomQuestById]
   );
 
   const value = useMemo(
     () => ({
-      dailyQuests: state.daily,
-      weeklyQuests: state.weekly,
-      questSource: state.source,
-      questGeneratedAt: state.generatedAt,
-      rollDate: state.rollDate,
-      rollWeek: state.rollWeek,
-      weekId: state.weekId,
+      activeTab,
+      setActiveTab,
+      serverDailyQuests: serverState.daily,
+      serverWeeklyQuests: serverState.weekly,
+      customDailyQuests: customState.daily,
+      customWeeklyQuests: customState.weekly,
+      customGeneratedAt: customState.generatedAt,
+      rollDate: serverState.rollDate,
+      rollWeek: serverState.rollWeek,
+      weekId: serverState.weekId,
       patchRewardToast,
       clearPatchRewardToast,
-      setQuestsFromLLM,
+      setQuestsFromGenerateResponse,
       resetToDefault,
-      toggleDaily,
-      toggleWeekly,
+      toggleServerDaily,
+      toggleServerWeekly,
+      completeCustomDaily,
+      completeCustomWeekly,
       reloadServerQuests: loadServerQuests,
+      reloadCustomQuests: loadCustomQuests,
       serverSyncLoading,
+      customSyncLoading,
       serverSyncError,
+      customSyncError,
+      dailyQuests: activeTab === 'custom' ? customState.daily : serverState.daily,
+      weeklyQuests: activeTab === 'custom' ? customState.weekly : serverState.weekly,
+      questSource: activeTab === 'custom' ? 'llm' : 'server',
+      questGeneratedAt: customState.generatedAt,
+      toggleDaily: activeTab === 'custom' ? completeCustomDaily : toggleServerDaily,
+      toggleWeekly: activeTab === 'custom' ? completeCustomWeekly : toggleServerWeekly,
     }),
     [
-      state,
-      setQuestsFromLLM,
-      resetToDefault,
-      toggleDaily,
-      toggleWeekly,
-      loadServerQuests,
-      serverSyncLoading,
-      serverSyncError,
+      activeTab,
+      serverState,
+      customState,
       patchRewardToast,
       clearPatchRewardToast,
+      setQuestsFromGenerateResponse,
+      resetToDefault,
+      toggleServerDaily,
+      toggleServerWeekly,
+      completeCustomDaily,
+      completeCustomWeekly,
+      loadServerQuests,
+      loadCustomQuests,
+      serverSyncLoading,
+      customSyncLoading,
+      serverSyncError,
+      customSyncError,
     ]
   );
 

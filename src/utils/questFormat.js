@@ -99,6 +99,49 @@ export function formatPatchRewardsToast(rewards) {
   return parts.length ? `보상: ${parts.join(' · ')}` : '';
 }
 
+/** 맞춤(LLM) 퀘스트 카드 보상 — 코인 항상 제외 */
+export function formatLlmQuestRewardLine(fields) {
+  return formatQuestRewardLine({
+    reward_exp: fields?.reward_exp ?? fields?.rewardExp ?? fields?.expReward ?? 0,
+    reward_coin: 0,
+    reward_stat_type: fields?.reward_stat_type ?? fields?.rewardStatType ?? null,
+    reward_stat_amount: fields?.reward_stat_amount ?? fields?.rewardStatAmount ?? 0,
+  });
+}
+
+/** 맞춤 퀘스트 완료 토스트 — 서버가 coin>0 을 돌려도 표시하지 않음 */
+export function formatLlmPatchRewardsToast(rewards) {
+  if (!rewards || typeof rewards !== 'object') return '';
+  return formatPatchRewardsToast({
+    exp: rewards.exp ?? rewards.rewardExp,
+    coin: 0,
+    rewardCoin: 0,
+    statType: rewards.statType ?? rewards.rewardStatType ?? rewards.stat_type,
+    statAmount: rewards.statAmount ?? rewards.rewardStatAmount ?? rewards.stat_amount,
+  });
+}
+
+/** localStorage·레거시 행 정규화 */
+export function sanitizeLlmQuestUiRow(row) {
+  if (!row || typeof row !== 'object') return row;
+  const exp =
+    Number(row.reward_exp ?? row.rewardExp ?? row.expReward) || 0;
+  const reward_stat_type = row.reward_stat_type ?? row.rewardStatType ?? null;
+  const reward_stat_amount =
+    Number(row.reward_stat_amount ?? row.rewardStatAmount) || 0;
+  return {
+    ...row,
+    reward_exp: exp,
+    reward_coin: 0,
+    questSource: 'llm',
+    reward: formatLlmQuestRewardLine({
+      reward_exp: exp,
+      reward_stat_type,
+      reward_stat_amount,
+    }),
+  };
+}
+
 /**
  * 서버 슬롯 응답 → UI 퀘스트 행
  * @param {'daily'|'weekly'} kind
