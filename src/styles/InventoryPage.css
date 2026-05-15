@@ -19,18 +19,9 @@
 .inventory-title {
   font-family: var(--pixel-font);
   font-size: 14px;
-  color: #fff8ee;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  color: #664b19;
+  text-shadow: 0 2px 4px rgb(208, 184, 125);
   margin: 0 0 16px;
-}
-
-.inventory-hint {
-  font-family: var(--body-font);
-  font-size: 11px;
-  line-height: 1.45;
-  color: rgba(255, 248, 238, 0.75);
-  margin: 0 0 14px;
-  max-width: 300px;
 }
 
 .inventory-error {
@@ -54,9 +45,9 @@
 .inv-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 5px;
   width: 100%;
-  max-width: 280px;
+  max-width: 300px;
   margin: 0 auto;
 }
 

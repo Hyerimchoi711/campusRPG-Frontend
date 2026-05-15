@@ -2,11 +2,81 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import AvatarDisplay from '../components/AvatarDisplay';
+import PetPortrait from '../components/PetPortrait';
 import { useAuth } from '../context/AuthContext';
 import { useProfile } from '../context/ProfileContext';
 import { fetchUserPublicProfile } from '../api/friendsClient';
 import { AVATAR_OPTIONS } from '../data/avatarOptions';
+import {
+  DEFAULT_EGG_PET_NAME,
+  getLineageBadgeText,
+  getPetSpeciesLabel,
+  isPetEgg,
+} from '../models/pet';
 import '../styles/ProfilePage.css';
+
+function petSubtitle(pet) {
+  if (!pet) return '펫 정보가 없어요';
+  if (isPetEgg(pet)) return '부화를 기다리는 중';
+  return '함께 모험 중';
+}
+
+function resolveUserLevel(raw) {
+  const n = Number(raw);
+  if (Number.isFinite(n) && n >= 1) return Math.floor(n);
+  return 1;
+}
+
+function ProfilePetPanel({ title, pet, userLevel }) {
+  const petName = pet?.name ?? DEFAULT_EGG_PET_NAME;
+  const petTitleLine = petSubtitle(pet);
+  const eggUi = isPetEgg(pet);
+  const lineageBadge = !eggUi && pet ? getLineageBadgeText(pet.lineageType) : null;
+  const speciesLabel = pet && !eggUi ? getPetSpeciesLabel(pet.animalType) : null;
+  const level = resolveUserLevel(userLevel);
+
+  return (
+    <section className="profile-win" aria-label={title}>
+      <header className="profile-win__titlebar profile-win__titlebar--pet">
+        <span className="profile-win__dots" aria-hidden>
+          <span className="profile-win__dot" />
+          <span className="profile-win__dot" />
+          <span className="profile-win__dot" />
+        </span>
+        <span className="profile-win__title">
+          <span className="profile-win__title-icon">🐾</span>
+          {title}
+        </span>
+      </header>
+      <div className="profile-win__body profile-win__body--pet">
+        <div className="profile-pet-win-body">
+          <div className="profile-pet-win-visual">
+            <div className="profile-pet-egg-hitbox">
+              <PetPortrait
+                animalType={pet?.animalType ?? 'egg'}
+                alt="펫"
+                imgClassName="profile-pet-img pet-egg-hop"
+              />
+            </div>
+          </div>
+          <div className="profile-pet-win-meta">
+            {(lineageBadge || speciesLabel) ? (
+              <div className="profile-pet-badge-row">
+                {lineageBadge ? (
+                  <span className="profile-pet-lineage-badge">계보 · {lineageBadge}</span>
+                ) : null}
+                {speciesLabel ? <span className="profile-pet-species-badge">{speciesLabel}</span> : null}
+              </div>
+            ) : null}
+            <span className="profile-pet-level profile-pet-level--win">Lv. {level}</span>
+            <div className="profile-pet-win-name">{petName}</div>
+            <div className="profile-pet-win-stat">{petTitleLine}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 const MAX_LEN = {
   intro: 160,
@@ -161,6 +231,22 @@ const ProfilePage = () => {
     }
     window.setTimeout(() => setCopyHint(''), 2000);
   }, [visibleFriendCode]);
+
+  const petPanel = useMemo(() => {
+    if (isFriendView) {
+      const p = friendLoad.publicProfile;
+      return {
+        title: '친구의 펫',
+        pet: p?.pet ?? null,
+        userLevel: p?.userLevel ?? 1,
+      };
+    }
+    return {
+      title: '나의 펫',
+      pet: me?.pet ?? null,
+      userLevel: me?.user?.level ?? 1,
+    };
+  }, [isFriendView, friendLoad.publicProfile, me?.pet, me?.user?.level]);
 
   /* 첫 페인트에서 status가 'idle'이면 본문이 렌더되며 displayProfile이 null → readonly 행에서 크래시 방지 */
   if (isFriendView && (friendLoad.status === 'loading' || friendLoad.status === 'idle')) {
@@ -388,6 +474,8 @@ const ProfilePage = () => {
               ) : null}
             </div>
           </section>
+
+          <ProfilePetPanel title={petPanel.title} pet={petPanel.pet} userLevel={petPanel.userLevel} />
         </div>
       </div>
 

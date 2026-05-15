@@ -1,4 +1,5 @@
 import { fetchRpgJsonAuth } from './rpgClient';
+import { normalizePet } from '../models/pet';
 
 /** @typedef {{ userId: string, nickname: string, avatar: string, intro: string, sortOrder: number }} NormalizedFriend */
 
@@ -153,11 +154,32 @@ function extractUserObjectFromUsersResponse(data) {
   return null;
 }
 
+/** GET /api/users/:id — /api/me 와 같이 루트·data 래퍼의 pet 형제 필드 */
+function extractPetFromUsersResponse(data) {
+  if (data == null || typeof data !== 'object') return null;
+  const root = /** @type {Record<string, unknown>} */ (data);
+  const nested =
+    root.data && typeof root.data === 'object' && !Array.isArray(root.data)
+      ? /** @type {Record<string, unknown>} */ (root.data)
+      : null;
+  const raw = root.pet ?? nested?.pet ?? null;
+  if (raw == null || typeof raw !== 'object') return null;
+  return normalizePet(raw);
+}
+
+function parseUserLevel(raw) {
+  const n = Number(raw);
+  if (Number.isFinite(n) && n >= 1) return Math.floor(n);
+  return 1;
+}
+
 export async function fetchUserPublicProfile(userId) {
   const data = await fetchRpgJsonAuth(`/api/users/${encodeURIComponent(userId)}`);
   const u = extractUserObjectFromUsersResponse(data);
   if (!u || typeof u !== 'object') return null;
   const o = /** @type {Record<string, unknown>} */ (u);
+  const pet = extractPetFromUsersResponse(data);
+  const userLevel = parseUserLevel(o.level ?? o.user_level);
   return {
     userId: asString(o.id ?? o.userId ?? userId),
     nickname: asString(o.nickname ?? o.realName ?? '').trim(),
@@ -168,5 +190,7 @@ export async function fetchUserPublicProfile(userId) {
     schoolYear: asString(o.schoolYear ?? o.school_year ?? ''),
     age: o.age != null ? asString(o.age) : '',
     friendCode: o.friendCode != null ? asString(o.friendCode) : o.friend_code != null ? asString(o.friend_code) : '',
+    pet,
+    userLevel,
   };
 }

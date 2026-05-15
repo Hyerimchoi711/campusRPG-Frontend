@@ -55,9 +55,6 @@ const InventoryPage = () => {
       <TopBar />
       <main className="inventory-main">
         <h1 className="inventory-title">아이템 보관함</h1>
-        <p className="inventory-hint">
-          상점에서 구매한 아이템은 아래 칸에 쌓입니다. 같은 아이템은 한 칸에 수량으로 표시됩니다. (화면에는 최대 {SLOT_COUNT}종까지 표시)
-        </p>
 
         {error ? (
           <p className="inventory-error" role="alert">
