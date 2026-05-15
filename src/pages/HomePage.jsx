@@ -124,8 +124,7 @@ const HomePage = () => {
           <div className="home-info-box">
             {(lineageBadge || speciesLabel) ? (
               <div className="home-pet-badge-row">
-                {lineageBadge ? <div className="home-pet-lineage-badge">계보 · {lineageBadge}</div> : null}
-                {speciesLabel ? <div className="home-pet-species-badge">{speciesLabel}</div> : null}
+                {lineageBadge ? <div className="home-pet-lineage-badge">{lineageBadge}</div> : null}
               </div>
             ) : null}
             <div className="home-info-nickname">{petName}</div>
